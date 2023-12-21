@@ -1,0 +1,7 @@
+- [ ] basic:
+  - [ ] schema file example
+  - [ ] python code to deserialize from schema file
+  - [ ] coe to serialize to schema file
+  - [ ] fastAPI server to share schema file between clients
+  - [ ] client code to connect to server to share schema file
+  - [ ] client code to fetch schema file from other clients
