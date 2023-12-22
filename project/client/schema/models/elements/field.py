@@ -27,7 +27,7 @@ class SchemaField(pydantic.BaseModel):
     default: typing.Optional[str]
     props: typing.Optional[typing.List[SchemaFieldProps]]
     
-    @pydantic.validator("props", pre=True)
+    # @pydantic.validator("props", pre=True)
     def _validate_props(cls, v):
         def validate_single_prop(prop):
             if prop not in SchemaFieldProps:
