@@ -28,10 +28,8 @@ example with description
 # - Description:  this is a description
 # - Hint:         this is a hint
 # - Type:         this is a type
-# - Required:     [True|False] this is a required field - default False
 # - Regex:        this is a regex - default None
-# - Generate:     [True|False] this is a generated value - default False
-# - User:         [True|False] user input - default True
+# - Props:        Required, Generate, Hidden <- list of props, default None
 FIELD_NAME=Default_value
 ```
 
@@ -56,8 +54,8 @@ example with values
 # Example:      django_shop
 # Description:  Name of the database
 # Type:         String
-# Required:     True
 # Regex:        ^[a-zA-Z0-9_]*$
+# Props:        Required
 DB_NAME=django_shop_db
 
 # Field:
@@ -65,15 +63,15 @@ DB_NAME=django_shop_db
 # Example:      django_shop_user
 # Description:  Name of the database user
 # Type:         String
-# Required:     True
 # Regex:        ^[a-zA-Z0-9_]*$
+# Props:        Required
 DB_USER=django_shop_user
 
 # Field:
 # Name:         Database password
 # Description:  Password of the database user
 # Type:         Password
-# Generate:     True
+# Props:        Generate
 DB_PASSWORD=django_shop_password
 
 # Field:
@@ -81,8 +79,8 @@ DB_PASSWORD=django_shop_password
 # Example:      localhost | 192.168.1.1 | domain.com
 # Description:  Host of the database
 # Type:         String
-# Required:     True
 # Regex:        ^[a-zA-Z0-9_]*$
+# Props:        Required
 DB_HOST=
 
 # Section:      Email
@@ -92,8 +90,8 @@ DB_HOST=
 # Example:      localhost
 # Description:  Host of the email server
 # Type:         String
-# Required:     True
 # Regex:        ^[a-zA-Z0-9_]*$
+# Props:        Required
 EMAIL_HOST=localhost
 
 ```

@@ -19,17 +19,20 @@ class SchemaFieldTypes(enum.Enum):
     regex = "regex"
     base64 = "base64"
     
+class SchemaFieldProps(enum.Enum):
+    required = "Required"
+    generate = "Generate"
+    hidden = "Hidden"
+    
 class SchemaField(pydantic.BaseModel):
     name: str
     example: typing.Optional[str]
     description: typing.Optional[str]
     hint: typing.Optional[str]
     type: SchemaFieldTypes
-    required: bool = False
     regex: typing.Optional[str]
-    generate: bool = False
-    user: bool = True
     default: typing.Optional[str]
+    props: typing.Optional[typing.List[SchemaFieldProps]]
     
 class SchemaTextTypes(enum.Enum):
     header = "header"
