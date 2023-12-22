@@ -30,7 +30,7 @@ example with description
 # - Type:         this is a type
 # - Required:     [True|False] this is a required field - default False
 # - Regex:        this is a regex - default None
-# - Generate:     [Base64|Password|UUID|REGEX|None] this is a generator - default None
+# - Generate:     [True|False] this is a generated value - default False
 # - User:         [True|False] user input - default True
 FIELD_NAME=Default_value
 ```
@@ -73,7 +73,7 @@ DB_USER=django_shop_user
 # Name:         Database password
 # Description:  Password of the database user
 # Type:         Password
-# Generate:     Password
+# Generate:     True
 DB_PASSWORD=django_shop_password
 
 # Field:
