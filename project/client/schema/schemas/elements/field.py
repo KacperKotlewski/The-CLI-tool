@@ -1,14 +1,7 @@
-import pydantic
-import typing
 import enum
+import typing
+import pydantic
 
-class SchemaInfo(pydantic.BaseModel):
-    name: str
-    description: str
-    version: str
-    author: str
-    license: str
-    
 class SchemaFieldTypes(enum.Enum):
     string = "string"
     integer = "int"
@@ -34,21 +27,18 @@ class SchemaField(pydantic.BaseModel):
     default: typing.Optional[str]
     props: typing.Optional[typing.List[SchemaFieldProps]]
     
-class SchemaTextTypes(enum.Enum):
-    header = "header"
-    section = "section"
-    subsection = "subsection"
-    message = "message"
-    space = "space"
-    divider = "divider"
-    
-class SchemaText(pydantic.BaseModel):
-    type: SchemaTextTypes
-    text: typing.Optional[str]
-    
-SchemaElement = typing.Union[SchemaField, SchemaText]
-
-class EnvSchema(pydantic.BaseModel):
-    schematizerVersion: str
-    schemaInfo: SchemaInfo
-    typing.List[SchemaElement]
+    @pydantic.validator("props", pre=True)
+    def _validate_props(cls, v):
+        def validate_single_prop(prop):
+            if prop not in SchemaFieldProps:
+                raise ValueError(f"Invalid prop: {prop}")
+            return prop
+        
+        if v is None:
+            return []
+        if isinstance(v, str):
+            return [validate_single_prop(v)]
+        if isinstance(v, list):
+            return [validate_single_prop(prop) for prop in v]
+        else:
+            raise ValueError(f"Invalid props, expected list, got {type(v)} : \n{v}")
