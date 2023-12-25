@@ -98,3 +98,30 @@ def test_parse_cli_config_second_line_valid():
             assert data.schema_model.schematizerVersion == expected
         except Exception as e:
             assert expected == e.__class__    
+            
+def test_cli_config_finish_valid():
+    """
+    test_cli_config_finish testing finishing flag in the cli config
+    """
+    data = parser.ParseData(
+        line = "---",
+        line_count=2,
+        schema_model=models.Schema(schematizerVersion=Version.v0_1),
+        flag=False 
+    )
+    data = parser.parse_cli_config(data)
+
+    assert data.line_count == 3
+    assert data.flag == True
+    assert isinstance(data.schema_model, models.Schema)
+    assert data.schema_model.schematizerVersion == Version.v0_1
+    
+    new_schema_data = {k: v for k, v in data.schema_model.model_dump().items() if v is not None}
+    new_schema = models.Schema(**new_schema_data)
+    
+    assert new_schema_data == {
+        "schematizerVersion": Version.v0_1,
+        "elements": [],
+    }
+    assert new_schema == data.schema_model
+    
