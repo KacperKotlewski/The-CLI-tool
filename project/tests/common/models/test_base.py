@@ -1,7 +1,10 @@
 import typing
 from common.models.base import BaseModel, ValidationError
+import warnings
+import pytest
 
 class TestBaseModel(BaseModel):
+    __test__ = False
     value1: str = None
     value2: bool = None
     value3: typing.List[str] = list()
@@ -54,6 +57,7 @@ def test_base_model_copy_filtered():
     assert copy.value4 == model.value4 == {}
     assert copy.value5 == model.value5 == None
     
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_base_model_copy_filtered_invalid():
     """
     test_base_model_filtered test BaseModel
@@ -80,7 +84,9 @@ def test_base_model_is_valid():
     model.value4 = {"key": "value"}
     
     assert model.isValid() == True
-    
+
+
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_base_model_is_valid_invalid():
     """
     test_base_model_is_valid test BaseModel
@@ -98,6 +104,7 @@ def test_base_model_is_valid_filtered():
     
     assert model.isValidFiltered() == True
     
+@pytest.mark.filterwarnings("ignore::UserWarning")
 def test_base_model_is_valid_filtered_invalid():
     """
     test_base_model_is_valid_filtered test BaseModel
