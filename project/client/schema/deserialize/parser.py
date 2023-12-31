@@ -29,6 +29,10 @@ def parse_cli_config(data:ParseData) -> ParseData:
         else:
             raise exc.EnvSchemaNotFound()
     if data.line == "---":
+        if not data.schema_model.isValid():
+            raise exc.EnvSchemaNotValid(schema=data.schema_model)
+        if data.flag != False:
+            raise exc.EnvSchemaParsingError()
         data.line_count+=1
         data.flag = True
         return data
