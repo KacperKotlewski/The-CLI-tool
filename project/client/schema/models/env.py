@@ -6,5 +6,5 @@ from ..versions import Version
 
 class EnvSchema(BaseModel):
     schematizerVersion: Version = None
-    schemaInfo: SchemaInfo = None
+    schemaInfo: typing.Optional[SchemaInfo] = None
     elements: typing.List[SchemaElement] = list()
