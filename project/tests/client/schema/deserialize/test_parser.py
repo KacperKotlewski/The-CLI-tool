@@ -144,13 +144,14 @@ def test_cli_config_finish_invalid():
     ]
     expected_exceptions = [exc.EnvSchemaParsingError, exc.EnvSchemaNotValid, exc.EnvSchemaNotFound]
     for data, expected_exception in list(zip(dataList, expected_exceptions)):
+        catch = None
         try:
-            if expected_exception is None:
-                data = parser.parse_cli_config(data)
-            else:
-                assert False, "Expected exception not raised: {expected_exception}"
+            parser.parse_cli_config(data)
         except Exception as e:
+            catch = e
+        finally:
             if expected_exception is None:
-                assert False, f"Unexpected exception: {e}"
+                if catch is not None:
+                    assert False, f"Unexpected exception: {catch}"
             else:
-                assert isinstance(e, expected_exception)
+                assert isinstance(catch, expected_exception)
