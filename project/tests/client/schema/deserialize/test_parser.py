@@ -115,13 +115,5 @@ def test_cli_config_finish_valid():
     assert data.flag == True
     assert isinstance(data.schema_model, models.Schema)
     assert data.schema_model.schematizerVersion == Version.v0_1
-    
-    new_schema_data = {k: v for k, v in data.schema_model.model_dump().items() if v is not None}
-    new_schema = models.Schema(**new_schema_data)
-    
-    assert new_schema_data == {
-        "schematizerVersion": Version.v0_1,
-        "elements": [],
-    }
-    assert new_schema == data.schema_model
+    assert data.schema_model.isValidFiltered()
     
