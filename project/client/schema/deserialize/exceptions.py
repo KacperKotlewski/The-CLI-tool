@@ -3,6 +3,15 @@ class EnvSchemaNotFound(Exception):
     def __init__(self, message="Environment schema file not found"):
         self.message = message
         super().__init__(self.message)
+        
+class EnvSchemaNotValid(Exception):
+    """Exception raised when the environment schema is not valid."""
+    def __init__(self, schema=None, message="Environment schema not valid"):
+        self.schema = schema
+        self.message = message
+        if schema:
+            self.message = f"{message}: {schema}"
+        super().__init__(self.message)
 
 class EnvSchemaNotValidVersion(Exception):
     """Exception raised when the schema version is not valid."""

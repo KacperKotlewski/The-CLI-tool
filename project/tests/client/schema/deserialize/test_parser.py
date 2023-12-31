@@ -117,3 +117,40 @@ def test_cli_config_finish_valid():
     assert data.schema_model.schematizerVersion == Version.v0_1
     assert data.schema_model.isValidFiltered()
     
+def test_cli_config_finish_invalid():
+    """
+    test_cli_config_finish testing finishing flag in the cli config
+    """
+    finishing_line = "---"
+    dataList = [
+        parser.ParseData(
+            line = finishing_line,
+            line_count=2,
+            schema_model=models.Schema(schematizerVersion=Version.v0_1),
+            flag=True # invalid flag - flag is True should be False
+        ),
+        parser.ParseData(
+            line = finishing_line,
+            line_count=1,
+            schema_model=models.Schema(), # invalid schema model - schematizerVersion is None
+            flag=False 
+        ),
+        parser.ParseData(
+            line = finishing_line,
+            line_count=0, # invalid line count - should be 2
+            schema_model=models.Schema(schematizerVersion=Version.v0_1),
+            flag=False 
+        ),
+    ]
+    expected_exceptions = [exc.EnvSchemaParsingError, exc.EnvSchemaNotValid, exc.EnvSchemaNotFound]
+    for data, expected_exception in list(zip(dataList, expected_exceptions)):
+        try:
+            if expected_exception is None:
+                data = parser.parse_cli_config(data)
+            else:
+                assert False, "Expected exception not raised: {expected_exception}"
+        except Exception as e:
+            if expected_exception is None:
+                assert False, f"Unexpected exception: {e}"
+            else:
+                assert isinstance(e, expected_exception)
