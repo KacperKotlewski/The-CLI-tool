@@ -115,7 +115,7 @@ def test_cli_config_finish_valid():
     assert data.flag == True
     assert isinstance(data.schema_model, models.Schema)
     assert data.schema_model.schematizerVersion == Version.v0_1
-    assert data.schema_model.isValidFiltered()
+    assert data.schema_model.isValid()
     
 def test_cli_config_finish_invalid():
     """
