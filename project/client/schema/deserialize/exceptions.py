@@ -56,7 +56,9 @@ class EnvSchemaBadFieldProp(Exception):
         
 class EnvSchemaParsingError(Exception):
     """Exception raised for a issue with parsing schema"""
-    def __init__(self, prop, message="Error while parsing"):
+    def __init__(self, prop=None, message="Error while parsing"):
         self.prop = prop
-        self.message = f"{message}: {prop}"
+        self.message = message
+        if prop:
+            self.message = f"{message}: {prop}"
         super().__init__(self.message)
