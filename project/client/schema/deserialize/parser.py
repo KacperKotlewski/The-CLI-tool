@@ -66,6 +66,22 @@ def parse_schema_info(data:ParseData) -> ParseData:
         data.line_count+=1
         data.schema_model.author = value
         return data
+    elif key.capitalize() == "Description":
+        data.line_count+=1
+        data.schema_model.description = value
+        return data
+    elif key.capitalize() == "License":
+        data.line_count+=1
+        data.schema_model.license = value
+        return data
+    elif key.capitalize() == "Name":
+        data.line_count+=1
+        data.schema_model.name = value
+        return data
+    elif key.capitalize() == "Version":
+        data.line_count+=1
+        data.schema_model.version = value
+        return data
     
     raise exc.EnvSchemaParsingError(f"Cannot parse this line: {data.line}")
     
