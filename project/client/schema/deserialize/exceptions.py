@@ -62,3 +62,12 @@ class EnvSchemaParsingError(Exception):
         if prop:
             self.message = f"{message}: {prop}"
         super().__init__(self.message)
+
+class EnvSchemaInvalidModel(Exception):
+    """Exception raised for a issue with parsing schema"""
+    def __init__(self, model=None, message="Invalid model"):
+        self.model = model
+        self.message = message
+        if model:
+            self.message = f"{message}: {model}"
+        super().__init__(self.message)

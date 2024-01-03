@@ -33,6 +33,7 @@ def parse_cli_config(data:ParseData) -> ParseData:
             raise exc.EnvSchemaNotValid(schema=data.schema_model)
         if data.flag != False:
             raise exc.EnvSchemaParsingError()
+        data.schema_model.schemaInfo = models.SchemaInfo()
         data.line_count+=1
         data.flag = True
         return data
@@ -48,18 +49,22 @@ def parse_cli_config(data:ParseData) -> ParseData:
         
 
 def parse_schema_info(data:ParseData) -> ParseData:
-    if not isinstance(data.schema_model, models.Schema):
-        raise exc.EnvSchemaParsingError()
+    if not isinstance(data.schema_model, models.SchemaInfo):
+        raise exc.EnvSchemaInvalidModel(model=data.schema_model)
     
     if data.line == "---":
+        if not data.schema_model.isValid():
+            raise exc.EnvSchemaNotValid(schema=data.schema_model)
+        if data.flag != False:
+            raise exc.EnvSchemaParsingError()
         data.line_count+=1
         data.flag = True
         return data
     (key,value) = get_key_and_value(data.line)
     
-    if key.lower() == "Author".lower() and versions.checkVersion(value):
+    if key.lower() == "Author".lower():
         data.line_count+=1
-        data.schema_model.schemaInfo.author = value
+        data.schema_model.author = value
         return data
     
     raise exc.EnvSchemaParsingError(f"Cannot parse this line: {data.line}")
@@ -82,21 +87,22 @@ def parse_env_schema(schema_text:str) -> models.Schema:
                     schema_model=schema,
                     flag=cli_info_flag
                 )
-                data = parse_cli_info(data)
+                data = parse_cli_config(data)
                 line = data.line
                 line_count = data.line_count
                 schema = data.schema_model
                 cli_info_flag = data.flag
+            
             elif schema_info_flag == False:
                 data = ParseData(
                     line=line,
                     line_count=line_count,
-                    schema_model=schema,
+                    schema_model=schema.schemaInfo,
                     flag=schema_info_flag
                 )
-                data = parse_cli_info(data)
+                data = parse_schema_info(data)
                 line = data.line
                 line_count = data.line_count
-                schema = data.schema_model
+                schema.schemaInfo = data.schema_model
                 schema_info_flag = data.flag
                 
