@@ -62,7 +62,7 @@ def parse_schema_info(data:ParseData) -> ParseData:
         return data
     (key,value) = get_key_and_value(data.line)
     
-    if key.lower() == "Author".lower():
+    if key.capitalize() == "Author":
         data.line_count+=1
         data.schema_model.author = value
         return data

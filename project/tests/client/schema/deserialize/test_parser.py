@@ -2,6 +2,7 @@ import pytest
 from client.schema.deserialize import parser, exceptions as exc
 from client.schema import models
 from client.schema.versions import Version
+from random import shuffle
 
 def test_get_key_and_value():
     lines = {
@@ -156,3 +157,42 @@ def test_cli_config_finish_invalid():
             else:
                 assert isinstance(catch, expected_exception)
                 
+def test_parse_schema_info():
+    """
+    test_parse_schema_info test parsing of the schema info
+    """
+    lines = [
+        "Author: author name/nickname",
+    ]
+    shuffle(lines)
+    baseData = parser.ParseData(
+        line="",
+        line_count=3,
+        schema_model=models.SchemaInfo(),
+        flag=False 
+    )
+    
+    for line in lines:
+        key = line.split(":")[0].strip()
+        value = line.split(":")[1].strip()
+        
+        data = baseData.model_copy()
+        data.line = line
+        data = parser.parse_schema_info(data)
+        
+        assert data.line_count == 4
+        assert data.flag == False
+        assert isinstance(data.schema_model, models.SchemaInfo)
+        if key == "Author":
+            assert data.schema_model.author == value
+        elif key == "Description":
+            assert data.schema_model.description == value
+        elif key == "License":
+            assert data.schema_model.license == value
+        elif key == "Name":
+            assert data.schema_model.name == value
+        elif key == "Version":
+            assert data.schema_model.version == value
+        else:
+            assert False, "Unexpected key"
+        assert data.schema_model.isValidFiltered()
