@@ -1,8 +1,8 @@
-import pydantic
+from common.models.base import BaseModel
 
-class SchemaInfo(pydantic.BaseModel):
-    name: str
-    description: str
-    version: str
-    author: str
-    license: str
+class SchemaInfo(BaseModel):
+    name: str = None
+    description: str = None
+    version: str = None
+    author: str = None
+    license: str = None

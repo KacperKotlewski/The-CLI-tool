@@ -16,7 +16,7 @@ class BaseModel(PydanticBaseModel):
         Filtered values:
             - None
         """
-        data = {k: v for k, v in self.model_dump().items() if v is not None}
+        data = {k: v for k, v in self.model_dump(exclude_none=True,exclude_defaults=True).items() if v is not None}
         new_model = self.__class__(**data)
         return new_model
 
