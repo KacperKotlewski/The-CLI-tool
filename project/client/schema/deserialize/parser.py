@@ -52,11 +52,12 @@ def parse_schema_info(data:ParseData) -> ParseData:
     if not isinstance(data.schema_model, models.SchemaInfo):
         raise exc.EnvSchemaInvalidModel(model=data.schema_model)
     
+    if data.flag != False:
+        raise exc.EnvSchemaParsingError()
+    
     if data.line == "---":
         if not data.schema_model.isValid():
             raise exc.EnvSchemaNotValid(schema=data.schema_model)
-        if data.flag != False:
-            raise exc.EnvSchemaParsingError()
         data.line_count+=1
         data.flag = True
         return data
