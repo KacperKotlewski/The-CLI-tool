@@ -200,3 +200,59 @@ def test_parse_schema_info():
         else:
             assert False, "Unexpected key"
         assert data.schema_model.isValidFiltered()
+        
+def test_parse_schema_info_invalid():
+    """
+    test_parse_schema_info_invalid test parsing of the schema info
+    """
+    datas = [
+        (
+            parser.ParseData(
+                line="Author: author name/nickname",
+                line_count=3,
+                schema_model=models.SchemaInfo(),
+                flag=True # invalid flag - flag is True should be False
+            ), 
+            exc.EnvSchemaParsingError
+        ),
+        (
+            parser.ParseData(
+                line="Author: author name/nickname",
+                line_count=3,
+                schema_model=models.Schema(), # invalid schema model - expected SchemaInfo
+                flag=False
+            ),
+            exc.EnvSchemaInvalidModel
+        ),
+        (
+            parser.ParseData(
+                line="xyz: xyz", # invalid key
+                line_count=3,
+                schema_model=models.SchemaInfo(),
+                flag=False 
+            ),
+            exc.EnvSchemaParsingError
+        ),
+        (
+            parser.ParseData(
+                line="xyz", # invalid line
+                line_count=3,
+                schema_model=models.SchemaInfo(),
+                flag=False 
+            ),
+            exc.EnvSchemaParsingError
+        ),
+    ]
+    
+    for data, expected_exception in datas:
+        catch = None
+        try:
+            parser.parse_schema_info(data)
+        except Exception as e:
+            catch = e
+        finally:
+            if expected_exception is None:
+                if catch is not None:
+                    assert False, f"Unexpected exception: {catch}"
+            else:
+                assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"
