@@ -163,6 +163,10 @@ def test_parse_schema_info():
     """
     lines = [
         "Author: author name/nickname",
+        "Description: example schema",
+        "License: MIT",
+        "Name: example",
+        "Version: 0.1",
     ]
     shuffle(lines)
     baseData = parser.ParseData(
