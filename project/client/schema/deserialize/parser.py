@@ -85,46 +85,104 @@ def parse_schema_info(data:ParseData) -> ParseData:
         return data
     
     raise exc.EnvSchemaParsingError(f"Cannot parse this line: {data.line}")
+
+def parse_field(data:ParseData) -> ParseData:
+    pass
+
+def parse_schema_text(data:ParseData) -> ParseData:
+    if not isinstance(data.schema_model, models.elements.text.SchemaText):
+        raise exc.EnvSchemaInvalidModel(model=data.schema_model)
+    
+    (key,value) = get_key_and_value(data.line)
+    key = key.capitalize()
+    
+    key_type = None
+    for member in models.elements.text.SchemaTextTypes:
+        if member.value == key.capitalize():
+            key_type = member
+            break
+    if key_type == None:
+        raise exc.EnvSchemaParsingError(f"Cannot parse this line: {data.line} - Invalid key type: {key}")
+    
+    data.schema_model.type = key_type
+    if value != None:
+        data.schema_model.text = value
+        
+    data.line_count+=1
+    
+    return data
     
 
 def parse_env_schema(schema_text:str) -> models.Schema:    
     schema:models.Schema = models.Schema()
     line_count = 0
-    cli_info_flag = schema_info_flag = False
+    cli_info_flag = schema_info_flag = field_element_in_developement = False
+    element_in_developement: typing.Optional[models.elements.SchemaElement] = None
+    
     for line in schema_text.split("\n"):
         line = line.strip()
         if line == "":
             continue
-        if line.startswith("#"):
-            line = line[1:].strip()
-            if cli_info_flag == False:
-                data = ParseData(
-                    line=line,
-                    line_count=line_count,
-                    schema_model=schema,
-                    flag=cli_info_flag
-                )
-                data = parse_cli_config(data)
-                line = data.line
-                line_count = data.line_count
-                schema = data.schema_model
-                cli_info_flag = data.flag
+        
+        if cli_info_flag == False:
+            data = ParseData(
+                line=line[1:].strip(),
+                line_count=line_count,
+                schema_model=schema,
+                flag=cli_info_flag
+            )
+            data = parse_cli_config(data)
+            line = data.line
+            line_count = data.line_count
+            schema = data.schema_model
+            cli_info_flag = data.flag
+            continue
+        
+        if schema_info_flag == False:
+            data = ParseData(
+                line=line[1:].strip(),
+                line_count=line_count,
+                schema_model=schema.schemaInfo,
+                flag=schema_info_flag
+            )
+            data = parse_schema_info(data)
+            line = data.line
+            line_count = data.line_count
+            schema.schemaInfo = data.schema_model
+            schema_info_flag = data.flag
+            continue
             
-            elif schema_info_flag == False:
-                data = ParseData(
+        if field_element_in_developement == True:
+            data = ParseData(
+                line=line,
+                line_count=line_count,
+                schema_model=element_in_developement,
+                flag=field_element_in_developement
+            )
+            data = parse_field(data)
+            line = data.line
+            line_count = data.line_count
+            element_in_developement = data.schema_model
+            field_element_in_developement = data.flag
+            if field_element_in_developement == False:
+                schema.elements.append(element_in_developement)
+                element_in_developement = None
+                
+        elif line.startswith("#"):
+            line = line[1:].strip()
+            key = line
+            if ":" in line:
+                key = line.split(":")[0].strip()
+            
+            if key.capitalize() == "Field":
+                field_element_in_developement = True
+                element_in_developement = models.Field()
+            elif key.capitalize() in [member.value for member in models.elements.text.SchemaTextTypes]:
+                parse_schema_text(data=ParseData(
                     line=line,
                     line_count=line_count,
-                    schema_model=schema.schemaInfo,
-                    flag=schema_info_flag
-                )
-                data = parse_schema_info(data)
-                line = data.line
-                line_count = data.line_count
-                schema.schemaInfo = data.schema_model
-                schema_info_flag = data.flag
-                
-            else:
-                raise exc.EnvSchemaParsingError(f"Cannot parse this line: {line}")
+                    schema_model=models.elements.text.SchemaText()
+                ))
             
     return schema
                 
