@@ -180,7 +180,7 @@ def test_parse_schema_info():
         key = line.split(":")[0].strip()
         value = line.split(":")[1].strip()
         
-        data = baseData.model_copy()
+        data = baseData.model_copy(deep=True)
         data.line = line
         data = parser.parse_schema_info(data)
         
@@ -319,6 +319,57 @@ def test_parse_schema_info_finish_invalid():
             else:
                 assert isinstance(catch, expected_exception)
                 
+def test_parse_schema_text():
+    """
+    test_parse_schema_text test parsing of the schema text
+    """
+    lines = [
+        "Header: example header",
+        "Section: example section",
+        "Subsection: example subsection",
+        "Message: example message",
+        "Space",
+        "Divider",
+    ]
+    shuffle(lines)
+    baseData = parser.ParseData(
+        line="",
+        line_count=5,
+        schema_model=models.SchemaText()
+    )
+    
+    for line in lines:
+        key = line.split(":")[0].strip() if ":" in line else line.strip()
+        value = line.split(":")[1].strip() if ":" in line else None
+        
+        data = baseData.model_copy(deep=True)
+        data.line = line
+        data = parser.parse_schema_text(data)
+        
+        assert data.line_count == 6
+        assert isinstance(data.schema_model, models.SchemaText)
+        if key == "Header":
+            assert data.schema_model.type == models.SchemaTextTypes.header
+            assert data.schema_model.text == value
+        elif key == "Section":
+            assert data.schema_model.type == models.SchemaTextTypes.section
+            assert data.schema_model.text == value
+        elif key == "Subsection":
+            assert data.schema_model.type == models.SchemaTextTypes.subsection
+            assert data.schema_model.text == value
+        elif key == "Message":
+            assert data.schema_model.type == models.SchemaTextTypes.message
+            assert data.schema_model.text == value
+        elif key == "Space":
+            assert data.schema_model.type == models.SchemaTextTypes.space
+            assert data.schema_model.text == None
+        elif key == "Divider":
+            assert data.schema_model.type == models.SchemaTextTypes.divider
+            assert data.schema_model.text == None
+        else:
+            assert False, "Unexpected key"
+        assert data.schema_model.isValidFiltered()
+                
                 
 def test_parse_env_schema_prefix():
     """
@@ -438,3 +489,5 @@ def test_parse_env_schema_elements():
             )
         ]
     )
+    
+    # assert parser.parse_env_schema(schema_text) == expected_schema

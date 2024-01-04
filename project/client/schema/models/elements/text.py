@@ -1,6 +1,6 @@
 import enum
 import typing
-import pydantic
+from common.models.base import BaseModel
     
 class SchemaTextTypes(enum.Enum):
     header = "Header"
@@ -10,6 +10,6 @@ class SchemaTextTypes(enum.Enum):
     space = "Space"
     divider = "Divider"
     
-class SchemaText(pydantic.BaseModel):
-    type: SchemaTextTypes
+class SchemaText(BaseModel):
+    type: SchemaTextTypes = None
     text: typing.Optional[str] = None
