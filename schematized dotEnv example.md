@@ -30,6 +30,7 @@ example with description
 # - Type:         this is a type
 # - Regex:        this is a regex - default None
 # - Props:        Required, Generate, Hidden <- list of props, default None
+# - Error:        this is an error message - default None
 FIELD_NAME=Default_value
 ```
 
