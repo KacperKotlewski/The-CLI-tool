@@ -369,6 +369,51 @@ def test_parse_schema_text():
         else:
             assert False, "Unexpected key"
         assert data.schema_model.isValidFiltered()
+        
+def test_parse_schema_text_invalid():
+    """
+    test_parse_schema_text_invalid test parsing of the schema text
+    """
+    datas = [
+        (
+            parser.ParseData(
+                line="Header: example header",
+                line_count=5,
+                schema_model=models.Schema(), # invalid schema model - expected SchemaText
+                flag=False
+            ),
+            exc.EnvSchemaInvalidModel
+        ),
+        (
+            parser.ParseData(
+                line="xyz: xyz", # invalid key
+                line_count=5,
+                schema_model=models.SchemaText()
+            ),
+            exc.EnvSchemaParsingError
+        ),
+        (
+            parser.ParseData(
+                line="xyz", # invalid line
+                line_count=5,
+                schema_model=models.SchemaText()
+            ),
+            exc.EnvSchemaParsingError
+        ),
+    ]
+    
+    for data, expected_exception in datas:
+        catch = None
+        try:
+            parser.parse_schema_text(data)
+        except Exception as e:
+            catch = e
+        finally:
+            if expected_exception is None:
+                if catch is not None:
+                    assert False, f"Unexpected exception: {catch}"
+            else:
+                assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"
                 
                 
 def test_parse_env_schema_prefix():
