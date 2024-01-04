@@ -26,6 +26,7 @@ class SchemaField(pydantic.BaseModel):
     regex: typing.Optional[str]
     default: typing.Optional[str]
     props: typing.Optional[typing.List[SchemaFieldProps]]
+    error: typing.Optional[str]
     
     # @pydantic.validator("props", pre=True)
     def _validate_props(cls, v):

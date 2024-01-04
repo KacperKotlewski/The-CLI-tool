@@ -318,3 +318,123 @@ def test_parse_schema_info_finish_invalid():
                     assert False, f"Unexpected exception: {catch}"
             else:
                 assert isinstance(catch, expected_exception)
+                
+                
+def test_parse_env_schema_prefix():
+    """
+    test_parse_env_schema test parsing of the schema
+    """
+    schema_text = """
+    # dotEnv schema
+    # CliVersion: 0.1
+    # ---
+    """
+    
+    expected_schema = models.Schema(
+        schematizerVersion=Version.v0_1,
+        schemaInfo=models.SchemaInfo(),
+    )
+    
+    schema = parser.parse_env_schema(schema_text)
+    
+    assert schema == expected_schema
+    
+    
+def test_parse_env_schema_info():
+    """
+    test_parse_env_schema test parsing of the schema
+    """
+    schema_text = """
+    # dotEnv schema
+    # CliVersion: 0.1
+    # ---
+    # Author: author name/nickname
+    # Description: example schema
+    # License: MIT
+    # Name: example
+    # Version: 0.1
+    # ---
+    """
+    
+    expected_schema = models.Schema(
+        schematizerVersion=Version.v0_1,
+        schemaInfo=models.SchemaInfo(
+            name="example",
+            description="example schema",
+            version="0.1",
+            author="author name/nickname",
+            license="MIT",
+        )
+    )
+    
+    schema = parser.parse_env_schema(schema_text)
+    
+    assert schema == expected_schema
+    
+def test_parse_env_schema_elements():
+    """
+    test_parse_env_schema test parsing of the schema
+    """
+    schema_text = """
+    # dotEnv schema
+    # CliVersion: 0.1
+    # ---
+    # Author: author name/nickname
+    # Description: example schema
+    # License: MIT
+    # Name: example
+    # Version: 0.1
+    # ---
+    
+    # Header: example header
+    # Section: example section
+    # Subsection: example subsection
+    # Message: example message
+    # Space
+    # Divider
+    
+    # Field:
+    # - Name: example_field
+    # - Example: example value
+    # - Description: example field
+    # - Hint: example hint
+    # - Type: string
+    # - Regex: ^[a-z]+$
+    # - Props: Required, Generate, Hidden
+    # - Error: example error msg
+    FIELD_NAME=default_value
+    """
+    
+    expected_schema = models.Schema(
+        schematizerVersion=Version.v0_1,
+        schemaInfo=models.SchemaInfo(
+            name="example",
+            description="example schema",
+            version="0.1",
+            author="author name/nickname",
+            license="MIT",
+        ),
+        elements=[
+            models.SchemaText(type=models.SchemaTextTypes.header, text="example header"),
+            models.SchemaText(type=models.SchemaTextTypes.section, text="example section"),
+            models.SchemaText(type=models.SchemaTextTypes.subsection, text="example subsection"),
+            models.SchemaText(type=models.SchemaTextTypes.message, text="example message"),
+            models.SchemaText(type=models.SchemaTextTypes.space),
+            models.SchemaText(type=models.SchemaTextTypes.divider),
+            models.SchemaField(
+                name="FIELD_NAME",
+                default="default_value",
+                example="example value",
+                description="example field",
+                hint="example hint",
+                type=models.SchemaFieldTypes.string,
+                regex="^[a-z]+$",
+                error="example error msg",
+                props=[
+                    models.SchemaFieldProps.required,
+                    models.SchemaFieldProps.generate,
+                    models.SchemaFieldProps.hidden,
+                ]
+            )
+        ]
+    )
