@@ -256,3 +256,65 @@ def test_parse_schema_info_invalid():
                     assert False, f"Unexpected exception: {catch}"
             else:
                 assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"
+                
+def test_parse_schema_info_finish_valid():
+    """
+    test_parse_schema_info_finish_valid test parsing of the schema info
+    """
+    data = parser.ParseData(
+        line = "---",
+        line_count=4,
+        schema_model=models.SchemaInfo(
+            name="example",
+            description="example schema",
+            version="0.1",
+            author="author name/nickname",
+            license="MIT",
+        ),
+        flag=False 
+    )
+    data = parser.parse_schema_info(data)
+
+    assert data.line_count == 5
+    assert data.flag == True
+    assert isinstance(data.schema_model, models.SchemaInfo)
+    assert data.schema_model.isValid()
+    
+def test_parse_schema_info_finish_invalid():
+    """
+    test_parse_schema_info_finish_invalid test parsing of the schema info
+    """
+    finishing_line = "---"
+    dataList = [
+        parser.ParseData(
+            line = finishing_line,
+            line_count=4,
+            schema_model=models.SchemaInfo(
+                name="example",
+                description="example schema",
+                version="0.1",
+                author="author name/nickname",
+                license="MIT",
+            ),
+            flag=True # invalid flag - flag is True should be False
+        ),
+        parser.ParseData(
+            line = finishing_line,
+            line_count=3,
+            schema_model=models.SchemaInfo(), # lack of required fields
+            flag=False
+        ),
+    ]
+    expected_exceptions = [exc.EnvSchemaParsingError, exc.EnvSchemaNotValid]
+    for data, expected_exception in list(zip(dataList, expected_exceptions)):
+        catch = None
+        try:
+            parser.parse_schema_info(data)
+        except Exception as e:
+            catch = e
+        finally:
+            if expected_exception is None:
+                if catch is not None:
+                    assert False, f"Unexpected exception: {catch}"
+            else:
+                assert isinstance(catch, expected_exception)
