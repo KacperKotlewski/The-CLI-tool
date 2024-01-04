@@ -90,7 +90,7 @@ def parse_schema_info(data:ParseData) -> ParseData:
 def parse_env_schema(schema_text:str) -> models.Schema:    
     schema:models.Schema = models.Schema()
     line_count = 0
-    cli_info_flag, schema_info_flag = False
+    cli_info_flag = schema_info_flag = False
     for line in schema_text.split("\n"):
         line = line.strip()
         if line == "":
@@ -122,4 +122,9 @@ def parse_env_schema(schema_text:str) -> models.Schema:
                 line_count = data.line_count
                 schema.schemaInfo = data.schema_model
                 schema_info_flag = data.flag
+                
+            else:
+                raise exc.EnvSchemaParsingError(f"Cannot parse this line: {line}")
+            
+    return schema
                 

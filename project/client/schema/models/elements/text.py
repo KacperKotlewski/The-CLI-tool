@@ -12,4 +12,4 @@ class SchemaTextTypes(enum.Enum):
     
 class SchemaText(pydantic.BaseModel):
     type: SchemaTextTypes
-    text: typing.Optional[str]
+    text: typing.Optional[str] = None
