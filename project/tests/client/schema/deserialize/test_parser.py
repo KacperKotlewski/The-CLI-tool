@@ -415,6 +415,117 @@ def test_parse_schema_text_invalid():
             else:
                 assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"
                 
+def test_parse_schema_field():
+    """
+    test_parse_schema_field test parsing of the schema field
+    """
+    lines = [
+        "Name: example_field",
+        "Example: example value",
+        "Description: example field",
+        "Hint: example hint",
+        "Type: string",
+        "Regex: ^[a-z]+$",
+        "Props: Required, Generate, Hidden",
+        "Error: example error msg",
+    ]
+    shuffle(lines)
+    baseData = parser.ParseData(
+        line="",
+        line_count=6,
+        schema_model=models.SchemaField()
+    )
+    
+    for line in lines:
+        key = line.split(":")[0].strip() if ":" in line else line.strip()
+        value = line.split(":")[1].strip() if ":" in line else None
+        
+        data = baseData.model_copy(deep=True)
+        data.line = line
+        data = parser.parse_field(data)
+        
+        assert data.line_count == 7
+        assert isinstance(data.schema_model, models.SchemaField)
+        if key == "Name":
+            assert data.schema_model.name == value
+        elif key == "Example":
+            assert data.schema_model.example == value
+        elif key == "Description":
+            assert data.schema_model.description == value
+        elif key == "Hint":
+            assert data.schema_model.hint == value
+        elif key == "Type":
+            assert data.schema_model.type == value
+        elif key == "Regex":
+            assert data.schema_model.regex == value
+        elif key == "Error":
+            assert data.schema_model.error == value
+        elif key == "Props":
+            assert data.schema_model.props == [models.SchemaFieldProps.required, models.SchemaFieldProps.generate, models.SchemaFieldProps.hidden]
+        else:
+            assert False, f"Unexpected key: {key}"
+        assert data.schema_model.isValidFiltered()       
+        
+def test_parse_schema_field_invalid():
+    """
+    test_parse_schema_field_invalid test parsing of the schema field
+    """
+    datas = [
+        (
+            parser.ParseData(
+                line="Name: example_field",
+                line_count=6,
+                schema_model=models.Schema(), # invalid schema model - expected SchemaField
+                flag=False
+            ),
+            exc.EnvSchemaInvalidModel
+        ),
+        (
+            parser.ParseData(
+                line="xyz: xyz", # invalid key
+                line_count=6,
+                schema_model=models.SchemaField()
+            ),
+            exc.EnvSchemaParsingError
+        ),
+        (
+            parser.ParseData(
+                line="xyz", # invalid line
+                line_count=6,
+                schema_model=models.SchemaField()
+            ),
+            exc.EnvSchemaParsingError
+        ),
+        (
+            parser.ParseData(
+                line="Regex: [", # invalid regex
+                line_count=6,
+                schema_model=models.SchemaField()
+            ),
+            exc.EnvSchemaParsingError
+        ),
+        (
+            parser.ParseData(
+                line="Props: Required, Generate, Hidden, Invalid", # invalid prop
+                line_count=6,
+                schema_model=models.SchemaField()
+            ),
+            exc.EnvSchemaParsingError
+        ),
+    ]
+    
+    for data, expected_exception in datas:
+        catch = None
+        try:
+            parser.parse_field(data)
+        except Exception as e:
+            catch = e
+        finally:
+            if expected_exception is None:
+                if catch is not None:
+                    assert False, f"Unexpected exception: {catch}"
+            else:
+                assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"         
                 
 def test_parse_env_schema_prefix():
     """
