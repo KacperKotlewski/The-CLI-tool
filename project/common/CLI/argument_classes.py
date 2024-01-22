@@ -65,6 +65,7 @@ class Argument(BaseModel):
     complexity: ArgumentComplexity = None
     key: typing.List[KeyModel] = list()
     value: typing.Optional[typing.Union[ValueModel, typing.List[ValueModel]]] = None
+    action: typing.Optional[typing.Callable] = None
     
     def __init__(self, **data):
         super().__init__(**data)

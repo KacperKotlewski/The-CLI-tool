@@ -2,7 +2,6 @@ import sys
 
 sys.path.append("./")
 
-from .main import baseCLI as __base
-
+from .base_cli_module import baseCLI as __base
 
 base = __base()

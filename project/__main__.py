@@ -1,5 +1,4 @@
 from CLI import base
 
-x = base.help_info()
-
-print(x)
+if __name__ == "__main__":
+    base()

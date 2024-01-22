@@ -6,7 +6,7 @@ import typing
 from .argument_classes import Argument, ArgumentComplexity, ArgumentKeyTypes, ArgumentValueTypes, KeyModel, ValueModel
 
 
-class CLI_Handler(BaseModel):
+class CLI_Model(BaseModel):
     arguments: typing.List[Argument] = list()
     module_name: str = None
     
@@ -32,3 +32,13 @@ class CLI_Handler(BaseModel):
         info = f"\nModule: {self.module_name.upper()}\n"
         info += "\n".join([f"{arg.help_info}\n" for arg in self.arguments])
         return info
+    
+    def get_argument_help_info(self, argument_name: str) -> str:
+        argument = self.get_argument(argument_name)
+        return argument.help_info
+    
+    def get_argument(self, argument_name: str) -> Argument:
+        for argument in self.arguments:
+            if argument.name == argument_name:
+                return argument
+        raise ValueError(f"Argument {argument_name} not found")
