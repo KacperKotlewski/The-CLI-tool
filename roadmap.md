@@ -1,5 +1,5 @@
 - [ ] basic:
-  - [ ] schema file example
+  - [x] schema file example
   - [ ] python code to deserialize from schema file
   - [ ] coe to serialize to schema file
   - [ ] fastAPI server to share schema file between clients
