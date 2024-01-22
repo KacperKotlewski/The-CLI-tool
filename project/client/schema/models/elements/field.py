@@ -1,6 +1,7 @@
 import enum
 import typing
 import pydantic
+from common.models.base import BaseModel
 
 class SchemaFieldTypes(enum.Enum):
     string = "string"
@@ -17,16 +18,17 @@ class SchemaFieldProps(enum.Enum):
     generate = "Generate"
     hidden = "Hidden"
     
-class SchemaField(pydantic.BaseModel):
-    name: str
-    example: typing.Optional[str]
-    description: typing.Optional[str]
-    hint: typing.Optional[str]
-    type: SchemaFieldTypes
-    regex: typing.Optional[str]
-    default: typing.Optional[str]
-    props: typing.Optional[typing.List[SchemaFieldProps]]
-    error: typing.Optional[str]
+class SchemaField(BaseModel):
+    og_name: str = None
+    default: typing.Optional[str] = None
+    name: typing.Optional[str] = None
+    example: typing.Optional[str] = None
+    description: typing.Optional[str] = None
+    hint: typing.Optional[str] = None
+    type: SchemaFieldTypes = None
+    regex: typing.Optional[str] = None
+    props: typing.Optional[typing.List[SchemaFieldProps]] = None
+    error: typing.Optional[str] = None
     
     # @pydantic.validator("props", pre=True)
     def _validate_props(cls, v):

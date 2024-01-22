@@ -11,7 +11,7 @@ def test_get_key_and_value():
         "key_list1 : x,y,z": ("key_list1", "x,y,z"),
         "key_list2 : [x,y,z]": ("key_list2", "[x,y,z]"),
         "empty": ("empty", None),
-        "error: : error": exc.EnvSchemaParsingError,
+        "doubleCollon: : : :": ("doubleCollon", ": : :"),
     }
     
     for line, expected in lines.items():
@@ -348,24 +348,21 @@ def test_parse_schema_text():
         
         assert data.line_count == 6
         assert isinstance(data.schema_model, models.SchemaText)
+        
+        assert data.schema_model.text == value
+            
         if key == "Header":
             assert data.schema_model.type == models.SchemaTextTypes.header
-            assert data.schema_model.text == value
         elif key == "Section":
             assert data.schema_model.type == models.SchemaTextTypes.section
-            assert data.schema_model.text == value
         elif key == "Subsection":
             assert data.schema_model.type == models.SchemaTextTypes.subsection
-            assert data.schema_model.text == value
         elif key == "Message":
             assert data.schema_model.type == models.SchemaTextTypes.message
-            assert data.schema_model.text == value
         elif key == "Space":
             assert data.schema_model.type == models.SchemaTextTypes.space
-            assert data.schema_model.text == None
         elif key == "Divider":
             assert data.schema_model.type == models.SchemaTextTypes.divider
-            assert data.schema_model.text == None
         else:
             assert False, "Unexpected key"
         assert data.schema_model.isValidFiltered()
@@ -425,6 +422,7 @@ def test_parse_schema_field():
         "Description: example field",
         "Hint: example hint",
         "Type: string",
+        "Type: bool",
         "Regex: ^[a-z]+$",
         "Props: Required, Generate, Hidden",
         "Error: example error msg",
@@ -455,7 +453,15 @@ def test_parse_schema_field():
         elif key == "Hint":
             assert data.schema_model.hint == value
         elif key == "Type":
-            assert data.schema_model.type == value
+            type = None
+            for member in models.elements.field.SchemaFieldTypes:
+                if member.value.capitalize() == value.capitalize():
+                    type = member
+                    break
+            if type is None:
+                assert False, f"Unexpected type: {value}"
+            assert data.schema_model.type == type
+            
         elif key == "Regex":
             assert data.schema_model.regex == value
         elif key == "Error":
@@ -525,7 +531,145 @@ def test_parse_schema_field_invalid():
                 if catch is not None:
                     assert False, f"Unexpected exception: {catch}"
             else:
-                assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"         
+                assert isinstance(catch, expected_exception), f"Unexpected exception: {catch} - expected: {expected_exception} - data: {data}"  
+                
+def test_parse_schema_element():
+    """
+    test_parse_schema_element test parsing of the schema element
+    """
+    # parser.parse_schema_element(data:ParseData, element_in_developement:models.SchemaElement) -> (ParseData, models.SchemaElement):
+    
+    baseModel = parser.ParseData(
+        line="",
+        line_count=7,
+        schema_model=models.Schema(),
+        flag=False
+    )
+    baseModelFlagged = baseModel.model_copy(deep=True, update={"flag": True})
+    assert baseModelFlagged.flag == True
+    
+    datas = [
+        "fields",
+        # (
+        #     baseModel.model_copy(deep=True, update={"line": "#Field:"}),
+        #     None
+        # ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "# Name: example_field"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "#Description: example field"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "# - Hint: example hint"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "#Type: string"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "#-Regex:"+
+                r"/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/gm"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "#- Props: Required, Generate, Hidden"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "# -Error: example error msg"}),
+            models.SchemaField()
+        ),
+        "field close",
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "FIELD_NAME=default_value"}),
+            models.SchemaField()
+        ),
+        (
+            baseModelFlagged.model_copy(deep=True, update={"line": "FIELD_NAME="}),
+            models.SchemaField()
+        ),
+        (
+            baseModel.model_copy(deep=True, update={"line": "FIELD_NAME= default_value"}),
+            None
+        ),
+        "text",
+        (
+            baseModel.model_copy(deep=True, update={"line": "#Space"}),
+            None
+        ),
+        (
+            baseModel.model_copy(deep=True, update={"line": "#Divider"}),
+            None
+        ),
+        (
+            baseModel.model_copy(deep=True, update={"line": "#Header: example header"}),
+            None
+        ),
+        (
+            baseModel.model_copy(deep=True, update={"line": "#Section: example section"}),
+            None
+        ),
+        (
+            baseModel.model_copy(deep=True, update={"line": "#Subsection: example subsection"}),
+            None
+        ),
+        (
+            baseModel.model_copy(deep=True, update={"line": "#Message: example message"}),
+            None
+        ),
+    ]
+    
+    fields_flag = fields_close_flag = text_flag = False
+    for data in datas:
+        if isinstance(data, str):
+            fields_flag = fields_close_flag = text_flag = False
+            if data == "fields":
+                fields_flag = True
+            elif data == "field close":
+                fields_close_flag = True
+            elif data == "text":
+                text_flag = True
+            else:
+                assert False, f"Unexpected data: {data}"
+            continue
+                
+        
+        if isinstance(data, tuple):
+            entry_data = data
+            data = parser.parse_schema_element(*data)
+            
+            element = data[1]
+            data = data[0]
+            
+            assert data.line_count == 8, f"Unexpected line count: {data.line_count} for data: {entry_data}"
+            
+            if fields_flag:
+                assert isinstance(element, models.SchemaField)
+                assert data.flag == True
+                assert len(data.schema_model.elements) == 0
+                assert data.schema_model.isValidFiltered()
+                assert element.isValidFiltered()
+                
+            elif fields_close_flag:
+                assert element == None, f"\nelement => {element}, \nline => {entry_data}"
+                assert data.flag == False
+                assert len(data.schema_model.elements) == 1
+                assert isinstance(data.schema_model.elements[0], models.SchemaField)
+                assert data.schema_model.elements[0].isValidFiltered()
+                
+            elif text_flag:
+                assert element == None, f"\nelement => {element}, \nline => {entry_data}"
+                assert data.flag == False
+                assert len(data.schema_model.elements) == 1
+                assert isinstance(data.schema_model.elements[0], models.SchemaText)
+                assert data.schema_model.elements[0].isValidFiltered()
+    
+    
+                
                 
 def test_parse_env_schema_prefix():
     """
@@ -629,8 +773,9 @@ def test_parse_env_schema_elements():
             models.SchemaText(type=models.SchemaTextTypes.space),
             models.SchemaText(type=models.SchemaTextTypes.divider),
             models.SchemaField(
-                name="FIELD_NAME",
+                og_name="FIELD_NAME",
                 default="default_value",
+                name="example_field",
                 example="example value",
                 description="example field",
                 hint="example hint",
@@ -646,4 +791,19 @@ def test_parse_env_schema_elements():
         ]
     )
     
-    # assert parser.parse_env_schema(schema_text) == expected_schema
+    schema = parser.parse_env_schema(schema_text)
+    
+    assert schema.schematizerVersion == expected_schema.schematizerVersion, f"\nschema.schematizerVersion => {schema.schematizerVersion}, \n\nexpected_schema.schematizerVersion => {expected_schema.schematizerVersion}"
+    
+    for k,v in schema.schemaInfo.model_dump().items():
+        assert v == expected_schema.schemaInfo.model_dump()[k], f"\nschema.schemaInfo.{k} => {v}, \n\nexpected_schema.schemaInfo.{k} => {expected_schema.schemaInfo.model_dump()[k]}"
+    assert schema.schemaInfo == expected_schema.schemaInfo, f"\nschema.schemaInfo => {schema.schemaInfo}, \n\nexpected_schema.schemaInfo => {expected_schema.schemaInfo}"
+    
+    for i, element in enumerate(schema.elements):
+        for k,v in element.model_dump().items():
+            assert v == expected_schema.elements[i].model_dump()[k], f"\nelement.{k} => {v}, \n\nexpected_schema.elements[{i}].{k} => {expected_schema.elements[i].model_dump()[k]}"
+        
+        assert element == expected_schema.elements[i], f"\nelement => {element}, \n\nexpected_schema.elements[{i}] => {expected_schema.elements[i]}"
+    assert schema.elements == expected_schema.elements, f"\nschema.elements => {schema.elements}, \n\nexpected_schema.elements => {expected_schema.elements}"
+    
+    assert schema == expected_schema, f"\nexpected_schema => {expected_schema}, \n\nschema => {schema}"
