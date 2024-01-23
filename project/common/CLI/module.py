@@ -6,9 +6,15 @@ import typing
 from .argument_classes import Argument, ArgumentComplexity, ArgumentKeyTypes, ArgumentValueTypes, KeyModel, ValueModel
 
 
-class CLI_Model(BaseModel):
+class ModuleType(enum.Enum):
+    root = enum.auto()
+    user_interface = enum.auto()
+    other = enum.auto()
+
+class CLImodule(BaseModel):
     arguments: typing.List[Argument] = list()
     module_name: str = None
+    module_type: ModuleType = ModuleType.other
     
     def __init__(self, **data) -> None:
         super().__init__(**data)

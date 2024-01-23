@@ -1,11 +1,11 @@
 import typing
-from common.CLI.model import CLI_Model
+from common.CLI.module import CLImodule, ModuleType
 
 
 class CLI_Module_Handler:
-    modules: typing.Dict[str, CLI_Model] = {}
+    modules: typing.Dict[str, CLImodule] = {}
     
-    def __init__(self, modules: typing.List[CLI_Model]):
+    def __init__(self, modules: typing.List[CLImodule]):
         self.modules = {module.module_name: module for module in modules}
         self._validate_modules()
         
@@ -13,8 +13,8 @@ class CLI_Module_Handler:
         if not isinstance(self.modules, dict):
             raise ValueError(f"modules {self.modules} is not a dict")
         
-        if not all(isinstance(module, CLI_Model) for module in self.modules.values()):
-            raise ValueError(f"modules {self.modules} is not a dict of CLI_Model")
+        if not all(isinstance(module, CLImodule) for module in self.modules.values()):
+            raise ValueError(f"modules {self.modules} is not a dict of CLImodule")
         
         self._validate_keys()
         
@@ -25,7 +25,7 @@ class CLI_Module_Handler:
             duplicate = set([key for key in keys if keys.count(key) > 1])
             raise ValueError(f"Duplicate keys found in keys, value of key is: {duplicate}")
         
-    def get_module(self, module_name: str) -> CLI_Model:
+    def get_module(self, module_name: str) -> CLImodule:
         if module_name not in self.modules:
             raise ValueError(f"Module {module_name} not found")
         
@@ -43,6 +43,10 @@ class CLI_Module_Handler:
     
     def get_help_info_for_argument(self, module_name: str, argument_name: str) -> str:
         return self.get_module(module_name).get_argument_help_info(argument_name)
+    
+    def filter_by_type(self, module_type: ModuleType) -> 'CLI_Module_Handler':
+        filtered_modules = [module for module in self.modules.values() if module.module_type == module_type]
+        return CLI_Module_Handler(modules=filtered_modules)
     
     def run_model(self, module_name: str, arguments: typing.List[str]) -> None:
         module = self.get_module(module_name)

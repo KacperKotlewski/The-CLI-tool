@@ -1,11 +1,11 @@
 from typing import Any
-from common.CLI.model import CLI_Model
+from common.CLI.module import CLImodule, ModuleType
 from common.CLI.argument_classes import Argument, ArgumentComplexity, ArgumentKeyTypes, ArgumentValueTypes, KeyModel, ValueModel
 
 import typing
 import sys
 
-class baseCLI(CLI_Model):
+class RootModule(CLImodule):
     arguments = [
         Argument(
             name='help',
@@ -19,6 +19,7 @@ class baseCLI(CLI_Model):
         ),
     ]
     module_name: str = 'base'
+    module_type: ModuleType = ModuleType.root
     
     arguments: typing.List[Argument]
     

@@ -1,9 +1,9 @@
 import typing
-from common.CLI.model import CLI_Model
+from common.CLI.module import CLImodule
 
 class UserInterfaceHandler:
-    interfaces: typing.Dict[str, CLI_Model] = {}
+    interfaces: typing.Dict[str, CLImodule] = {}
     
-    def __init__(self, interfaces: typing.List[CLI_Model]):
+    def __init__(self, interfaces: typing.List[CLImodule]):
         self.interfaces = {interface.module_name: interface for interface in interfaces}
         
