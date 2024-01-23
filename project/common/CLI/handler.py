@@ -1,24 +1,26 @@
 import typing
 from common.CLI.model import CLI_Model
 
+
 class CLI_Module_Handler:
     modules: typing.Dict[str, CLI_Model] = {}
     
     def __init__(self, modules: typing.List[CLI_Model]):
         self.modules = {module.module_name: module for module in modules}
-        self.__validate_modules()
+        self._validate_modules()
         
-    def __validate_modules(self) -> None:
+    def _validate_modules(self) -> None:
         if not isinstance(self.modules, dict):
             raise ValueError(f"modules {self.modules} is not a dict")
         
         if not all(isinstance(module, CLI_Model) for module in self.modules.values()):
             raise ValueError(f"modules {self.modules} is not a dict of CLI_Model")
         
-        self.__validate_keys()
+        self._validate_keys()
         
-    def __validate_keys(self) -> None:
-        keys = [key for module in self.modules.values() for arg in module.arguments for key in arg.key]
+    def _validate_keys(self) -> None:
+        keys = [key.key for module in self.modules.values() for arg in module.arguments for key in arg.key]
+                    
         if len(keys) != len(set(keys)):
             duplicate = set([key for key in keys if keys.count(key) > 1])
             raise ValueError(f"Duplicate keys found in keys, value of key is: {duplicate}")

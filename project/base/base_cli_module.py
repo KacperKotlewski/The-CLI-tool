@@ -3,14 +3,7 @@ from common.CLI.model import CLI_Model
 from common.CLI.argument_classes import Argument, ArgumentComplexity, ArgumentKeyTypes, ArgumentValueTypes, KeyModel, ValueModel
 
 import typing
-
-import enum
-
 import sys
-
-class userInterfaces(enum.Enum):
-    cli = "cli"
-    web = "web"
 
 class baseCLI(CLI_Model):
     arguments = [
