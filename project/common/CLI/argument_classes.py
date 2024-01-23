@@ -1,4 +1,5 @@
 import enum
+from typing import Any
 
 from common.models.base import BaseModel
 import typing
@@ -105,3 +106,28 @@ class Argument(BaseModel):
             
         else:
             raise ValueError(f"Argument {self.name} has invalid complexity: {self.complexity}")
+        
+    def _get_letter_keys(self) -> typing.List[str]:
+        return [key.key for key in self.key if key.type == ArgumentKeyTypes.letter]
+    
+    def _get_phrase_keys(self) -> typing.List[str]:
+        return [key.key for key in self.key if key.type == ArgumentKeyTypes.phrase]
+    
+    def check_key_letter(self, key: str) -> bool:
+        return key in self._get_letter_keys()
+    
+    def check_key_phrase(self, key: str) -> bool:
+        return key in self._get_phrase_keys()
+    
+    def run_action(self, cli_module, *args, **kwargs) -> None:
+        if self.action is None:
+            raise ValueError(f"Argument {self.name} has no action")
+        
+        self.action(cli_module, *args, **kwargs)
+        
+    def is_action_set(self) -> bool:
+        return self.action is not None
+    
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        if self.is_action_set():
+            self.run_action(*args, **kwds)

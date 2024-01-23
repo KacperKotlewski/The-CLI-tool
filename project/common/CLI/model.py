@@ -42,3 +42,10 @@ class CLI_Model(BaseModel):
             if argument.name == argument_name:
                 return argument
         raise ValueError(f"Argument {argument_name} not found")
+    
+    def get_argument_by_key(self, key: str) -> Argument:
+        for argument in self.arguments:
+            for arg_key in argument.key:
+                if arg_key.key == key:
+                    return argument
+        raise ValueError(f"Argument with key {key} not found")

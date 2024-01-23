@@ -39,13 +39,24 @@ class baseCLI(CLI_Model):
     
     def __call__(self) -> Any:
         if len(self.user_args) == 0:
-            print(f"{self.script_name} <commands>")
-            print("\nUse -h or --help for help info")
+            print(f"\n{self.script_name} <commands>")
+            print(f"\nUse \"{self.script_name} -h\" or \"{self.script_name} --help\" for help and information\n")
         else:
             self.run(self.user_args)
             
-    def run(self, arguments: typing.List[str]) -> None:
-        pass
+    def run(self, args: typing.List[str]) -> None:
+        if len(args) == 0:
+            raise ValueError("No arguments passed")
+        
+        for arg in args:
+            if arg.startswith("-") or arg.startswith("--"):
+                argument = self.get_argument_by_key(arg.strip("-"))
+            if argument is None:
+                raise ValueError(f"Argument {arg} not found")
+            if argument.complexity != ArgumentComplexity.key_only:
+                pass
+            if argument.is_action_set():
+                argument(self)
         
     def print_help(self) -> None:
         print(self.help_info())
