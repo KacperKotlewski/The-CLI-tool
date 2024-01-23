@@ -43,9 +43,26 @@ class CLI_Model(BaseModel):
                 return argument
         raise ValueError(f"Argument {argument_name} not found")
     
-    def get_argument_by_key(self, key: str) -> Argument:
+    def get_argument_by_key_letter(self, key_letter: str) -> Argument:
         for argument in self.arguments:
             for arg_key in argument.key:
-                if arg_key.key == key:
+                if arg_key.type == ArgumentKeyTypes.letter and arg_key.key == key_letter:
                     return argument
-        raise ValueError(f"Argument with key {key} not found")
+        raise ValueError(f"Argument with key \"-{key_letter}\" not found")
+    
+    def get_argument_by_key_phrase(self, key_phrase: str) -> Argument:
+        for argument in self.arguments:
+            for arg_key in argument.key:
+                if arg_key.type == ArgumentKeyTypes.phrase and arg_key.key == key_phrase:
+                    return argument
+        raise ValueError(f"Argument with key \"--{key_phrase}\" not found")
+    
+    def get_argument_by_key(self, key: str) -> Argument:
+        if key.startswith("--"):
+            return self.get_argument_by_key_phrase(key.strip("-"))
+        
+        elif key.startswith("-"):
+            return self.get_argument_by_key_letter(key.strip("-"))
+        
+        else:
+            raise ValueError(f"Invalid key: {key}")

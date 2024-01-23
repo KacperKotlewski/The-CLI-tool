@@ -49,10 +49,12 @@ class baseCLI(CLI_Model):
             raise ValueError("No arguments passed")
         
         for arg in args:
-            if arg.startswith("-") or arg.startswith("--"):
-                argument = self.get_argument_by_key(arg.strip("-"))
+            if arg.startswith("-"):
+                argument = self.get_argument_by_key(arg)
+                
             if argument is None:
                 raise ValueError(f"Argument {arg} not found")
+            
             if argument.complexity != ArgumentComplexity.key_only:
                 pass
             if argument.is_action_set():
