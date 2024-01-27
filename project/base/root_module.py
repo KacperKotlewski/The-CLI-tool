@@ -1,7 +1,9 @@
 from typing import Any
 from common.CLI.module import CLImodule, ModuleType
 from common.CLI import options as o
+from common.CLI import commands as c
 from .config import ROOT_MODULE_NAME
+from client.schema.versions import Version
 
 import typing
 import sys
@@ -20,6 +22,24 @@ class RootModule(CLImodule):
             ],
             details=['-h, --help','Show this help message.'],
             action = lambda self : self.print_help()
+        ),
+        o.Option(
+            name='version',
+            complexity=o.OptionComplexity.key_only,
+            key=[
+                o.KeyModel(key='v', type=o.OptionKeyTypes.letter),
+                o.KeyModel(key='version', type=o.OptionKeyTypes.phrase)
+            ],
+            details=['-v, --version', 'Show version of the tool'],
+            action= lambda self : self.print_version(),
+        ),
+    ]
+    
+    commands: typing.List[c.Command] = [
+        c.Command(
+            command='run',
+            short_desc='Run the tool on the given file',
+            details='run <file> [options]',
         ),
     ]
     
@@ -56,3 +76,6 @@ class RootModule(CLImodule):
     def print_help(self) -> None:
         print(f"\nUsage:\n{self.script_name} [OPTIONS] COMMAND [ARGS]")
         print(f'{self.get_details()}')
+        
+    def print_version(self) -> None:
+        print(f"\nVersion: {Version.getLatest().value}\n")
