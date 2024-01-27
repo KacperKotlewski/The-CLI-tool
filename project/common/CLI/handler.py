@@ -19,7 +19,7 @@ class CLI_Module_Handler:
         self._validate_keys()
         
     def _validate_keys(self) -> None:
-        keys = [key.key for module in self.modules.values() for arg in module.arguments for key in arg.key]
+        keys = [key.key for module in self.modules.values() for arg in module.options for key in arg.key]
                     
         if len(keys) != len(set(keys)):
             duplicate = set([key for key in keys if keys.count(key) > 1])
@@ -41,13 +41,13 @@ class CLI_Module_Handler:
     def get_help_info_for_module(self, module_name: str) -> str:
         return self.get_module(module_name).help_info()
     
-    def get_help_info_for_argument(self, module_name: str, argument_name: str) -> str:
-        return self.get_module(module_name).get_argument_help_info(argument_name)
+    def get_help_info_for_option(self, module_name: str, option_name: str) -> str:
+        return self.get_module(module_name).get_option_help_info(option_name)
     
     def filter_by_type(self, module_type: ModuleType) -> 'CLI_Module_Handler':
         filtered_modules = [module for module in self.modules.values() if module.module_type == module_type]
         return CLI_Module_Handler(modules=filtered_modules)
     
-    def run_model(self, module_name: str, arguments: typing.List[str]) -> None:
+    def run_model(self, module_name: str, options: typing.List[str]) -> None:
         module = self.get_module(module_name)
-        module.run(arguments)
+        module.run(options)
