@@ -26,19 +26,19 @@ class BaseWithOptions(BaseModel):
             duplicate = set([key for key in keys if keys.count(key) > 1])
             raise ValueError(f"Duplicate keys found in keys, value of key is: {duplicate}")
         
-    def get_help_info(self) -> str:
+    def get_details(self) -> str:
         info = ""
         if len(self.options) > 0:
             info += f"\nOptions:\n"
-            strlen = max([len(opt.details[0]) for opt in self.options])
+            strlen = max([opt.get_details_len() for opt in self.options])
             
-            info += "\n".join([f"{opt.details[0]:<{strlen}s}\t{opt.details[1]}" for opt in self.options])
+            info += "\n".join([opt.get_stylized_details(strlen) for opt in self.options])
             
         return info
     
     def get_option_help_info(self, option_name: str) -> str:
         option = self.get_option(option_name)
-        return option.help_info
+        return option.get_details
     
     def get_option(self, option_name: str) -> o.Option:
         for option in self.options:

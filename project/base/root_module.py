@@ -55,4 +55,4 @@ class RootModule(CLImodule):
         
     def print_help(self) -> None:
         print(f"\nUsage:\n{self.script_name} [OPTIONS] COMMAND [ARGS]")
-        print(f'{self.get_help_info()}')
+        print(f'{self.get_details()}')

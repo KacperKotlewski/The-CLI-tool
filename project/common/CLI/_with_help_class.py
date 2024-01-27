@@ -10,6 +10,9 @@ class BaseWithHelp(BaseModel):
         
     def _validate_details(self) -> None:
         raise BaseException("_validate_details not implemented yet")
+    
+    def get_details(self) -> str:
+        return self.details
 
 class BaseWithPropertyHelp(BaseWithHelp):
     details: typing.List[str] = None
@@ -27,4 +30,15 @@ class BaseWithPropertyHelp(BaseWithHelp):
         if not all(isinstance(arg, str) for arg in self.details):
             raise ValueError(f"Help info {self.details} is not a list of strings")
 
+    def get_stylized_details(self, max_len:int = None) -> str:
+        if not max_len is None and not isinstance(max_len, int):
+            raise ValueError(f"expected INT got: {type(max_len)}")
+        
+        if max_len is None:
+            max_len = self.get_details_len()
+            
+        return f"{self.details[0]:<{max_len}s}\t{self.details[1]}"
+    
+    def get_details_len(self) -> int:
+        return len(self.details[0])
     
