@@ -2,6 +2,7 @@ import enum
 
 from common.models.base import BaseModel
 from ._with_help_class import BaseWithPropertyHelp
+from ._with_arguments_class import ValueModel, WithArgumentBase, OptionValueTypes
 import typing
 
 class OptionComplexity(enum.Enum):
@@ -12,10 +13,6 @@ class OptionComplexity(enum.Enum):
 class OptionKeyTypes(enum.Enum):
     letter = enum.auto()
     phrase = enum.auto()
-    
-class OptionValueTypes(enum.Enum):
-    single = enum.auto()
-    multiple = enum.auto()
     
 class KeyModel(BaseModel):
     key: typing.Optional[str] = None
@@ -39,33 +36,10 @@ class KeyModel(BaseModel):
         else:
             raise ValueError(f"Key {self.key} has invalid type: {self.type}")
             
-    
-class ValueModel(BaseModel):
-    value: typing.Optional[str] = None
-    type: OptionValueTypes = None
-    
-    def __init__(self, **data):
-        super().__init__(**data)
-        self._validate_value()
-        
-    def _validate_value(self):
-        if self.type == OptionValueTypes.single:
-            if not isinstance(self.value, (str, type(None))):
-                raise ValueError(f"Value {self.value} is not a string")
-            
-        elif self.type == OptionValueTypes.multiple:
-            if not isinstance(self.value, list) or not all(isinstance(v, str) for v in self.value):
-                raise ValueError(f"Value {self.value} is not a list of strings")
-            
-        else:
-            raise ValueError(f"Value {self.value} has invalid type: {self.type}")
-    
-class Option(BaseWithPropertyHelp):
-    name: str = None
+
+class Option(BaseWithPropertyHelp, WithArgumentBase):
     complexity: OptionComplexity = None
     key: typing.List[KeyModel] = list()
-    value: typing.Optional[typing.Union[ValueModel, typing.List[ValueModel]]] = None
-    action: typing.Optional[typing.Callable] = None
     
     def __init__(self, **data):
         super().__init__(**data)
@@ -117,16 +91,3 @@ class Option(BaseWithPropertyHelp):
     
     def check_key_phrase(self, key: str) -> bool:
         return key in self._get_phrase_keys()
-    
-    def run_action(self, cli_module, *args, **kwargs) -> None:
-        if self.action is None:
-            raise ValueError(f"Option {self.name} has no action")
-        
-        self.action(cli_module, *args, **kwargs)
-        
-    def is_action_set(self) -> bool:
-        return self.action is not None
-    
-    def __call__(self, *args: typing.Any, **kwds: typing.Any) -> typing.Any:
-        if self.is_action_set():
-            self.run_action(*args, **kwds)

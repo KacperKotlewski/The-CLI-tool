@@ -4,6 +4,7 @@ from common.CLI import options as o
 from common.CLI import commands as c
 from .config import ROOT_MODULE_NAME
 from client.schema.versions import Version
+from . import commands as baseCommands
 
 import typing
 import sys
@@ -21,7 +22,7 @@ class RootModule(CLImodule):
                 o.KeyModel(key='help', type=o.OptionKeyTypes.phrase)
             ],
             details=['-h, --help','Show this help message.'],
-            action = lambda self : self.print_help()
+            action = lambda self,args : self.print_help()
         ),
         o.Option(
             name='version',
@@ -31,16 +32,12 @@ class RootModule(CLImodule):
                 o.KeyModel(key='version', type=o.OptionKeyTypes.phrase)
             ],
             details=['-v, --version', 'Show version of the tool'],
-            action= lambda self : self.print_version(),
+            action= lambda self, args : self.print_version(),
         ),
     ]
     
     commands: typing.List[c.Command] = [
-        c.Command(
-            command='run',
-            short_desc='Run the tool on the given file',
-            details='run <file> [options]',
-        ),
+        baseCommands.Run(),
     ]
     
     user_args: typing.List[str] = None
@@ -63,15 +60,16 @@ class RootModule(CLImodule):
         
         for arg in args:
             if arg.startswith("-"):
-                option = self.get_option_by_key(arg)
+                self.run_option(arg, args)
+            else:
+                command = self.get_command(arg)
                 
-            if option is None:
-                raise ValueError(f"option {arg} not found")
-            
-            if option.complexity != o.OptionComplexity.key_only:
-                pass
-            if option.is_action_set():
-                option(self)
+                if command is None:
+                    raise ValueError(f"command {arg} not found")
+                
+                command(self, args)
+                break
+                
         
     def print_help(self) -> None:
         print(f"\nUsage:\n{self.script_name} [OPTIONS] COMMAND [ARGS]")

@@ -32,7 +32,7 @@ class BaseWithOptions(BaseModel):
             info += f"\nOptions:\n"
             strlen = max([opt.get_details_len() for opt in self.options])
             
-            info += "\n".join([opt.get_stylized_details(strlen) for opt in self.options])
+            info += "\n".join([f'  {opt.get_stylized_details(strlen)}' for opt in self.options]) +"\n"
             
         return info
     
@@ -69,3 +69,15 @@ class BaseWithOptions(BaseModel):
         
         else:
             raise ValueError(f"Invalid key: {key}")
+        
+    def run_option(self, option_name: str, args) -> None:
+        option = self.get_option_by_key(option_name)
+        
+        if option is None:
+            raise ValueError(f"option {option_name} not found")
+        
+        if option.complexity != o.OptionComplexity.key_only:
+            pass
+        
+        if option.is_action_set():
+            option(self, args)
