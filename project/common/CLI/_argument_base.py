@@ -6,3 +6,6 @@ import enum
 
 class ArgumentLikeBase(BaseModel):
     name: str = None
+    
+    def __init__(self, **data) -> None:
+        super().__init__(**data)

@@ -5,10 +5,10 @@ from . import options as o
 
 from ._with_options_class import BaseWithOptions
 from ._with_help_class import BaseWithHelp
-from ._with_arguments_class import ArgumentLikeBase
+from ._with_arguments_class import WithArgumentBase
 import typing
 
-class Command(BaseWithOptions, ArgumentLikeBase, BaseWithHelp):
+class Command(BaseWithOptions, WithArgumentBase, BaseWithHelp):
     short_desc: str
     
     def __init__(self, **data):
@@ -36,7 +36,7 @@ class Command(BaseWithOptions, ArgumentLikeBase, BaseWithHelp):
             if arg.startswith("-"):
                 self.run_option(arg, args)
             else:
-                raise ValueError(f"command {arg} not found")
+                self.run_argument(arg, args)
     
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         raise NotImplementedError(f"Command __call__ not implemented for {self.name}")

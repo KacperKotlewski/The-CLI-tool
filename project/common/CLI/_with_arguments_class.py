@@ -57,3 +57,6 @@ class WithArgumentBase(ArgumentLikeBase):
     
     def get_details_len(self) -> int:
         return len(self.name)
+    
+    def run_argument(self, argument_name: str, args) -> None:
+        pass

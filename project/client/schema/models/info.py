@@ -6,3 +6,11 @@ class SchemaInfo(BaseModel):
     version: str = None
     author: str = None
     license: str = None
+    
+    def __str__(self) -> str:
+        return f'''Schema Info:
+Name: {self.name}
+Description: {self.description}
+Version: {self.version}
+Author: {self.author}
+License: {self.license}'''

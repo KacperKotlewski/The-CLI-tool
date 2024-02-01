@@ -38,6 +38,7 @@ class RootModule(CLImodule):
     
     commands: typing.List[c.Command] = [
         baseCommands.Run(),
+        baseCommands.Deserialize(),
     ]
     
     user_args: typing.List[str] = None
