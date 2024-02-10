@@ -81,3 +81,4 @@ class BaseWithOptions(BaseModel):
         
         if option.is_action_set():
             option(self, args)
+            

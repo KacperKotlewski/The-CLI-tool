@@ -25,6 +25,20 @@ class Deserialize(Command):
         #     ],
         #     details=['-m, --mode <mode>', 'Set the mode to run the tool in.'],
         # ),
+        o.Option(
+            name="input schema file",
+            complexity=o.OptionComplexity.key_and_value,
+            key=[
+                o.KeyModel(key='i', type=o.OptionKeyTypes.letter),
+                o.KeyModel(key='input', type=o.OptionKeyTypes.phrase)
+            ],
+            details=['-i, --input <file>', 'Set the input file to deserialize.'],
+            value = o.ValueModel(
+                type=o.OptionValueTypes.single,
+                value=None
+            ),
+            action = lambda self, args: setattr(self, 'input_file', args[0])
+        ),
     ]
     arguments:typing.List[a.Argument]=[
         # a.Argument(
@@ -38,6 +52,9 @@ class Deserialize(Command):
         # # )
     ]
     
+    input_file: str = None
+    output_file: str = None
+    
     def __init__(self, **data) -> None:
         super().__init__(**data)
         
@@ -50,18 +67,19 @@ class Deserialize(Command):
         super().run(args)
         
         #ask for file path
-        input_file = input("Enter file path: ")
-        #check existence
-        if not os.path.exists(input_file):
-            print(f"File {input_file} does not exist")
+        if self.input_file is None:
+            self.output_file = input("Enter file path: ")
+        
+        if not os.path.exists(self.output_file):
+            print(f"File {self.output_file} does not exist")
             sys.exit(1)
             
-        text = open(input_file, 'r').read()
+        text = open(self.output_file, 'r').read()
         
         schema = parser.parse_env_schema(text)
         
         #print schema
-        print(f"\nSchema: {input_file}\n\n{schema}\n\n")
+        print(f"\nSchema: {self.output_file}\n\n{schema}\n\n")
         
         output_file_data = ""
         
@@ -89,11 +107,14 @@ class Deserialize(Command):
                 
                 output_file_data += f"{element.og_name}={element.default}\n"
                 
-        output_file_name = input("Enter output file name (default: .env): ")
-        if output_file_name == "":
-            output_file_name = ".env"
+                
+        # if self.output_file is None:
+        #     self.output_file = input("Enter output file name (default: .env): ")
+        # if self.output_file == "":
+        #     self.output_file = ".env"
+        self.output_file = ".env"
             
-        with open(output_file_name, 'w') as f:
+        with open(self.output_file, 'w') as f:
             f.write(output_file_data)
             
         
