@@ -4,3 +4,4 @@ __pycache__
 .python-version
 thesis/build
 thesis.pdf
+.vscode
