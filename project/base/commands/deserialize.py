@@ -105,14 +105,15 @@ class Deserialize(Command):
                 if new_value != "":
                     element.default = new_value
                 
-                output_file_data += f"{element.og_name}={element.default}\n"
+                descrition_str = f" # {element.description}" if element.description is not None else ""
+                output_file_data += f"{element.og_name}={element.default}{descrition_str}\n"
                 
                 
         # if self.output_file is None:
         #     self.output_file = input("Enter output file name (default: .env): ")
         # if self.output_file == "":
         #     self.output_file = ".env"
-        self.output_file = ".env"
+        self.output_file = ".env-deserialized"
             
         with open(self.output_file, 'w') as f:
             f.write(output_file_data)

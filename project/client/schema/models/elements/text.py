@@ -43,3 +43,9 @@ class SchemaText(BaseModel):
             return f"----------"
         else:
             return f"{self.text}"
+        
+    def to_text(self) -> str:
+        if self.type in [SchemaTextTypes.space, SchemaTextTypes.divider]:
+            return f"# {self.type.value}"
+        else:
+            return f"# {self.type.value}: {self.text}\n"

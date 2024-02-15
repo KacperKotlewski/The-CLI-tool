@@ -18,6 +18,29 @@ class SchemaFieldProps(enum.Enum):
     generate = "Generate"
     hidden = "Hidden"
     
+def text_field_template(field: 'SchemaField') -> str:
+    text =  '# Field:\n'
+    if field.name:
+        text += f'- Name:         {field.name}\n'
+    if field.example:
+        text += f'- Example:      {field.example}\n'
+    if field.description:
+        text += f'- Description:  {field.description}\n'
+    if field.hint:
+        text += f'- Hint:         {field.hint}\n'
+    if field.type:
+        text += f'- Type:         {field.type}\n'
+    if field.regex:
+        text += f'- Regex:        {field.regex}\n'
+    if field.props:
+        text += f'- Props:        {", ".join([prop.value for prop in field.props])}\n'
+    if field.error:
+        text += f'- Error:        {field.error}\n'
+            
+    text += f'{field.og_name}={field.default}\n'
+    
+    return text
+    
 class SchemaField(BaseModel):
     og_name: str = None
     default: typing.Optional[str] = None
@@ -45,3 +68,6 @@ class SchemaField(BaseModel):
             return [validate_single_prop(prop) for prop in v]
         else:
             raise ValueError(f"Invalid props, expected list, got {type(v)} : \n{v}")
+        
+    def to_text(self) -> str:
+        return text_field_template(self)
