@@ -100,10 +100,32 @@ class Deserialize(Command):
                 output_file_data += f"# {element}\n"
                     
             elif isinstance(element, models.SchemaField):
-                print(f"\n{element.name}:\n {element.description}\n example: {element.example}")
-                new_value = input(f"Enter value (default: {element.default}): ")
-                if new_value != "":
-                    element.default = new_value
+                
+                if not element.is_hidden():
+                    print(f"\n{element.name if element.name is not None else element.og_name}")
+                    if element.description is not None:
+                        print(f" {element.description}") 
+                    if element.example is not None:
+                        print(f" example: {element.example}")
+                        
+                    default = "will be generated" if element.is_auto_generated() else element.default
+                    
+                    while True:
+                        new_value = input(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
+                        
+                        if new_value == "" and element.is_required():
+                            print(f"Field is required")
+                        elif new_value != "" and element.check_regex(new_value):
+                            element.default = new_value
+                            break
+                        elif new_value == "" and element.is_auto_generated():
+                            element.default = element.generate()
+                            break
+                        else:
+                            break
+
+                elif element.is_auto_generated():
+                    element.default = element.generate()
                 
                 descrition_str = f" # {element.description}" if element.description is not None else ""
                 output_file_data += f"{element.og_name}={element.default}{descrition_str}\n"

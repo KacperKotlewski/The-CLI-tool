@@ -45,7 +45,11 @@ class SchemaText(BaseModel):
             return f"{self.text}"
         
     def to_text(self) -> str:
+        return f"# {self.introduce()}\n"
+        
+    
+    def introduce(self) -> str:
         if self.type in [SchemaTextTypes.space, SchemaTextTypes.divider]:
-            return f"# {self.type.value}"
+            return f"{self.type.value}"
         else:
-            return f"# {self.type.value}: {self.text}\n"
+            return f"{self.type.value}: {self.text}"

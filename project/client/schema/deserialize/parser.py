@@ -188,7 +188,11 @@ def parse_schema_element(inputData:ParseData, element_in_developement:models.Sch
 
     
     def finishField(line: str, inputData:ParseData, field_in_developement:models.SchemaField):
-        og_name, default = line.split("=")
+        splited = line.split("=")
+        og_name = splited[0].strip()
+        default = ""
+        if len(splited) > 1:
+            default = "=".join(splited[1:]).strip()
         field_in_developement.og_name = og_name.strip()
         field_in_developement.default = default.strip()
         inputData.schema_model.elements.append(field_in_developement)

@@ -69,11 +69,22 @@ class Serialize(Command):
             message = ":".join(message.split(":")[:-1])
         return message
                 
-    def user_input_string(self, message: str) -> str:
+    def user_input_string(self, message: str, required:bool=False, return_none:bool=False) -> str:
+        if required and return_none:
+            raise ValueError("required and return_none cannot be both True")
+        
         if message is None:
             message = "Enter value"
         message = self.strip_user_msg(message)
-        return input(f'{message}: ')
+        
+        while True:
+            input_ = input(f'{message}: ')
+            if input_ != "" or (not required and input_ == "" and not return_none):
+                return input_
+            elif not required and input_ == "" and return_none:
+                return None
+            else:
+                print("Value is required")
     
     def user_input_accept(self, message: str) -> bool:
         if message is None:
@@ -110,6 +121,31 @@ class Serialize(Command):
                 return choices[choice-1]
             except ValueError:
                 print("Invalid value. Input must be a number corresponding to the option")
+                
+    def user_input_choose_item(self, items: typing.List[models.SchemaElement], message: str, escape:bool=False, allow_empty_element:bool=False) -> typing.Tuple[int, models.SchemaElement]:
+        if message is None:
+            message = "Enter value"
+        message = self.strip_user_msg(message)
+        
+        print("Choose from the following options:")
+        for i, item in enumerate(items):
+            if item is None and allow_empty_element:
+                print(f"{i+1}. --- Empty ---")
+            print(f"{i+1}. {item.introduce()}")
+        if escape:
+            print("Type 'escape' to cancel")
+        
+        while True:
+            try:
+                inp = input(f"{message}: ")
+                if escape and inp.lower() == "escape":
+                    return None, None
+                choice = int(inp)
+                if choice < 1 or choice > len(items):
+                    raise ValueError()
+                return choice-1, items[choice-1]
+            except ValueError:
+                print("Invalid value. Input must be a number corresponding to the option")
     
                 
                 
@@ -124,30 +160,31 @@ class Serialize(Command):
         
         license = None
         
-        if licence_choice == "Choose established license" or licence_choice == "Detect":
-            licenses = requests.get("https://api.github.com/licenses").json()
-            license_names = [license["spdx_id"] for license in licenses]
+        while license is None:
+            if licence_choice == "Choose established license" or licence_choice == "Detect":
+                licenses = requests.get("https://api.github.com/licenses").json()
+                license_names = [license["spdx_id"] for license in licenses]
+                
+                if licence_choice == "Choose established license":
+                    license = self.user_input_choice(license_names, "Choose license: ")
+                elif licence_choice == "Detect":
+                    for root, dirs, files in os.walk("."):
+                        if "LICENSE" in files:
+                            with open(os.path.join(root, "LICENSE"), 'r') as f:
+                                license_content = f.read()
+                                
+                            for lic_name in license_names:
+                                if lic_name in license_content:
+                                    if self.user_input_accept(f"Detected license: {lic_name}\nUse this license?"):
+                                        license = lic_name
+                                        break
+                            break
             
-            if licence_choice == "Choose established license":
-                license = self.user_input_choice(license_names, "Choose license: ")
-            elif licence_choice == "Detect":
-                for root, dirs, files in os.walk("."):
-                    if "LICENSE" in files:
-                        with open(os.path.join(root, "LICENSE"), 'r') as f:
-                            license_content = f.read()
-                            
-                        for lic_name in license_names:
-                            if lic_name in license_content:
-                                if self.user_input_accept(f"Detected license: {lic_name}\nUse this license?"):
-                                    license = lic_name
-                                    break
-                        break
-        
-        elif licence_choice == "Custom license":
-            license = self.user_input_string("Enter license: ")
-            
-        elif licence_choice == "None":
-            license = "None"
+            elif licence_choice == "Custom license":
+                license = self.user_input_string("Enter license: ")
+                
+            elif licence_choice == "None":
+                license = "None"
             
         
         return models.SchemaInfo(
@@ -157,6 +194,189 @@ class Serialize(Command):
             author=author,
             license=license,
         )
+        
+    # def go_through_elements(self, elements: typing.List[models.SchemaElement]) -> typing.List[models.SchemaElement]:
+    
+    def edit_field(self, element: models.SchemaField) -> models.SchemaField:
+        print(f"Editing field: {element.og_name}")
+        # default: typing.Optional[str] = None
+        # name: typing.Optional[str] = None
+        # example: typing.Optional[str] = None
+        # description: typing.Optional[str] = None
+        # hint: typing.Optional[str] = None
+        # type: SchemaFieldTypes = None
+        # regex: typing.Optional[str] = None
+        # props: typing.Optional[typing.List[SchemaFieldProps]] = None
+        # error: typing.Optional[str] = None
+        
+        name = self.user_input_string("Enter name" + f"(current: {element.name})" if element.name else "")
+        description = self.user_input_string("Enter description" + f"(current: {element.description})" if element.description else "")
+        hint = self.user_input_string("Enter hint" + f"(current: {element.hint})" if element.hint else "")
+        # type_ = self.user_input_string("Enter type" + f"(current: {element.type})" if element.type else "")
+        default = self.user_input_string("Enter default value" + f"(current: {element.default})" if element.default else "")
+        regex = self.user_input_string("Enter regex" + f"(current: {element.regex})" if element.regex else "")
+        required = self.user_input_accept(f"Is required? (current: {models.SchemaFieldProps.required in element.props}): ")
+        hidden = self.user_input_accept(f"Is hidden? (current: {models.SchemaFieldProps.hidden in element.props}): ")
+        generate = self.user_input_accept(f"Is generated? (current: {models.SchemaFieldProps.generate in element.props}): ")
+        error = self.user_input_string("Enter error message" + f"(current: {element.error})" if element.error else "")
+        
+        return models.SchemaElement(
+            name=name if name else element.name,
+            description=description if description else element.description,
+            hint=hint if hint else element.hint,
+            default=default if default else element.default,
+            regex=regex if regex else element.regex,
+            props=[
+                models.SchemaFieldProps.required if required else None,
+                models.SchemaFieldProps.hidden if hidden else None,
+                models.SchemaFieldProps.generate if generate else None,
+            ],
+            error=error if error else element.error,
+        )
+        
+    def edit_text(self, element: models.SchemaText) -> models.SchemaText:
+        no_text = [models.SchemaTextTypes.space, models.SchemaTextTypes.divider]
+        
+        print(f"Editing text element: {element.type.value} : {element.text if element.text else ''}")
+        
+        if element.type in no_text:
+            new_type = self.user_input_choice([t.value for t in models.SchemaTextTypes if t not in no_text], "Choose new type")
+            text = None
+            if not new_type in no_text:
+                text = self.user_input_string(f"Enter text (current: {element.text if element.text else ''})")
+            return models.SchemaText(type=new_type, text=text)
+        else:
+            new_type = self.user_input_choice(["Type", "Text"], "Choose what to edit")
+            if new_type == "Type":
+                new_type = self.user_input_choice([t.value for t in models.SchemaTextTypes], "Choose new type")
+                return models.SchemaText(type=new_type, text=element.text)
+            elif new_type == "Text":
+                text = self.user_input_string(f"Enter text (current: {element.text if element.text else ''})")
+                return models.SchemaText(type=element.type, text=text)
+        
+    def edit_element(self, element: models.SchemaElement) -> models.SchemaElement:
+        if isinstance(element, models.SchemaField):
+            return self.edit_field(element)
+        elif isinstance(element, models.SchemaText):
+            return self.edit_text(element)
+        
+        
+    def create_new_field(self) -> models.SchemaField:
+        print("Enter field information:")
+        og_name = self.user_input_string("Enter field (example: DATABASE_PASSWORD)", required=True)
+        name = self.user_input_string("Enter display name", return_none=True)
+        default = self.user_input_string("Enter default value")
+        description = self.user_input_string("Enter description", return_none=True)
+        example = self.user_input_string("Enter example", return_none=True)
+        hint = self.user_input_string("Enter hint", return_none=True)
+        # type_ = self.user_input_string("Enter type")
+        regex = self.user_input_string("Enter regex", return_none=True)
+        error_msg = self.user_input_string("Enter error message", return_none=True)
+        
+        props = list()
+        for elem in models.SchemaFieldProps:
+            answer = self.user_input_accept(f"Is {elem.value} set?")
+            if answer:
+                props.append(elem)
+        
+        return models.SchemaField(
+            og_name=og_name,
+            default=default,
+            name=name,
+            example=example,
+            description=description,
+            hint=hint,
+            # type=type.
+            regex=regex,
+            props=props,
+            error=error_msg
+        )
+        
+    def create_new_text(self) -> models.SchemaText:
+        print("Enter text information:")
+        choices = [e.value for e in models.SchemaTextTypes]
+        type_ = self.user_input_choice(choices, "Choose text type")
+        type_ = models.SchemaTextTypes(type_)
+        if type_ in [models.SchemaTextTypes.space, models.SchemaTextTypes.divider]:
+            return models.SchemaText(type=type_)
+        else:
+            text = self.user_input_string("Enter text")
+            return models.SchemaText(type=type_, text=text)
+    
+    def create_new_element(self) -> models.SchemaElement:
+        choices = ["Field", "Text"]
+        choice = self.user_input_choice(choices, "Choose element type")
+        
+        if choice == "Field":
+            return self.create_new_field()
+        elif choice == "Text":
+            return self.create_new_text()
+        
+    def insert_element(self, element: models.SchemaElement, elements: typing.List[models.SchemaElement]) -> typing.List[models.SchemaElement]:
+        index, elem = self.user_input_choose_item(elements, "Choose position", allow_empty_element=True)
+        if index is None:
+            return None
+        
+        elements.insert(index, element)
+        return elements
+    
+    def last_think_before_save(self, schema: models.Schema) -> models.Schema:
+        
+        while True:
+            
+            choices = ["View", "Edit", "Save"]
+            print("\n\n--------- Options ---------\n")
+            choice = self.user_input_choice(choices, "What do you want to do?")
+            
+            if choice == "View":
+                choice = self.user_input_choice(["Schema", "Elements"], "What do you want to view?")
+                if choice == "Schema":
+                    print("\n\n--------- Schema ---------\n")
+                    print(schema.to_text())
+                    input("Press key to continue")
+                elif choice == "Elements":
+                    print("\n\n--------- Elements ---------\n")
+                    for element in schema.elements:
+                        print(element.introduce())
+                    input("Press key to continue")
+                
+            elif choice == "Save":
+                break
+            
+            elif choice == "Edit":               
+                
+                while True:
+                    choices = ["Change schema info", "Edit element", "Add element", "Remove element", "Change element position", "Finish editing"]
+                    choice = self.user_input_choice(choices, "What do you want to do?")
+                    if choice == "Change schema info":
+                        schema.schemaInfo = self.create_schema_info()
+                        
+                    elif choice == "Edit element":
+                        index, element = self.user_input_choose_item(schema.elements, "Choose element to edit")
+                        schema.elements[index] = self.edit_element(element)
+                        
+                    elif choice == "Add element":
+                        element = self.create_new_element()
+                        schema.elements = self.insert_element(element, schema.elements+[None])
+
+                    elif choice == "Remove element":
+                        index, element = self.user_input_choose_item(schema.elements, "Choose element to delete", escape=True)
+                        schema.elements.pop(index)
+                    
+                    elif choice == "Change element position":
+                        index, element = self.user_input_choose_item(schema.elements, "Choose element to change position", escape=True)
+                        if index is None:
+                            continue
+                        trimmed_list = schema.elements[:index] + schema.elements[index+1:]
+                        schema.elements = self.insert_element(element, trimmed_list)
+                    
+                    elif choice == "Finish editing":
+                        break
+                    
+        return schema
+        
+        
+        
         
         
     def run(self, args: typing.List[str]) -> None:
@@ -181,11 +401,11 @@ class Serialize(Command):
         schemaInfo = self.create_schema_info()
         
         
-        
+        schem = self.last_think_before_save(parser.build_schema(schemaInfo, elements))
         
         self.output_file = "schema.env-serialized"
         
-        parsed = parser.build_schema(schemaInfo, elements).to_text()
+        parsed = schem.to_text()
             
         with open(self.output_file, 'w') as f:
             f.write(parsed)
