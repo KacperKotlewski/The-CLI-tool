@@ -52,8 +52,8 @@ class Deserialize(Command):
         # # )
     ]
     
-    input_file: str = None
-    output_file: str = None
+    input_file: typing.Optional[str]  = None
+    output_file: typing.Optional[str] = None
     
     def __init__(self, **data) -> None:
         super().__init__(**data)
@@ -68,18 +68,18 @@ class Deserialize(Command):
         
         #ask for file path
         if self.input_file is None:
-            self.output_file = input("Enter file path: ")
+            self.input_file = input("Enter file path: ")
         
-        if not os.path.exists(self.output_file):
-            print(f"File {self.output_file} does not exist")
+        if not os.path.exists(self.input_file):
+            print(f"File {self.input_file} does not exist")
             sys.exit(1)
             
-        text = open(self.output_file, 'r').read()
+        text = open(self.input_file, 'r').read()
         
         schema = parser.parse_env_schema(text)
         
         #print schema
-        print(f"\nSchema: {self.output_file}\n\n{schema}\n\n")
+        print(f"\nSchema: {self.input_file}\n\n{schema}\n\n")
         
         output_file_data = ""
         
@@ -108,34 +108,36 @@ class Deserialize(Command):
                     if element.example is not None:
                         print(f" example: {element.example}")
                         
-                    default = "will be generated" if element.is_auto_generated() else element.default
+                    default = "will be generated" if element.is_generated() else element.default
                     
                     while True:
                         new_value = input(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
                         
-                        if new_value == "" and element.is_required():
-                            print(f"Field is required")
-                        elif new_value != "" and element.check_regex(new_value):
+                        if new_value != "" and element.check_regex(new_value):
                             element.default = new_value
                             break
-                        elif new_value == "" and element.is_auto_generated():
+                        elif new_value == "" and element.is_generated():
                             element.default = element.generate()
                             break
+                        elif new_value == "" and element.is_required() and element.default == "":
+                            print(f"Field is required")
                         else:
                             break
 
-                elif element.is_auto_generated():
+                elif element.is_generated():
                     element.default = element.generate()
                 
                 descrition_str = f" # {element.description}" if element.description is not None else ""
                 output_file_data += f"{element.og_name}={element.default}{descrition_str}\n"
                 
                 
-        # if self.output_file is None:
-        #     self.output_file = input("Enter output file name (default: .env): ")
-        # if self.output_file == "":
-        #     self.output_file = ".env"
-        self.output_file = ".env-deserialized"
+        sname = schema.schemaInfo.name.lower().replace(' ', '_')
+        if self.output_file is None:
+            self.output_file = input(f"Enter output file name (default: .env." + (f".{sname}" if sname != "" else "") + "): ").strip()
+        if self.output_file == "":
+            self.output_file = ".env." + (f".{sname}" if sname != "" else "") + ".deserialized"
+            
+        print(f"Saves to {self.output_file}")
             
         with open(self.output_file, 'w') as f:
             f.write(output_file_data)

@@ -104,7 +104,7 @@ class Serialize(Command):
             except ValueError:
                 print("Invalid value. Input must be an integer number")
     
-    def user_input_choice(self, choices: typing.List[str], message: str) -> str:
+    def user_input_choice(self, choices: typing.List[str], message: str, escape:bool=False) -> str:
         if message is None:
             message = "Enter value"
         message = self.strip_user_msg(message)
@@ -112,10 +112,15 @@ class Serialize(Command):
         print("Choose from the following options:")
         for i, choice in enumerate(choices):
             print(f"{i+1}. {choice}")
+        if escape:
+            print("Type 'escape' to cancel")
         
         while True:
             try:
-                choice = int(input(f"{message}: "))
+                inp = input(f"{message}: ")
+                if escape and inp.lower() == "escape":
+                    return None
+                choice = int(inp)
                 if choice < 1 or choice > len(choices):
                     raise ValueError()
                 return choices[choice-1]
@@ -129,9 +134,11 @@ class Serialize(Command):
         
         print("Choose from the following options:")
         for i, item in enumerate(items):
-            if item is None and allow_empty_element:
-                print(f"{i+1}. --- Empty ---")
-            print(f"{i+1}. {item.introduce()}")
+            if item is None:
+                if allow_empty_element:
+                    print(f"{i+1}. --- Empty ---")
+            else:
+                print(f"{i+1}. {item.introduce()}")
         if escape:
             print("Type 'escape' to cancel")
         
@@ -199,40 +206,38 @@ class Serialize(Command):
     
     def edit_field(self, element: models.SchemaField) -> models.SchemaField:
         print(f"Editing field: {element.og_name}")
-        # default: typing.Optional[str] = None
-        # name: typing.Optional[str] = None
-        # example: typing.Optional[str] = None
-        # description: typing.Optional[str] = None
-        # hint: typing.Optional[str] = None
-        # type: SchemaFieldTypes = None
-        # regex: typing.Optional[str] = None
-        # props: typing.Optional[typing.List[SchemaFieldProps]] = None
-        # error: typing.Optional[str] = None
         
-        name = self.user_input_string("Enter name" + f"(current: {element.name})" if element.name else "")
-        description = self.user_input_string("Enter description" + f"(current: {element.description})" if element.description else "")
-        hint = self.user_input_string("Enter hint" + f"(current: {element.hint})" if element.hint else "")
-        # type_ = self.user_input_string("Enter type" + f"(current: {element.type})" if element.type else "")
-        default = self.user_input_string("Enter default value" + f"(current: {element.default})" if element.default else "")
-        regex = self.user_input_string("Enter regex" + f"(current: {element.regex})" if element.regex else "")
-        required = self.user_input_accept(f"Is required? (current: {models.SchemaFieldProps.required in element.props}): ")
-        hidden = self.user_input_accept(f"Is hidden? (current: {models.SchemaFieldProps.hidden in element.props}): ")
-        generate = self.user_input_accept(f"Is generated? (current: {models.SchemaFieldProps.generate in element.props}): ")
-        error = self.user_input_string("Enter error message" + f"(current: {element.error})" if element.error else "")
+        inp = lambda message: self.user_input_string(message, return_none=True)
         
-        return models.SchemaElement(
-            name=name if name else element.name,
-            description=description if description else element.description,
-            hint=hint if hint else element.hint,
-            default=default if default else element.default,
-            regex=regex if regex else element.regex,
-            props=[
-                models.SchemaFieldProps.required if required else None,
-                models.SchemaFieldProps.hidden if hidden else None,
-                models.SchemaFieldProps.generate if generate else None,
-            ],
-            error=error if error else element.error,
-        )
+        og_name = inp("Enter field key" + f"(current: {element.og_name})")
+        name = inp("Enter display name" + (f"(current: {element.name})" if element.name else ""))
+        description = inp("Enter description" + (f"(current: {element.description})" if element.description else ""))
+        hint = inp("Enter hint" + (f"(current: {element.hint})" if element.hint else ""))
+        default = inp("Enter default value" + (f"(current: {element.default})" if element.default else ""))
+        regex = inp("Enter regex" + (f"(current: {element.regex})" if element.regex else ""))
+        error = inp("Enter error message" + (f"(current: {element.error})" if element.error else ""))
+        
+        props = list()
+        for prop in models.SchemaFieldProps:
+            enabled = element.props is not None and prop in element.props
+            answer = self.user_input_accept(f"Is {prop.value} set?" + (f" (current: {'yes' if enabled else 'no'})" if enabled else ""))
+            if answer:
+                props.append(prop)
+                
+        if len(props) == 0:
+            props = None
+                
+        new_elem = element.__deepcopy__()
+        new_elem.og_name = og_name if og_name else element.og_name
+        new_elem.name = name if name else element.name
+        new_elem.description = description if description else element.description
+        new_elem.hint = hint if hint else element.hint
+        new_elem.default = default if default else element.default
+        new_elem.regex = regex if regex else element.regex
+        new_elem.props = props if props else element.props
+        new_elem.error = error if error else element.error
+        
+        return new_elem
         
     def edit_text(self, element: models.SchemaText) -> models.SchemaText:
         no_text = [models.SchemaTextTypes.space, models.SchemaTextTypes.divider]
@@ -305,7 +310,7 @@ class Serialize(Command):
     
     def create_new_element(self) -> models.SchemaElement:
         choices = ["Field", "Text"]
-        choice = self.user_input_choice(choices, "Choose element type")
+        choice = self.user_input_choice(choices, "Choose element type", escape=True)
         
         if choice == "Field":
             return self.create_new_field()
@@ -352,7 +357,7 @@ class Serialize(Command):
                         schema.schemaInfo = self.create_schema_info()
                         
                     elif choice == "Edit element":
-                        index, element = self.user_input_choose_item(schema.elements, "Choose element to edit")
+                        index, element = self.user_input_choose_item(schema.elements, "Choose element to edit", escape=True)
                         schema.elements[index] = self.edit_element(element)
                         
                     elif choice == "Add element":
@@ -367,11 +372,15 @@ class Serialize(Command):
                         index, element = self.user_input_choose_item(schema.elements, "Choose element to change position", escape=True)
                         if index is None:
                             continue
-                        trimmed_list = schema.elements[:index] + schema.elements[index+1:]
+                        trimmed_list = schema.elements[:index] + schema.elements[index+1:] + [None]
                         schema.elements = self.insert_element(element, trimmed_list)
+                        # filter none values
+                        schema.elements = [elem for elem in schema.elements if elem is not None]
                     
                     elif choice == "Finish editing":
                         break
+                    
+                    schema.elements = [elem for elem in schema.elements if elem is not None]
                     
         return schema
         
@@ -384,15 +393,15 @@ class Serialize(Command):
         
         #ask for file path
         if self.input_file is None:
-            self.output_file = input("Enter file path: ")
+            self.input_file = input("Enter file path: ")
         
-        if not os.path.exists(self.output_file):
-            print(f"File {self.output_file} does not exist")
+        if not os.path.exists(self.input_file):
+            print(f"File {self.input_file} does not exist")
             sys.exit(1)
            
         print("Serializing .env data...")
         elements = None
-        with open(self.output_file, 'r') as f:
+        with open(self.input_file, 'r') as f:
             elements = parser.parse_env_to_elements(f.read())
             
         print("Serializing finished\n")
@@ -401,14 +410,18 @@ class Serialize(Command):
         schemaInfo = self.create_schema_info()
         
         
-        schem = self.last_think_before_save(parser.build_schema(schemaInfo, elements))
+        schema = self.last_think_before_save(parser.build_schema(schemaInfo, elements))
         
-        self.output_file = "schema.env-serialized"
-        
-        parsed = schem.to_text()
+        sname = schema.schemaInfo.name.lower().replace(' ', '_')
+        if self.output_file is None:
+            self.output_file = input(f"Enter output file name (default: .env" + (f".{sname}" if sname != "" else "") + ".schema): ").strip()
+        if self.output_file == "":
+            self.output_file = ".env" + (f".{sname}" if sname != "" else "") + ".schema"
             
-        with open(self.output_file, 'w') as f:
-            f.write(parsed)
+        print(f"Saves to {self.output_file}")
+            
+        with open(self.output_file, 'w', encoding="utf-8") as f:
+            f.write(schema.to_text())
         
         
                 

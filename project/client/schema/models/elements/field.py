@@ -140,4 +140,7 @@ class SchemaField(BaseModel):
         return SchemaFieldProps.required in self.props
     
     def is_generated(self) -> bool:
-        return self.generator is not None
+        # return self.generator is not None
+        if self.props is None:
+            return False
+        return SchemaFieldProps.generate in self.props
