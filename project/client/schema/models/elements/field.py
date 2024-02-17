@@ -31,7 +31,7 @@ class GeneratorField(BaseModel):
     
     def generate(self, type: SchemaFieldTypes) -> str:
         if type in [SchemaFieldTypes.string, SchemaFieldTypes.password, SchemaFieldTypes.base64]:
-            special_chars = ''.join(set(string.punctuation) - {'#', '='})
+            special_chars = ''.join({'!', '@', '%', '^', '-', '_', '+', '{', '}', '[', ']', ':', ',', '.', '/', '~'})
             return ''.join(random.choices(string.ascii_letters + string.digits + special_chars, k=self.length))
                 
         elif type == SchemaFieldTypes.integer:

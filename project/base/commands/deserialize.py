@@ -12,7 +12,7 @@ import sys
 
 class Deserialize(Command):
     name:str='deserialize'
-    short_desc:str='Deserialize the given file'
+    short_desc:str='Deserialize the given file - create .env file from .env.schema file.'
     usage:str="deserialize [options]"
     details:str="deserialize [options]"
     options:typing.List[o.Option]=[
@@ -61,10 +61,10 @@ class Deserialize(Command):
     def __call__(self, module:CLImodule, args:typing.List[str]) -> Any:
         stripped_args = args[1:]
         
-        self.run(stripped_args)
+        self.execute(stripped_args)
         
-    def run(self, args: typing.List[str]) -> None:
-        super().run(args)
+    def execute(self, args: typing.List[str]) -> None:
+        super().execute(args)
         
         #ask for file path
         if self.input_file is None:

@@ -10,6 +10,7 @@ import typing
 
 class Command(BaseWithOptions, WithArgumentBase, BaseWithHelp):
     short_desc: str
+    steps: typing.List[typing.Callable] = list()
     
     def __init__(self, **data):
         super().__init__(**data)
@@ -31,12 +32,19 @@ class Command(BaseWithOptions, WithArgumentBase, BaseWithHelp):
     def get_stylized_details(self, strlen: int) -> str:
         return super().get_stylized_details(strlen) + f'\t\t{self.short_desc}'
     
-    def run(self, args: typing.List[str]) -> None:
+    def fetch_args(self, args: typing.List[str]) -> typing.List[str]:
         for arg in args:
             if arg.startswith("-"):
                 self.run_option(arg, args)
             else:
                 self.run_argument(arg, args)
+        return args
+        
+    
+    def execute(self, args: typing.List[str]) -> None:
+        args = self.fetch_args(args)
+        for step in self.steps:
+            step(args)
     
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         raise NotImplementedError(f"Command __call__ not implemented for {self.name}")

@@ -29,3 +29,6 @@ class CLIHandlerRegistry(CLI_Module_Handler):
             root_module = roots_handler.get_module(ROOT_MODULE_NAME)
         
             root_module()
+            
+    # def reqister_command(self, command: Any) -> None:
+    #     .commands.append(command)

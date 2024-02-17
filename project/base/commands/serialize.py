@@ -62,7 +62,7 @@ class Serialize(Command):
     def __call__(self, module:CLImodule, args:typing.List[str]) -> Any:
         stripped_args = args[1:]
         
-        self.run(stripped_args)
+        self.execute(stripped_args)
         
     def strip_user_msg(self, message: str) -> str:
         if message.strip().endswith(":"):
@@ -388,8 +388,8 @@ class Serialize(Command):
         
         
         
-    def run(self, args: typing.List[str]) -> None:
-        super().run(args)
+    def execute(self, args: typing.List[str]) -> None:
+        super().execute(args)
         
         #ask for file path
         if self.input_file is None:
