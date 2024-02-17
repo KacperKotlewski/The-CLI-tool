@@ -12,7 +12,8 @@ class OptionFactory:
     """
         
     # function that makes a universal builder for all functions later
-    def __create_builder(self, name: str, keys: typing.List[str], description: str) -> OptionBuilder:
+    @classmethod
+    def _create_builder(self, name: str, keys: typing.List[str], description: str) -> OptionBuilder:
         """
         __create_builder creates a builder for a abstract_instance, flag, argument, or option.
 
@@ -31,6 +32,7 @@ class OptionFactory:
         builder.set_description(description)
         return builder
     
+    @classmethod
     def _create_abstract_instance(self, name: str, keys: typing.List[str], description: str) -> OptionAbstract:
         """
         _create_abstract_instance creates an abstract instance of a flag, argument, or option.
@@ -43,10 +45,11 @@ class OptionFactory:
         Returns:
             OptionAbstract: The abstract instance of the flag, argument, or option.
         """
-        builder = self.__create_builder(name, keys, description)
+        builder = self._create_builder(name, keys, description)
         return builder.build()
     
-    def create_flag(self, name: str, keys: typing.List[str], description: str) -> Flag:
+    @classmethod
+    def flag(self, name: str, keys: typing.List[str], description: str) -> Flag:
         """
         create_flag creates a flag.
         
@@ -61,7 +64,8 @@ class OptionFactory:
         abstract_instance = self._create_abstract_instance(name, keys, description)
         return Flag(**abstract_instance.model_dump())
     
-    def create_argument(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Argument:
+    @classmethod
+    def argument(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Argument:
         """
         create_argument creates an argument.
         
@@ -79,7 +83,8 @@ class OptionFactory:
         abstract_instance = builder.build()
         return Argument(**abstract_instance.model_dump())
     
-    def create_option(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Option:
+    @classmethod
+    def option(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Option:
         """
         create_option creates an option.
         

@@ -11,7 +11,6 @@ class Option(OptionAbstract):
         description (str): The description of the option.
         default_value (typing.Optional[str]): The default value of the option.
     """
-    _type = OptionType.option
     
     def __init__(self, default_value: typing.Optional[str] = None, **data) -> None:
         if default_value is not None:

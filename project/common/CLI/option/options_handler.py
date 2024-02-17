@@ -1,5 +1,9 @@
 from .keymodel import KeyModelTypes
-from .option_abstract import OptionAbstract, OptionType
+
+from .option_abstract import OptionAbstract
+from .argument import Argument
+from .flag import Flag
+
 from common.models.base import BaseModel
 
 import typing
@@ -96,6 +100,18 @@ class OptionHandler(BaseModel):
                     return option
         return None
     
+    def get_help(self) -> str:
+        """
+        get_help gets the help message for the flags, arguments, and options.
+        
+        Returns:
+            str: The help message for the flags, arguments, and options.
+        """
+        help_str = ""
+        for option in self.options:
+            help_str += option.get_help() + "\n"
+        return help_str
+    
     def handle_args(self, args: typing.List[str]) -> None:
         """
         handle_args handles the arguments of the flags, arguments, and options.
@@ -104,13 +120,13 @@ class OptionHandler(BaseModel):
             args (typing.List[str]): The arguments of the flags, arguments, and options.
         """
         index = 0
-        queue_of_arguments = [option for option in self.options if option._type == OptionType.argument]
+        queue_of_arguments = [option for option in self.options if isinstance(option, Argument)]
         while index < len(args):
             arg = args[index]
             if arg.startswith("-"):
                 option = self.get_option_by_key(arg)
                 if option:
-                    if option._type == OptionType.flag:
+                    if isinstance(option, Flag):
                         option.set_value()
                     else:
                         index += 1
@@ -120,3 +136,22 @@ class OptionHandler(BaseModel):
                 option.set_value(arg)
             index += 1
         
+    def __add__(self, other: typing.Union['OptionHandler', OptionAbstract]) -> 'OptionHandler':
+        """
+        __add__ adds two options handlers together or an option handler and an option.
+        
+        Args:
+            other (typing.Union[OptionHandler, OptionAbstract]): The other option handler or option to add.
+            
+        Returns:
+            OptionHandler: The option handler with the other option handler or option added.
+        """
+        if isinstance(other, OptionHandler):
+            for option in other.options:
+                try:
+                    self.add_option(option)
+                except ValueError as e:
+                    pass # ignore duplicate options
+        elif isinstance(other, OptionAbstract):
+            self.add_option(other)
+        return self

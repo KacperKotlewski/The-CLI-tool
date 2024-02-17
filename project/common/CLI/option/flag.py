@@ -9,7 +9,6 @@ class Flag(OptionAbstract):
         key (typing.List[KeyModel]): The key of the flag.
         description (str): The description of the flag.
     """
-    _type = OptionType.flag
     _value = False
     
     def _validate_key(self) -> None:

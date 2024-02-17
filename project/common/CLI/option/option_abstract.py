@@ -6,11 +6,6 @@ from common.models.base import BaseModel
 
 from .keymodel import KeyModel
 
-class OptionType(enum.Enum):
-    flag = enum.auto()
-    argument = enum.auto()
-    option = enum.auto()
-
 class OptionAbstract(BaseModel, ABC):
     """
     OptionAbstract class is a class that represents a flag, argument, or option.
@@ -24,7 +19,6 @@ class OptionAbstract(BaseModel, ABC):
     keys: typing.List[KeyModel] = list()
     description: str = None
     _value: typing.Optional[str] = None
-    _type: OptionType = None
     
     @property
     def value(self) -> typing.Optional[str]:
@@ -86,3 +80,12 @@ class OptionAbstract(BaseModel, ABC):
         """
         if key not in self.keys:
             self.keys.append(key)
+
+    def get_help(self) -> str:
+        """
+        get_help gets the help message for the flag, argument, or option.
+        
+        Returns:
+            str: The help message for the flag, argument, or option.
+        """
+        return f"{self.name} - {self.description}"
