@@ -1,26 +1,27 @@
 from .module_abstract import ModuleAbstract
-from .module_handler import ModuleHandler
+from .module_handler import ModuleHandler, ModuleNotFound
 from .command import Command
+
+from pydantic import Field
 
 import typing
 
 class Module(ModuleAbstract):
-    module_handler: ModuleHandler = None
+    module_handler: ModuleHandler = Field(default_factory=ModuleHandler)
     
     def __init__(self, **data) -> None:
-        self.module_handler = ModuleHandler()
         super().__init__(**data)
         
     def _validate(self) -> None:
         """
         _validate validates the module.
         """
-        self._validate_hanlder()
+        self._validate_handler()
         return super()._validate()
     
-    def _validate_hanlder(self) -> None:
+    def _validate_handler(self) -> None:
         """
-        _validate_hanlder validates the module handler.
+        _validate_handler validates the module handler.
         
         Raises:
             ValueError: If the module handler is not set.
@@ -36,6 +37,10 @@ class Module(ModuleAbstract):
         Args:
             *args: The arguments to be passed to the module.
         """
-        name = args[0]
-        args = args[1:]
-        return self.module_handler.execute(name, *args)
+        try:
+            name = args[0] if len(args) > 0 else None
+            fetch_module = self.module_handler.get_module(name)
+            return fetch_module.execute(*args[1:])
+        except ModuleNotFound as e:
+            super().execute(*args)
+        

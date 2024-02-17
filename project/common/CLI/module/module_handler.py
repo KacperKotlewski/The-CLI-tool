@@ -3,6 +3,9 @@ from common.models.base import BaseModel
 
 import typing
 
+class ModuleNotFound(Exception):
+    pass
+
 class ModuleHandler(BaseModel):
     modules: typing.List[ModuleAbstract] = list()
     
@@ -35,7 +38,7 @@ class ModuleHandler(BaseModel):
         for module in self.modules:
             if module.name == name:
                 return module
-        raise ValueError(f"Module {name} not found.")
+        raise ModuleNotFound(f"Module {name} not found.")
     
     def __iadd__(self, module: typing.Union[ModuleAbstract, typing.List[ModuleAbstract]]) -> 'ModuleHandler':
         if isinstance(module, list):

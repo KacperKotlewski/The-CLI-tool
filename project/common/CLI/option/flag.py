@@ -1,4 +1,4 @@
-from .option_abstract import OptionAbstract, OptionType
+from .option_abstract import OptionAbstract
 
 class Flag(OptionAbstract):
     """
@@ -10,6 +10,10 @@ class Flag(OptionAbstract):
         description (str): The description of the flag.
     """
     _value = False
+    
+    def __init__(self, **data):
+        super().__init__(**data)
+        self._validate_value()
     
     def _validate_key(self) -> None:
         self._validate_key_existence()
@@ -25,8 +29,13 @@ class Flag(OptionAbstract):
         if self.value is not None and not isinstance(self.value, bool):
             raise ValueError(f"Flag {self.name} has value {self.value} that is not a boolean")
         
-    def set_value(self, value) -> None:
-        self._value = True
+    def set_value(self, value: bool=True) -> None:
+        if not isinstance(value, bool):
+            raise ValueError(f"Flag {self.name} has value {value} that is not a boolean")
+        self._value = value
         
     def is_set(self) -> bool:
         return self._value
+
+    def __str__(self) -> str:
+        return f"Flag: {self.name}, {self.description}, {self.value}"

@@ -1,4 +1,4 @@
-from .option_abstract import OptionAbstract, OptionType
+from .option_abstract import OptionAbstract
 import typing
 
 class Option(OptionAbstract):
@@ -20,3 +20,6 @@ class Option(OptionAbstract):
     def _validate_key(self) -> None:
         self._validate_key_existence()
         return super()._validate_key()
+
+    def __str__(self) -> str:
+        return f"Option: {self.name}, {self.description}, {self.value} | keys: {self.keys}"

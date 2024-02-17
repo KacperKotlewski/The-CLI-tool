@@ -1,5 +1,4 @@
 from .module_abstract import ModuleAbstract
-from .module import Module
 
 # from common.CLI.option import OptionAbstract
 # from common.CLI.interface import UserInterface, UIDataDriven, UIMenuDriven

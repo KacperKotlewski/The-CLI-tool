@@ -4,12 +4,21 @@ import typing
 from .option_abstract import OptionAbstract
 from .keymodel import KeyModelTypes, KeyModel
 
+from .flag import Flag
+from .argument import Argument
+from .option import Option
+
 class OptionBuilder:
     """
     OptionBuilder class is a class that builds a flag, argument, or option.
-    """
+    """    
+    name: str = None
+    keys: typing.List[KeyModel] = list()
+    description: str = None
+    value: typing.Optional[str] = None
+    
     def __init__(self) -> None:
-        self.option = OptionAbstract()
+        pass    
         
     def set_name(self, name: str) -> 'OptionBuilder':
         """
@@ -21,7 +30,7 @@ class OptionBuilder:
         Returns:
             OptionBuilder: The OptionBuilder object.
         """
-        self.option.name = name
+        self.name = name
         return self
     
     def add_key(self, key: str) -> 'OptionBuilder':
@@ -42,7 +51,8 @@ class OptionBuilder:
         else:
             raise ValueError(f"Key {key} is not a valid key, all keys must start with '-' or '--' and have a length of 2 or more.")
         
-        self.option.append_key(KeyModel(key=key, type=type))
+        key = key.strip("-").strip()
+        self.keys.append(KeyModel(key=key, type=type))
         return self
     
     def set_description(self, description: str) -> 'OptionBuilder':
@@ -55,7 +65,7 @@ class OptionBuilder:
         Returns:
             OptionBuilder: The OptionBuilder object.
         """
-        self.option.description = description
+        self.description = description
         return self
     
     def set_value(self, value: typing.Optional[str]) -> 'OptionBuilder':
@@ -68,8 +78,46 @@ class OptionBuilder:
         Returns:
             OptionBuilder: The OptionBuilder object.
         """
-        self.option.value = value
+        
         return self
     
-    def build(self) -> OptionAbstract:
-        return deepcopy(self.option)
+    def build_flag(self) -> Flag:
+        """
+        build_Flag builds a flag.
+        
+        Returns:
+            Flag: The flag object.
+        """
+        return Flag(
+            name=self.name,
+            keys=deepcopy(self.keys),
+            description=self.description
+        )
+    
+    def build_argument(self) -> Argument:
+        """
+        build_argument builds an argument.
+        
+        Returns:
+            Argument: The argument object.
+        """
+        return Argument(
+            name=self.name,
+            keys=deepcopy(self.keys),
+            description=self.description,
+            value=self.value
+        )
+    
+    def build_option(self) -> Option:
+        """
+        build_option builds an option.
+        
+        Returns:
+            Option: The option object.
+        """
+        return Option(
+            name=self.name,
+            keys=deepcopy(self.keys),
+            description=self.description,
+            value=self.value
+        )

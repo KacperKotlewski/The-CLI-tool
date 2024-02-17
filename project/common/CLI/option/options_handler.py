@@ -90,8 +90,10 @@ class OptionHandler(BaseModel):
         if not key.startswith("-"):
             raise ValueError(f"Key {key} is not a valid key, all keys must start with '-' or '--'")
         
+        key = key.strip("-")
+        
         type = KeyModelTypes.phrase
-        if len(key) == 2:
+        if len(key) == 1:
             type = KeyModelTypes.letter
             
         for option in self.options:
@@ -112,7 +114,7 @@ class OptionHandler(BaseModel):
             help_str += option.get_help() + "\n"
         return help_str
     
-    def handle_args(self, args: typing.List[str]) -> None:
+    def handle_args(self, *args: str) -> None:
         """
         handle_args handles the arguments of the flags, arguments, and options.
         
@@ -121,8 +123,10 @@ class OptionHandler(BaseModel):
         """
         index = 0
         queue_of_arguments = [option for option in self.options if isinstance(option, Argument)]
+        
         while index < len(args):
             arg = args[index]
+            
             if arg.startswith("-"):
                 option = self.get_option_by_key(arg)
                 if option:
@@ -155,3 +159,12 @@ class OptionHandler(BaseModel):
         elif isinstance(other, OptionAbstract):
             self.add_option(other)
         return self
+    
+    def __str__(self) -> str:
+        """
+        __str__ gets the string representation of the options handler.
+        
+        Returns:
+            str: The string representation of the options handler.
+        """
+        return f"OptionsHandler: \n\t" + "\t\n".join([str(option) for option in self.options])

@@ -99,3 +99,7 @@ class OptionAbstract(BaseModel, ABC):
             bool: True if the flag, argument, or option is set, False otherwise.
         """
         return self._value is not None
+    
+    @abstractmethod
+    def __str__(self) -> str:
+        pass

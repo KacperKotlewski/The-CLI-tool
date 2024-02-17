@@ -1,11 +1,10 @@
 import typing
-from common.models.base import BaseModel
 from common.CLI.option import OptionAbstract, Flag
 
 from .action import Action
 from .builder import ActionBuilder
 
-class ActionFactory(BaseModel):
+class ActionFactory:
     @staticmethod
     def action_builder(name: str, function: typing.Callable, condition: typing.Callable) -> ActionBuilder:
         builder = ActionBuilder()
@@ -34,7 +33,7 @@ class ActionFactory(BaseModel):
         if not isinstance(option, Flag):
             raise ValueError(f"Option is not a Flag: {option}")
         
-        condition = lambda **kwargs: option.is_set()
+        condition = lambda *args: option.is_set()
         return ActionFactory.action(option.name, function, condition)
     
     @staticmethod

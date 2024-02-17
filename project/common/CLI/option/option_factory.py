@@ -33,22 +33,6 @@ class OptionFactory:
         return builder
     
     @classmethod
-    def _create_abstract_instance(self, name: str, keys: typing.List[str], description: str) -> OptionAbstract:
-        """
-        _create_abstract_instance creates an abstract instance of a flag, argument, or option.
-
-        Args:
-            name (str): The name of the flag, argument, or option.
-            keys (typing.List[str]): The keys of the flag, argument, or option.
-            description (str): The description of the flag, argument, or option.
-
-        Returns:
-            OptionAbstract: The abstract instance of the flag, argument, or option.
-        """
-        builder = self._create_builder(name, keys, description)
-        return builder.build()
-    
-    @classmethod
     def flag(self, name: str, keys: typing.List[str], description: str) -> Flag:
         """
         create_flag creates a flag.
@@ -61,8 +45,9 @@ class OptionFactory:
         Returns:
             Flag: The flag object.
         """
-        abstract_instance = self._create_abstract_instance(name, keys, description)
-        return Flag(**abstract_instance.model_dump())
+        builder = self._create_builder(name, keys, description)
+        flag = builder.build_flag()
+        return flag
     
     @classmethod
     def argument(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Argument:
@@ -78,10 +63,10 @@ class OptionFactory:
         Returns:
             Argument: The argument object.
         """
-        builder = self.__create_builder(name, keys, description)
+        builder = self._create_builder(name, keys, description)
         builder.set_value(default_value)
-        abstract_instance = builder.build()
-        return Argument(**abstract_instance.model_dump())
+        argument = builder.build_argument()
+        return argument
     
     @classmethod
     def option(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Option:
@@ -97,8 +82,8 @@ class OptionFactory:
         Returns:
             Option: The option object.
         """
-        builder = self.__create_builder(name, keys, description)
+        builder = self._create_builder(name, keys, description)
         builder.set_value(default_value)
-        abstract_instance = builder.build()
-        return Option(**abstract_instance.model_dump())
+        option = builder.build_option()
+        return option
     

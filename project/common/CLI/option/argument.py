@@ -1,4 +1,4 @@
-from .option_abstract import OptionAbstract, OptionType
+from .option_abstract import OptionAbstract
 
 import typing
 
@@ -12,9 +12,11 @@ class Argument(OptionAbstract):
         description (str): The description of the argument.
         default_value (typing.Optional[str]): The default value of the argument.
     """
-    _type = OptionType.argument
     
     def __init__(self, default_value: typing.Optional[str] = None, **data) -> None:
         if default_value is not None:
             self.value = default_value
         super().__init__(**data)
+
+    def __str__(self) -> str:
+        return f"Argument: {self.name}, {self.description}, {self.value} | keys: {self.keys}"
