@@ -31,9 +31,15 @@ class ActionHandler(BaseModel):
         if action in self.actions:
             self.actions.remove(action)
             
-    def execute_actions(self, *args, **kwargs) -> None:
+    def execute_actions(self, *args, **kwargs) -> int:
+        count_of_executed_actions = 0
+        
         for action in self.actions:
-            action.execute(*args, **kwargs)
+            fetched = action.execute(*args, **kwargs)
+            
+            if fetched:
+                count_of_executed_actions += 1
+        return count_of_executed_actions
             
     def get_action(self, action: Action) -> Action:
         return action

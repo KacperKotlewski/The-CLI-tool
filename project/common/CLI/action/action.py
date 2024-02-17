@@ -23,6 +23,6 @@ class Action(BaseModel):
         if not self.condition:
             raise ValueError(f"Action has no condition: {self.condition}")
         
-    def execute(self, *args, **kwargs) -> None:
+    def execute(self, *args, **kwargs) -> typing.Optional[typing.Tuple[bool, typing.Any]]:
         if self.condition(*args, **kwargs):
-            self.function(*args, **kwargs)
+            return True, self.function(*args, **kwargs)

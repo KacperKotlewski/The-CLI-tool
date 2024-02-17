@@ -1,6 +1,7 @@
 import enum
 from copy import deepcopy
 import typing
+import sys
 
 from abc import ABC, abstractmethod
 
@@ -11,13 +12,16 @@ from common.CLI.option import OptionHandler, OptionFactory
 from common.CLI.action import ActionFactory, ActionHandler
 # from common.CLI.interface import UserInterface
 
+from common.debug import DEBUG
+
 class ModuleAbstract(BaseModel, ABC):
     name: str = None
     description: str = None
     details: str = None
     help_str: str = None
-    option_handler: OptionHandler = Field(default_factory=OptionHandler)
-    action_handler: ActionHandler = Field(default_factory=ActionHandler)
+    option_handler: OptionHandler = None
+    action_handler: ActionHandler = None
+    default_action: typing.Callable = Field(default=lambda *args: print(f"Command not found. Try '{sys.argv[0]} -h' for help."))
     # current_user_interface: 'UserInterface' = None
     
     def __init__(self, **data) -> None:
@@ -27,12 +31,19 @@ class ModuleAbstract(BaseModel, ABC):
         data['action_handler'] = ActionHandler()
         
         super().__init__(**data)
+        
         self._setup_options_and_actions()
+        
+        self._extra_options_and_actions()
         
         if option_handler:
             self.option_handler += option_handler
         if action_handler:
             self.action_handler += action_handler
+        
+    @abstractmethod
+    def _extra_options_and_actions(self) -> None:
+        pass
         
     def _setup_options_and_actions(self) -> None:
         #add help option
@@ -68,14 +79,17 @@ class ModuleAbstract(BaseModel, ABC):
         print(self.describe())
         
     # get args and go through options with option_handler.handle_args()
-    def handle_args(self, *args) -> None:
+    def handle_args(self, *args) -> int:
         if len(args) == 0:
             return
-        self.option_handler.handle_args(*args)
+        return self.option_handler.handle_args(*args)
         
     def execute_actions(self, *args) -> None:
-        self.handle_args(*args)
-        self.action_handler.execute_actions(*args)
+        handled_args_number = self.handle_args(*args)
+        handled_action_number = self.action_handler.execute_actions(*args)
+
+        if handled_args_number == 0 and handled_action_number == 0:
+            self.default_action(*args)
     
     def __call__(self, *args) -> None:
         self.execute(*args)

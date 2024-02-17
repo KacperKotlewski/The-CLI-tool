@@ -114,13 +114,14 @@ class OptionHandler(BaseModel):
             help_str += option.get_help() + "\n"
         return help_str
     
-    def handle_args(self, *args: str) -> None:
+    def handle_args(self, *args: str) -> int:
         """
         handle_args handles the arguments of the flags, arguments, and options.
         
         Args:
             args (typing.List[str]): The arguments of the flags, arguments, and options.
         """
+        count_of_executed_options = 0
         index = 0
         queue_of_arguments = [option for option in self.options if isinstance(option, Argument)]
         
@@ -132,13 +133,18 @@ class OptionHandler(BaseModel):
                 if option:
                     if isinstance(option, Flag):
                         option.set_value()
+                        count_of_executed_options += 1
                     else:
                         index += 1
                         option.set_value(args[index])
-            else:
+                        count_of_executed_options += 1
+            elif len(queue_of_arguments) > 0:
                 option = queue_of_arguments.pop(0)
                 option.set_value(arg)
+                count_of_executed_options += 1
             index += 1
+            
+        return count_of_executed_options
         
     def __add__(self, other: typing.Union['OptionHandler', OptionAbstract]) -> 'OptionHandler':
         """

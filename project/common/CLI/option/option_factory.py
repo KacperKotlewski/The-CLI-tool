@@ -25,7 +25,9 @@ class OptionFactory:
         Returns:
             OptionBuilder: The OptionBuilder object.
         """
+        
         builder = OptionBuilder()
+        
         builder.set_name(name)
         for key in keys:
             builder.add_key(key)

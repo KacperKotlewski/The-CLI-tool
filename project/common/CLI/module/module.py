@@ -7,9 +7,10 @@ from pydantic import Field
 import typing
 
 class Module(ModuleAbstract):
-    module_handler: ModuleHandler = Field(default_factory=ModuleHandler)
+    module_handler: ModuleHandler = None
     
     def __init__(self, **data) -> None:
+        data['module_handler'] = ModuleHandler()
         super().__init__(**data)
         
     def _validate(self) -> None:

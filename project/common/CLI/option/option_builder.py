@@ -13,12 +13,12 @@ class OptionBuilder:
     OptionBuilder class is a class that builds a flag, argument, or option.
     """    
     name: str = None
-    keys: typing.List[KeyModel] = list()
+    keys: typing.List[KeyModel] = None
     description: str = None
     value: typing.Optional[str] = None
     
     def __init__(self) -> None:
-        pass    
+        self.keys = list()
         
     def set_name(self, name: str) -> 'OptionBuilder':
         """
