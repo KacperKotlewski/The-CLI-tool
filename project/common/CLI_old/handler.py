@@ -1,5 +1,5 @@
 import typing
-from common.CLI.module import CLImodule, ModuleType
+from common.CLI_old.module import CLImodule, ModuleType
 
 
 class CLI_Module_Handler:

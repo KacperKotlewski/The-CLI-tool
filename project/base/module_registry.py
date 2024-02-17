@@ -1,7 +1,7 @@
 import typing
 from typing import Any
-from common.CLI.handler import CLI_Module_Handler, CLImodule
-from common.CLI.module import ModuleType
+from common.CLI_old.handler import CLI_Module_Handler, CLImodule
+from common.CLI_old.module import ModuleType
 from .config import ROOT_MODULE_NAME
 
 class CLIHandlerRegistry(CLI_Module_Handler):

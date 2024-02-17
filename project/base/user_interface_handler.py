@@ -1,5 +1,5 @@
 import typing
-from common.CLI.module import CLImodule
+from common.CLI_old.module import CLImodule
 
 class UserInterfaceHandler:
     interfaces: typing.Dict[str, CLImodule] = {}

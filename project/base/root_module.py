@@ -1,7 +1,7 @@
 from typing import Any
-from common.CLI.module import CLImodule, ModuleType
-from common.CLI import options as o
-from common.CLI import commands as c
+from common.CLI_old.module import CLImodule, ModuleType
+from common.CLI_old import options as o
+from common.CLI_old import commands as c
 from .config import ROOT_MODULE_NAME
 from client.schema.versions import Version
 from . import commands as baseCommands
