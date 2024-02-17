@@ -89,3 +89,13 @@ class OptionAbstract(BaseModel, ABC):
             str: The help message for the flag, argument, or option.
         """
         return f"{self.name} - {self.description}"
+    
+    
+    def is_set(self) -> bool:
+        """
+        is_set checks if the flag, argument, or option is set.
+        
+        Returns:
+            bool: True if the flag, argument, or option is set, False otherwise.
+        """
+        return self._value is not None

@@ -27,3 +27,6 @@ class Flag(OptionAbstract):
         
     def set_value(self, value) -> None:
         self._value = True
+        
+    def is_set(self) -> bool:
+        return self._value
