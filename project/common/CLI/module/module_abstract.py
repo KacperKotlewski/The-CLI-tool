@@ -5,7 +5,7 @@ import sys
 
 from abc import ABC, abstractmethod
 
-from common.models.base import BaseModel
+from common.CLI.abstract_model import AbstractModel
 from pydantic import Field
 
 from common.CLI.option import OptionHandler, OptionFactory
@@ -14,10 +14,7 @@ from common.CLI.action import ActionFactory, ActionHandler
 
 from common.debug import DEBUG
 
-class ModuleAbstract(BaseModel, ABC):
-    name: str = None
-    description: str = None
-    details: str = None
+class ModuleAbstract(AbstractModel, ABC):
     help_str: str = None
     option_handler: OptionHandler = None
     action_handler: ActionHandler = None
@@ -47,7 +44,7 @@ class ModuleAbstract(BaseModel, ABC):
         
     def _setup_options_and_actions(self) -> None:
         #add help option
-        help_option = OptionFactory.flag(name='help', keys=['-h', '--help'], description='Display the help message.')
+        help_option = OptionFactory.flag(name='help', keys=['-h', '--help'], description='Display the help message. Also use with commands to display the command help message. Also use with options to display the option help message.')
         help_action = ActionFactory.from_flag(option=help_option, function=self.print_help)
         self.option_handler += help_option
         self.action_handler += help_action
@@ -69,8 +66,56 @@ class ModuleAbstract(BaseModel, ABC):
         return self.help_str
     
     def print_help(self, *args) -> None:
-        print(self.get_help())
-        print(self.option_handler.get_help())
+        print(f"\n{self.get_help()}\n")
+        print(self.get_details())
+            
+    
+    def get_details(self) -> str:
+        info = ""
+        
+        try:
+            from blessed import Terminal
+            term = Terminal()
+            width = term.width
+        except ImportError:
+            import shutil
+            width = shutil.get_terminal_size().columns
+            
+        print(width)
+        spaces = {"before": 2, "after": 10}
+        
+        calc_taken = lambda strlen: spaces["before"] + strlen + spaces["after"]
+        
+        create_str = lambda text1, text2: (
+            " " * spaces["before"] +
+            text1 +
+            " " * spaces["after"] +
+            text2
+        )
+        
+        if len(self.option_handler) > 0:
+            info += f"\nOptions:\n"
+            strlen = max([len(opt.get_keys_str()) for opt in self.option_handler.options])
+            
+            taken = calc_taken(strlen)
+            
+            create_opt_str = lambda option: create_str(option.get_stylized_keys(strlen), option.spaced_description(taken, width)[taken+1:])
+            
+            info += "\n".join([create_opt_str(opt) for opt in self.option_handler.options]) +"\n"
+        
+        # if len(self.options) > 0:
+        #     info += f"\nOptions:\n"
+        #     strlen = max([opt.get_details_len() for opt in self.options])
+            
+        #     info += "\n".join([f'  {opt.get_stylized_details(strlen)}' for opt in self.options]) +"\n"
+        
+        # if len(self.commands) > 0:
+        #     info += f"\nCommands:\n"
+        #     strlen = max([comm.get_details_len()  for comm in self.commands])
+            
+        #     info += "\n".join([f'  {comm.get_stylized_details(strlen)}' for comm in self.commands]) +"\n"
+            
+        return info
         
     def describe(self) -> str:
         return self.description

@@ -2,11 +2,11 @@ import enum
 import typing
 from abc import ABC, abstractmethod
 
-from common.models.base import BaseModel
+from common.CLI.abstract_model import AbstractModel
 
-from .keymodel import KeyModel
+from .keymodel import KeyModel, KeyModelTypes
 
-class OptionAbstract(BaseModel, ABC):
+class OptionAbstract(AbstractModel, ABC):
     """
     OptionAbstract class is a class that represents a flag, argument, or option.
     
@@ -15,9 +15,7 @@ class OptionAbstract(BaseModel, ABC):
         keys (typing.List[KeyModel]): The keys of the flag, argument, or option.
         description (str): The description of the flag, argument, or option.
     """
-    name: str = None
     keys: typing.List[KeyModel] = list()
-    description: str = None
     _value: typing.Optional[str] = None
     
     @property
@@ -38,6 +36,7 @@ class OptionAbstract(BaseModel, ABC):
         """
         _validate validates the flag, argument, or option.
         """
+        super()._validate()
         self._validate_key()
         self._validate_value()
     
@@ -103,3 +102,34 @@ class OptionAbstract(BaseModel, ABC):
     @abstractmethod
     def __str__(self) -> str:
         pass
+    
+    def get_keys(self) -> typing.List[str]:
+        """
+        get_keys gets the keys of the flag, argument, or option.
+        
+        Returns:
+            typing.List[str]: The keys of the flag, argument, or option.
+        """
+        return [key.key for key in self.keys]
+    
+    def get_keys_str(self) -> str:
+        """
+        get_keys_str gets the keys of the flag, argument, or option as a string.
+        
+        Returns:
+            str: The keys of the flag, argument, or option as a string.
+        """
+        styled_keys = [f"-{key.key}" if key.type == KeyModelTypes.letter else f"--{key.key}" for key in self.keys]
+        return ", ".join(styled_keys)
+    
+    def get_stylized_keys(self, strlen: int) -> str:
+        """
+        get_stylized_keys gets the keys of the flag, argument, or option as a string.
+        
+        Args:
+            strlen (int): The length of the keys.
+            
+        Returns:
+            str: The keys of the flag, argument, or option as a string.
+        """
+        return self.get_keys_str().ljust(strlen)

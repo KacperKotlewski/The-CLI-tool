@@ -174,3 +174,7 @@ class OptionHandler(BaseModel):
             str: The string representation of the options handler.
         """
         return f"OptionsHandler: \n\t" + "\t\n".join([str(option) for option in self.options])
+    
+    
+    def __len__(self) -> int:
+        return len(self.options)
