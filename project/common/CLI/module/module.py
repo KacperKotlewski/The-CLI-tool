@@ -31,6 +31,9 @@ class Module(ModuleAbstract):
             raise ValueError("Module handler not set.")
         self.module_handler._validate()
         
+    def _extra_options_and_actions(self) -> None:
+        return super()._extra_options_and_actions()
+        
     def execute(self, *args) -> typing.Any:
         """
         execute executes the module.

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from common.models.base import BaseModel
+from common.logger_model import LoggerModel
 from common.debug import log_section
 
 # def cut_strings_to_sentences(string:str, taken:int, total:int, separator:str="."):
@@ -52,7 +52,7 @@ def cut_strings_to_words(string:str, taken:int, total:int):
     lines.append(current_line)
     return '\n'.join(lines)
 
-class AbstractModel(ABC, BaseModel):
+class AbstractModel(LoggerModel, ABC):
     """
     AbstractModel class is a class that represents a model.
     
@@ -62,10 +62,6 @@ class AbstractModel(ABC, BaseModel):
     """
     name: str = None
     description: str = None
-    
-    @classmethod
-    def log(cls, *args, **kwargs):
-        log_section(cls.__name__, *args, **kwargs)
     
     def __init__(self, **data) -> None:
         super().__init__(**data)
@@ -109,7 +105,7 @@ class AbstractModel(ABC, BaseModel):
     
     def spaced_description(self, taken:int, total:int) -> str:
         l = total - taken
-        AbstractModel.log(l, taken, total)
+        AbstractModel.log_strict(l, taken, total)
         if l < 10:
             raise ValueError("Total length is less than taken length. Need at least 10 characters.")
         

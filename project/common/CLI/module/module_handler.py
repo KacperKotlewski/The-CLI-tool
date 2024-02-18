@@ -52,4 +52,40 @@ class ModuleHandler(BaseModel):
         module = self.get_module(name)
         return module(*args)
     
-    
+    def get_details(self) -> str:
+        info = super().get_details()
+        
+        try:
+            from blessed import Terminal
+            term = Terminal()
+            width = term.width
+        except ImportError:
+            import shutil
+            width = shutil.get_terminal_size().columns
+            
+        spaces = {"before": 2, "after": 10}
+        
+        calc_taken = lambda strlen: spaces["before"] + strlen + spaces["after"]
+        
+        create_str = lambda text1, text2: (
+            " " * spaces["before"] +
+            text1 +
+            " " * spaces["after"] +
+            text2
+        )
+        
+        # if len(self.commands) > 0:
+        #     info += f"\nCommands:\n"
+        #     strlen = max([comm.get_details_len()  for comm in self.commands])
+            
+        #     info += "\n".join([f'  {comm.get_stylized_details(strlen)}' for comm in self.commands]) +"\n"
+        
+        if len(self.modules) > 0:
+            info += f"\nOptions:\n"
+            strlen = max([len(opt.get_keys_str()) for opt in self.option_handler.options])
+            
+            taken = calc_taken(strlen)
+            
+            create_opt_str = lambda option: create_str(option.get_stylized_keys(strlen), option.spaced_description(taken, width)[taken+1:])
+            
+            info += "\n".join([create_opt_str(opt) for opt in self.option_handler.options]) +"\n"

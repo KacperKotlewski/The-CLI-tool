@@ -15,6 +15,9 @@ class DEBUG:
             
     def dlog(*args, **kwargs):
         DEBUG.log("DEBUG: ", *args, **kwargs)
+        
+    def elog(*args, **kwargs):
+        DEBUG.log("ERROR: ", *args, **kwargs)
             
     @staticmethod
     def conditional_log(condition: bool, *args, **kwargs):
