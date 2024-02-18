@@ -13,6 +13,8 @@ from common.CLI.abstract_handler import AbstractHandler
 
 import typing
 
+from .exceptions import *
+
 class OptionHandler(AbstractHandler, BaseModel):
     """
     OptionsHandler class is a class that handles flags, arguments, and options.
@@ -75,6 +77,19 @@ class OptionHandler(AbstractHandler, BaseModel):
             help_str += option.get_help() + "\n"
         return help_str
     
+    def is_requirement_met(self, *args: str) -> bool:
+        """
+        is_requirenment_met checks if the required flags, arguments, and options are set.
+        
+        Returns:
+            bool: True if the required flags, arguments, and options are set, False otherwise.
+        """
+        for option in self.items:
+            if option.required and not option.is_set():
+                class_name = option.__class__.__name__
+                raise OptionNotSetError(f"{class_name} '{option.name}' is required.")
+        return True
+    
     def execute(self, *args: str) -> int:
         """
         handle_args handles the arguments of the flags, arguments, and options.
@@ -86,6 +101,7 @@ class OptionHandler(AbstractHandler, BaseModel):
         index = 0
         queue_of_arguments = [option for option in self.items if isinstance(option, Argument)]
         
+                
         while index < len(args):
             arg = args[index]
                         
@@ -95,7 +111,7 @@ class OptionHandler(AbstractHandler, BaseModel):
                     if isinstance(option, Flag):
                         option.set_value()
                         count_of_executed_options += 1
-                    elif isinstance(option, Option):
+                    elif isinstance(option, (Option, Argument)):
                         #handle option with argument, catch the next argument, if it is not a flag or not empty set the value of the option to the argument, else treat it as a flag
                         try:
                             next_arg = args[index+1]
@@ -109,16 +125,17 @@ class OptionHandler(AbstractHandler, BaseModel):
                             
                         count_of_executed_options += 1
                     else:
-                        raise ValueError(f"Option {option.name} is not a valid option. \n\t{option}")
+                        raise OptionNotValidError(f"Option '{option.name}' is not a valid option. \n\t{option}")
                             
             elif len(queue_of_arguments) > 0:
                 option = queue_of_arguments.pop(0)
                 option.set_value(arg)
                 count_of_executed_options += 1
             else:
-                raise ValueError(f"Option {option.name} is not a valid option. \n\t{option}")
+                raise ArgumentNotValidError(f"Argument '{arg}' is not a valid argument.")
             index += 1
             
+        # if self.required_fulfilled():
         return count_of_executed_options
     
     def __str__(self) -> str:
@@ -161,6 +178,12 @@ class OptionHandler(AbstractHandler, BaseModel):
     def get(self, name: str) -> OptionAbstract:
         return super().get(name)    
     
+    def filter(self, condition: typing.Callable = None, type: typing.Type = None) -> typing.List[OptionAbstract]:
+        return super().filter(condition, type)
+    
+    def filtered(self, condition: typing.Callable = None, type: typing.Type = None) -> 'OptionHandler':
+        return super().filtered(condition, type)
+    
     def __add__(self, other: typing.Union['OptionHandler', OptionAbstract, list]) -> 'OptionHandler':
         return super().__add__(other)
     
@@ -173,3 +196,5 @@ class OptionHandler(AbstractHandler, BaseModel):
     def __lt__(self, other: 'OptionHandler') -> bool:
         return super().__lt__(other)
     
+    def __repr__(self) -> str:
+        return f"OptionsHandler: {self.items}"
