@@ -4,30 +4,6 @@ from pydantic import Field
 from common.logger_model import LoggerModel
 from common.debug import log_section
 
-# def cut_strings_to_sentences(string:str, taken:int, total:int, separator:str="."):
-#     sentences = string.split(separator)
-#     lines = []
-#     current_line = ' ' * taken
-#     for sentence in sentences:
-#         print(len(current_line), len(sentence) + 1, total, current_line, sentence)
-#         # split the sentence if it's too long
-#         while len(sentence) > total:
-#             lines.append(current_line + sentence[:total-2])
-#             sentence = sentence[total-2:]
-#             current_line = ' ' * taken
-        
-#         # add the sentence to the current line if it fits  
-#         if len(current_line) + len(sentence) + 1 <= total:
-#             current_line += ' ' + sentence
-            
-#         # start a new line if it doesn't fit
-#         else:
-#             lines.append(current_line)
-#             current_line = ' ' * taken + sentence
-                
-#         lines.append(current_line)
-#         return '\n'.join(lines)
-
 def cut_strings_to_words(string:str, taken:int, total:int):
     words = string.split()
     lines = []
@@ -162,8 +138,12 @@ class AbstractModel(LoggerModel, ABC):
         return f"{self.name}: {self.description}"
     
     @abstractmethod
-    def __repr__(self) -> str:
+    def __repr__tuple__(self) -> str:
         return (self.name, self.description)
+    
+    @abstractmethod
+    def __repr__(self) -> str:
+        return f"{self.name}: {self.description}"
     
     @abstractmethod
     def __lt__(self, other) -> bool:
@@ -186,7 +166,7 @@ class AbstractModel(LoggerModel, ABC):
         
         return cut_strings_to_words(self.description, taken, total)
     
-    def stylized_representation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_lenght:int=None, second_str_lenght:int=None) -> str:
+    def stylized_representation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_length:int=None, second_str_length:int=None) -> str:
         """
         stylized_presentation stylizes the presentation of the model.
         
@@ -194,11 +174,11 @@ class AbstractModel(LoggerModel, ABC):
             total_space (int): The total space. Default is None.
             space_before (int): The space before the model. Default is None.
             space_after (int): The space after the model. Default is None.
-            first_str_lenght (int): The length of the first string. Default is None.
-            second_str_lenght (int): The length of the second string. Default is None.
+            first_str_length (int): The length of the first string. Default is None.
+            second_str_length (int): The length of the second string. Default is None.
         """
         
-        repr_str = self.__repr__()
+        repr_str = self.__repr__tuple__()
         
         if total_space is None:
             total_space = RepresentationSettings.total_space()
@@ -209,17 +189,17 @@ class AbstractModel(LoggerModel, ABC):
         if space_after is None:
             space_after = RepresentationSettings.space_after()
         
-        if first_str_lenght is None:
-            first_str_lenght = len(repr_str[0])
+        if first_str_length is None:
+            first_str_length = len(repr_str[0])
             
-        space_before_second = first_str_lenght + space_before + space_after
+        space_before_second = first_str_length + space_before + space_after
             
-        if second_str_lenght is None:
-            second_str_lenght = min(len(self.description), (total_space - space_before_second))
+        if second_str_length is None:
+            second_str_length = min(len(self.description), (total_space - space_before_second))
         
         return (
             " " * space_before + 
-            repr_str[0].ljust(first_str_lenght) + 
+            repr_str[0].ljust(first_str_length) + 
             " " * space_after + 
             self.spaced_description(space_before_second, total_space)[space_before_second:]
         )

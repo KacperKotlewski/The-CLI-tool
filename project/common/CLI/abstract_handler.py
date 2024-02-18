@@ -143,6 +143,36 @@ class AbstractHandler(ABC):
                 return item
         raise ValueError(f"Item {name} does not exist in the handler.")
     
+    @abstractmethod
+    def filter(self, condition: typing.Callable = None, type: typing.Type = None) -> typing.List[typing.Any]:
+        """
+        filter filters the items of the handler by name.
+        
+        Args:
+            name (str): The name to filter the items by.
+            
+        Returns:
+            List[Any]: The items of the handler filtered by name.
+        """
+        if condition is not None:
+            return filter(condition, self.items)
+        elif type is not None:
+            return filter(lambda item: isinstance(item, type), self.items)
+        
+        raise ValueError("Condition or Type must be set.")
+    
+    def filtered(self, condition: typing.Callable = None, type: typing.Type = None) -> 'AbstractHandler':
+        """
+        filtered filters the items of the handler by name.
+        
+        Args:
+            name (str): The name to filter the items by.
+            
+        Returns:
+            AbstractHandler: The items of the handler filtered by name.
+        """
+        return self.__class__(items=self.filter(condition, type))
+    
     @abstractmethod    
     def execute(self, name: str, *args) -> typing.Any:
         """
@@ -213,7 +243,8 @@ class AbstractHandler(ABC):
         
         return self
     
-    def stylized_representation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_lenght:int=None, second_str_lenght:int=None) -> str:
+    
+    def stylized_representation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_length:int=None, second_str_length:int=None) -> str:
         """
         stylized_presentation stylizes the presentation of the handler.
         
@@ -221,8 +252,10 @@ class AbstractHandler(ABC):
             total_space (int): The total space. Default is None.
             space_before (int): The space before the handler. Default is None.
             space_after (int): The space after the handler. Default is None.
-            first_str_lenght (int): The length of the first string. Default is None.
-            second_str_lenght (int): The length of the second string. Default is None.
+            first_str_length (int): The length of the first string. Default is None.
+            second_str_length (int): The length of the second string. Default is None.
         """
         
-        return [item.stylized_representation(total_space, space_before, space_after, first_str_lenght, second_str_lenght) for item in self.items]    
+        return [item.stylized_representation(total_space, space_before, space_after, first_str_length, second_str_length) for item in self.items]    
+    
+    
