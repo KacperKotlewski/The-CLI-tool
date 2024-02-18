@@ -157,12 +157,23 @@ class AbstractModel(LoggerModel, ABC):
         if not self.description:
             raise ValueError("Model description not set.")
         
+    @abstractmethod
     def __str__(self) -> str:
-        return f"{self.__class__.__name__()} | {self.name}: {self.description}"
+        return f"{self.name}: {self.description}"
     
-    def description_len(self) -> int:
-        return len(self.description)
-
+    @abstractmethod
+    def __repr__(self) -> str:
+        return (self.name, self.description)
+    
+    @abstractmethod
+    def __lt__(self, other) -> bool:
+        if not isinstance(other, AbstractModel):
+            raise ValueError("Can only compare with AbstractModel.")
+        return len(self) > len(other)
+    
+    @abstractmethod
+    def __len__(self) -> int:
+        return len(self.__repr__()[0])
     
     def spaced_description(self, taken:int, total:int) -> str:
         l = total - taken
@@ -175,10 +186,7 @@ class AbstractModel(LoggerModel, ABC):
         
         return cut_strings_to_words(self.description, taken, total)
     
-    def __repr__(self) -> str:
-        return (self.name, self.description)
-    
-    def stylized_presentation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_lenght:int=None, second_str_lenght:int=None) -> str:
+    def stylized_representation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_lenght:int=None, second_str_lenght:int=None) -> str:
         """
         stylized_presentation stylizes the presentation of the model.
         
@@ -208,5 +216,10 @@ class AbstractModel(LoggerModel, ABC):
             
         if second_str_lenght is None:
             second_str_lenght = min(len(self.description), (total_space - space_before_second))
-            
-        return " " * space_before + repr_str[0].ljust(first_str_lenght) + " " * space_after + self.spaced_description(space_before_second, total_space)[space_before_second:]
+        
+        return (
+            " " * space_before + 
+            repr_str[0].ljust(first_str_lenght) + 
+            " " * space_after + 
+            self.spaced_description(space_before_second, total_space)[space_before_second:]
+        )

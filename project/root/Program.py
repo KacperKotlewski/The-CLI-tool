@@ -14,8 +14,8 @@ Root = RootModule(
 
 
 def register_base_modules() -> None:
-    # from . import modules as module
-    # Root.module_handler += module.create
+    from . import modules as module
+    Root.module_handler += module.create
     pass
 
 def register_base_interfaces() -> None:

@@ -1,56 +1,75 @@
+from typing import List
+
+from pydantic import Field
 from .module_abstract import ModuleAbstract
 from common.models.base import BaseModel
+from common.CLI.abstract_handler import AbstractHandler
 
 import typing
 
 class ModuleNotFound(Exception):
     pass
 
-class ModuleHandler(BaseModel):
-    modules: typing.List[ModuleAbstract] = list()
+class ModuleHandler(AbstractHandler, BaseModel):
+    """
+    ModuleHandler class is a class that handles modules.
+    
+    Args:
+        items (List[ModuleAbstract]): The modules of the handler.
+    """
+    items: typing.List[ModuleAbstract] = list()
+    items_instance: typing.Type = Field(default=ModuleAbstract)
     
     def __init__(self, **data) -> None:
         super().__init__(**data)
-        self._validate()
         
     def _validate(self) -> None:
-        self._validate_modules()
+        super()._validate()
         
-    def _validate_modules(self) -> None:
-        list_of_names = [module.name for module in self.modules]
-        if len(list_of_names) != len(set(list_of_names)):
-            raise ValueError(f"ModuleHandler has duplicate module names: \n{list_of_names}")
-        
-        for module in self.modules:
-            module._validate()
-            
-    def add_module(self, module: ModuleAbstract) -> None:
-        if module not in self.modules:
-            self.modules.append(module)
-            self._validate_modules()
-            
-    def remove_module(self, module: ModuleAbstract) -> None:
-        if module in self.modules:
-            self.modules.remove(module)
-            self._validate_modules()
-            
-    def get_module(self, name: str) -> ModuleAbstract:
-        for module in self.modules:
-            if module.name == name:
-                return module
-        raise ModuleNotFound(f"Module {name} not found.")
+    def _validate_items(self) -> None:
+        return super()._validate_items()
     
-    def __iadd__(self, module: typing.Union[ModuleAbstract, typing.List[ModuleAbstract]]) -> 'ModuleHandler':
-        if isinstance(module, list):
-            for mod in module:
-                self.add_module(mod)
-        else:
-            self.add_module(module)
-        return self
+    def _validate_duplicates(self) -> None:
+        return super()._validate_duplicates()
+    
+    def verify_item(self, item: typing.Any) -> bool:
+        return super().verify_item(item)
+        
+    def check_item_duplicates(self, item: typing.Any) -> bool:
+        return super().check_item_duplicates(item)
+    
+    def check_item_instance(self, item: typing.Any) -> bool:
+        return super().check_item_instance(item)
+            
+    def add(self, module: ModuleAbstract) -> None:
+        super().add(module)
+        
+    def extend(self, items: List[ModuleAbstract]) -> None:
+        return super().extend(items)
+    
+    def insert(self, index: int, item: typing.Any) -> None:
+        return super().insert(index, item)
+            
+    def remove(self, module: ModuleAbstract) -> None:
+        super().remove(module)
+        
+    def get(self, name: str) -> ModuleAbstract:
+        try:
+            return super().get(name)
+        except ValueError as e:
+            raise ModuleNotFound(f"Module {name} not found.")
+    
+    def __add__(self, other: typing.Union[ModuleAbstract, typing.List[ModuleAbstract]]) -> 'ModuleHandler':
+        return super().__add__(other)
     
     def execute(self, name: str, *args) -> typing.Any:
-        module = self.get_module(name)
-        return module(*args)
+        super().execute(name, *args)
     
     def __len__(self) -> int:
-        return len(self.modules)
+        return super().__len__()
+    
+    def __iter__(self):
+        return super().__iter__()
+    
+    def __lt__(self, other: 'ModuleHandler') -> bool:
+        return super().__lt__(other)

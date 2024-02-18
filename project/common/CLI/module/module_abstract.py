@@ -77,10 +77,10 @@ class ModuleAbstract(AbstractModel, ABC):
         
         if len(self.option_handler) > 0:
             info += f"\nOptions:\n"
-            strlen = max([len(opt.__repr__()[0]) for opt in self.option_handler.options])
             
-            style_kwargs = {"first_str_lenght": strlen}
-            info += "\n".join([opt.stylized_presentation(**style_kwargs) for opt in self.option_handler.options]) +"\n"
+            strlen = max([len(opt.__repr__()[0]) for opt in self.option_handler])
+            
+            info += "\n".join(self.option_handler.stylized_representation(first_str_lenght=strlen)) +"\n"
             
         return info
         
@@ -94,7 +94,7 @@ class ModuleAbstract(AbstractModel, ABC):
     def handle_args(self, *args) -> int:
         if len(args) == 0:
             return
-        return self.option_handler.handle_args(*args)
+        return self.option_handler.execute(*args)
         
     def execute_actions(self, *args) -> None:
         handled_args_number = self.handle_args(*args)
@@ -109,3 +109,15 @@ class ModuleAbstract(AbstractModel, ABC):
     def inherit_from(self, module: 'ModuleAbstract') -> None:
         self.option_handler += module.option_handler
         self.action_handler += module.action_handler
+        
+    def __str__(self) -> str:
+        return super().__str__()
+    
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __lt__(self, other) -> bool:
+        return super().__lt__(other)
+    
+    def __len__(self) -> int:
+        return super().__len__()

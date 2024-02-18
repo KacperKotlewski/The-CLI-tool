@@ -156,18 +156,12 @@ class OptionAbstract(AbstractModel, ABC):
         
         return output
     
-    def get_stylized_keys(self, strlen: int) -> str:
-        """
-        get_stylized_keys gets the keys of the flag, argument, or option as a string.
-        
-        Args:
-            strlen (int): The length of the keys.
-            
-        Returns:
-            str: The keys of the flag, argument, or option as a string.
-        """
-        return self.get_keys_str().ljust(strlen)
-    
     def __repr__(self) -> str:
         keys = self.get_keys_str()
         return (keys, self.description)
+    
+    def __lt__(self, other) -> bool:
+        super().__lt__(other)
+    
+    def __len__(self) -> int:
+        return len(self.get_keys_str())
