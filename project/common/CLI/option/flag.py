@@ -10,6 +10,7 @@ class Flag(OptionAbstract):
         description (str): The description of the flag.
     """
     _value = False
+    _require_argument = False
     
     def __init__(self, **data):
         super().__init__(**data)

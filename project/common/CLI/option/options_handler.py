@@ -3,6 +3,7 @@ from .keymodel import KeyModelTypes
 from .option_abstract import OptionAbstract
 from .argument import Argument
 from .flag import Flag
+from .option import Option
 
 from common.models.base import BaseModel
 
@@ -49,6 +50,18 @@ class OptionHandler(BaseModel):
         """
         if option not in self.options:
             self.options.append(option)
+            self._validate_options()
+            
+    def insert_option(self, index: int, option: OptionAbstract) -> None:
+        """
+        insert_option inserts a flag, argument, or option into the options handler at the given index.
+        
+        Args:
+            index (int): The index to insert the flag, argument, or option into the options handler.
+            option (OptionAbstract): The flag, argument, or option to insert into the options handler.
+        """
+        if option not in self.options:
+            self.options.insert(index, option)
             self._validate_options()
             
     def remove_option(self, option: OptionAbstract) -> None:
@@ -127,21 +140,35 @@ class OptionHandler(BaseModel):
         
         while index < len(args):
             arg = args[index]
-            
+                        
             if arg.startswith("-"):
                 option = self.get_option_by_key(arg)
                 if option:
                     if isinstance(option, Flag):
                         option.set_value()
                         count_of_executed_options += 1
-                    else:
-                        index += 1
-                        option.set_value(args[index])
+                    elif isinstance(option, Option):
+                        #handle option with argument, catch the next argument, if it is not a flag or not empty set the value of the option to the argument, else treat it as a flag
+                        try:
+                            next_arg = args[index+1]
+                            if next_arg.startswith("-"):
+                                raise IndexError("Next argument is a flag.")
+                            option.set_value(next_arg)
+                            index += 1
+                            
+                        except IndexError as e: # threat as flag
+                            option.set_value()
+                            
                         count_of_executed_options += 1
+                    else:
+                        raise ValueError(f"Option {option.name} is not a valid option. \n\t{option}")
+                            
             elif len(queue_of_arguments) > 0:
                 option = queue_of_arguments.pop(0)
                 option.set_value(arg)
                 count_of_executed_options += 1
+            else:
+                raise ValueError(f"Option {option.name} is not a valid option. \n\t{option}")
             index += 1
             
         return count_of_executed_options

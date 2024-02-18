@@ -12,11 +12,16 @@ class OptionAbstract(AbstractModel, ABC):
     
     Args:
         name (str): The name of the flag, argument, or option.
-        keys (typing.List[KeyModel]): The keys of the flag, argument, or option.
+        keys (List[KeyModel]): The keys of the flag, argument, or option.
+        option (str|None): The displayed in [option] in the help message. If None, it will be the same as the name.
         description (str): The description of the flag, argument, or option.
+        error_message (str|None): The error message of the flag, argument, or option.
     """
     keys: typing.List[KeyModel] = list()
     _value: typing.Optional[str] = None
+    error_message: typing.Optional[str] = None
+    option: typing.Optional[str] = None
+    _require_argument: bool = True
     
     @property
     def value(self) -> typing.Optional[str]:
@@ -26,6 +31,15 @@ class OptionAbstract(AbstractModel, ABC):
     def value(self, value: typing.Optional[str]) -> None:
         self._value = value
         self._validate_value()
+        
+    @property
+    def require_argument(self) -> bool:
+        return self._require_argument
+    
+    @require_argument.setter
+    def require_argument(self, require_argument: bool) -> None:
+        if require_argument is not None:
+            self._require_argument = require_argument
             
     @abstractmethod
     def __init__(self, **data) -> None:
@@ -120,7 +134,27 @@ class OptionAbstract(AbstractModel, ABC):
             str: The keys of the flag, argument, or option as a string.
         """
         styled_keys = [f"-{key.key}" if key.type == KeyModelTypes.letter else f"--{key.key}" for key in self.keys]
-        return ", ".join(styled_keys)
+        option = self.name
+        if self.option:
+            option = self.option
+            
+            
+        option_str = ""
+        join_str = ", "
+        if self.__class__.__name__ != "Flag":
+            bracket = "[]"
+            if self.require_argument:
+                bracket = "<>"
+            option_str = f" {bracket[0]}{option}{bracket[1]}"
+            
+            join_str = option_str + join_str
+            
+        output =  join_str.join(styled_keys)
+        
+        if self.__class__.__name__ != "Flag":
+            output += option_str
+        
+        return output
     
     def get_stylized_keys(self, strlen: int) -> str:
         """

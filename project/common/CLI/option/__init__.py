@@ -1,4 +1,5 @@
 from .options_handler import OptionHandler
+from .option_builder import OptionBuilder
 from .option_factory import OptionFactory
 from .option_abstract import OptionAbstract
 

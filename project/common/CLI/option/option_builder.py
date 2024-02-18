@@ -16,6 +16,8 @@ class OptionBuilder:
     keys: typing.List[KeyModel] = None
     description: str = None
     value: typing.Optional[str] = None
+    require_argument: typing.Optional[str] = None
+    option: typing.Optional[str] = None
     
     def __init__(self) -> None:
         self.keys = list()
@@ -81,6 +83,32 @@ class OptionBuilder:
         
         return self
     
+    def set_require_argument(self, require_argument: bool) -> 'OptionBuilder':
+        """
+        set_require_argument sets the flag that indicates that this function can act as flag or only as an option with a value/argument.
+        
+        Args:
+            require_argument (bool): The flag that indicates that this function can act as flag or only as an option with a value/argument.
+            
+        Returns:
+            OptionBuilder: The OptionBuilder object.
+        """
+        self.require_argument = require_argument
+        return self
+    
+    def set_option(self, option: str) -> 'OptionBuilder':
+        """
+        set_option sets the option of the option.
+        
+        Args:
+            option (str): The option of the option.
+            
+        Returns:
+            OptionBuilder: The OptionBuilder object.
+        """
+        self.option = option
+        return self
+    
     def build_flag(self) -> Flag:
         """
         build_Flag builds a flag.
@@ -101,12 +129,15 @@ class OptionBuilder:
         Returns:
             Argument: The argument object.
         """
-        return Argument(
+        argument =  Argument(
             name=self.name,
             keys=deepcopy(self.keys),
             description=self.description,
             value=self.value
         )
+        if self.require_argument is not None:
+            argument.require_argument = self.require_argument
+        return argument
     
     def build_option(self) -> Option:
         """
@@ -115,9 +146,14 @@ class OptionBuilder:
         Returns:
             Option: The option object.
         """
-        return Option(
+        option = Option(
             name=self.name,
             keys=deepcopy(self.keys),
             description=self.description,
             value=self.value
         )
+        if self.require_argument is not None:
+            option.require_argument = self.require_argument
+        if self.option is not None:
+            option.option = self.option
+        return option

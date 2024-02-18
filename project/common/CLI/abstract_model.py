@@ -1,5 +1,56 @@
 from abc import ABC, abstractmethod
 from common.models.base import BaseModel
+from common.debug import log_section
+
+# def cut_strings_to_sentences(string:str, taken:int, total:int, separator:str="."):
+#     sentences = string.split(separator)
+#     lines = []
+#     current_line = ' ' * taken
+#     for sentence in sentences:
+#         print(len(current_line), len(sentence) + 1, total, current_line, sentence)
+#         # split the sentence if it's too long
+#         while len(sentence) > total:
+#             lines.append(current_line + sentence[:total-2])
+#             sentence = sentence[total-2:]
+#             current_line = ' ' * taken
+        
+#         # add the sentence to the current line if it fits  
+#         if len(current_line) + len(sentence) + 1 <= total:
+#             current_line += ' ' + sentence
+            
+#         # start a new line if it doesn't fit
+#         else:
+#             lines.append(current_line)
+#             current_line = ' ' * taken + sentence
+                
+#         lines.append(current_line)
+#         return '\n'.join(lines)
+
+def cut_strings_to_words(string:str, taken:int, total:int):
+    words = string.split()
+    lines = []
+    current_line = ' ' * taken
+    log_section("cut_strings_to_words", word)
+    for word in words:
+        log_section("cut_strings_to_words", len(current_line), len(word) + 1, total, current_line, word)
+        
+        # split the word if it's too long
+        while len(word) > total:
+            lines.append(current_line + word[:total-2])
+            word = word[total-2:]
+            current_line = ' ' * taken
+        
+        # add the word to the current line if it fits  
+        if len(current_line) + len(word) + 1 <= total:
+            current_line += ' ' + word
+            
+        # start a new line if it doesn't fit
+        else:
+            lines.append(current_line)
+            current_line = ' ' * taken + word
+                
+    lines.append(current_line)
+    return '\n'.join(lines)
 
 class AbstractModel(ABC, BaseModel):
     """
@@ -11,6 +62,10 @@ class AbstractModel(ABC, BaseModel):
     """
     name: str = None
     description: str = None
+    
+    @classmethod
+    def log(cls, *args, **kwargs):
+        log_section(cls.__name__, *args, **kwargs)
     
     def __init__(self, **data) -> None:
         super().__init__(**data)
@@ -54,28 +109,11 @@ class AbstractModel(ABC, BaseModel):
     
     def spaced_description(self, taken:int, total:int) -> str:
         l = total - taken
-        print(l, taken, total)
+        AbstractModel.log(l, taken, total)
         if l < 10:
             raise ValueError("Total length is less than taken length. Need at least 10 characters.")
         
-        words = self.description.split()
-        lines = []
-        current_line = ' ' * taken
-        for word in words:
-            # split the word if it's too long
-            while len(word) > l:
-                lines.append(current_line + word[:l-2])
-                word = word[l-2:]
-                current_line = ' ' * taken
-            
-            # add the word to the current line if it fits  
-            if len(current_line) + len(word) + 1 <= l:
-                current_line += ' ' + word
-                
-            # start a new line if it doesn't fit
-            else:
-                lines.append(current_line)
-                current_line = ' ' * taken + word
-                
-        lines.append(current_line)
-        return '\n'.join(lines)
+        if len(self.description) < l:
+            return ' ' * taken + self.description
+        
+        return cut_strings_to_words(self.description, taken, total)
