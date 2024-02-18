@@ -13,9 +13,11 @@ class DEBUG:
         if DEBUG.debug_mode:
             print(*args, **kwargs)
             
+    @staticmethod
     def dlog(*args, **kwargs):
         DEBUG.log("DEBUG: ", *args, **kwargs)
         
+    @staticmethod
     def elog(*args, **kwargs):
         DEBUG.log("ERROR: ", *args, **kwargs)
             

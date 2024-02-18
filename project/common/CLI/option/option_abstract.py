@@ -167,3 +167,7 @@ class OptionAbstract(AbstractModel, ABC):
             str: The keys of the flag, argument, or option as a string.
         """
         return self.get_keys_str().ljust(strlen)
+    
+    def __repr__(self) -> str:
+        keys = self.get_keys_str()
+        return (keys, self.description)

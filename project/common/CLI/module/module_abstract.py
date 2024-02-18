@@ -5,7 +5,7 @@ import sys
 
 from abc import ABC, abstractmethod
 
-from common.CLI.abstract_model import AbstractModel
+from common.CLI.abstract_model import AbstractModel, RepresentationSettings
 from pydantic import Field
 
 from common.CLI.option import OptionHandler, OptionFactory
@@ -71,36 +71,16 @@ class ModuleAbstract(AbstractModel, ABC):
             
     
     def get_details(self) -> str:
+        RepresentationSettings.set_space_before(2)
+        RepresentationSettings.set_space_after(10)
         info = ""
-        
-        try:
-            from blessed import Terminal
-            term = Terminal()
-            width = term.width
-        except ImportError:
-            import shutil
-            width = shutil.get_terminal_size().columns
-            
-        spaces = {"before": 2, "after": 10}
-        
-        calc_taken = lambda strlen: spaces["before"] + strlen + spaces["after"]
-        
-        create_str = lambda text1, text2: (
-            " " * spaces["before"] +
-            text1 +
-            " " * spaces["after"] +
-            text2
-        )
         
         if len(self.option_handler) > 0:
             info += f"\nOptions:\n"
-            strlen = max([len(opt.get_keys_str()) for opt in self.option_handler.options])
+            strlen = max([len(opt.__repr__()[0]) for opt in self.option_handler.options])
             
-            taken = calc_taken(strlen)
-            
-            create_opt_str = lambda option: create_str(option.get_stylized_keys(strlen), option.spaced_description(taken, width)[taken+1:])
-            
-            info += "\n".join([create_opt_str(opt) for opt in self.option_handler.options]) +"\n"
+            style_kwargs = {"first_str_lenght": strlen}
+            info += "\n".join([opt.stylized_presentation(**style_kwargs) for opt in self.option_handler.options]) +"\n"
             
         return info
         

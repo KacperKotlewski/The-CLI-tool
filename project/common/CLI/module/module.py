@@ -27,7 +27,7 @@ class Module(ModuleAbstract):
         Raises:
             ValueError: If the module handler is not set.
         """
-        if not self.module_handler:
+        if self.module_handler is None:
             raise ValueError("Module handler not set.")
         self.module_handler._validate()
         
@@ -48,3 +48,39 @@ class Module(ModuleAbstract):
         except ModuleNotFound as e:
             super().execute(*args)
         
+        
+        
+    def get_details(self) -> str:
+        info = super().get_details()
+        
+        try:
+            from blessed import Terminal
+            term = Terminal()
+            width = term.width
+        except ImportError:
+            import shutil
+            width = shutil.get_terminal_size().columns
+            
+        spaces = {"before": 2, "after": 10}
+        
+        calc_taken = lambda strlen: spaces["before"] + strlen + spaces["after"]
+        
+        create_str = lambda text1, text2: (
+            " " * spaces["before"] +
+            text1 +
+            " " * spaces["after"] +
+            text2
+        )
+        
+        if len(self.module_handler) > 0:
+            info += f"\nCommands:\n"
+            info += "\n".join([f" {command.name} - {command.description}" for command in self.module_handler.modules]) +"\n"
+            # strlen = max([len(opt.get_keys_str()) for opt in self.option_handler.options])
+            
+            # taken = calc_taken(strlen)
+            
+            # create_opt_str = lambda option: create_str(option.get_stylized_keys(strlen), option.spaced_description(taken, width)[taken+1:])
+            
+            # info += "\n".join([create_opt_str(opt) for opt in self.option_handler.options]) +"\n"
+            
+        return info

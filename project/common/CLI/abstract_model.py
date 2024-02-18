@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+from pydantic import Field
 from common.logger_model import LoggerModel
 from common.debug import log_section
 
@@ -52,6 +54,64 @@ def cut_strings_to_words(string:str, taken:int, total:int):
     lines.append(current_line)
     return '\n'.join(lines)
 
+
+def terminal_width() -> int:
+    try:
+        try:
+            from blessed import Terminal
+            term = Terminal()
+            width = term.width
+        except ImportError:
+            import shutil
+            width = shutil.get_terminal_size().columns
+    except Exception:
+        width = 80
+        
+    return width
+
+class RepresentationSettings:
+    TOTAL_SPACE: int = None
+    SPACE_BEFORE: int = 0
+    SPACE_AFTER: int = 1
+    
+    @staticmethod
+    def set_total_space(space:int) -> None:
+        RepresentationSettings.TOTAL_SPACE = space
+    
+    @staticmethod
+    def set_space_before(space:int) -> None:
+        RepresentationSettings.SPACE_BEFORE = space
+    
+    @staticmethod
+    def set_space_after(space:int) -> None:
+        RepresentationSettings.SPACE_AFTER = space
+        
+    @staticmethod
+    def reset_total_space() -> None:
+        RepresentationSettings.TOTAL_SPACE = None
+        
+    @staticmethod
+    def reset_space_before() -> None:
+        RepresentationSettings.SPACE_BEFORE = 0
+        
+    @staticmethod
+    def reset_space_after() -> None:
+        RepresentationSettings.SPACE_AFTER = 1
+        
+    @staticmethod
+    def total_space() -> int:
+        if RepresentationSettings.TOTAL_SPACE is None:
+            return terminal_width()
+        return RepresentationSettings.TOTAL_SPACE
+    
+    @staticmethod
+    def space_before() -> int:
+        return RepresentationSettings.SPACE_BEFORE
+    
+    @staticmethod
+    def space_after() -> int:
+        return RepresentationSettings.SPACE_AFTER
+
 class AbstractModel(LoggerModel, ABC):
     """
     AbstractModel class is a class that represents a model.
@@ -102,6 +162,7 @@ class AbstractModel(LoggerModel, ABC):
     
     def description_len(self) -> int:
         return len(self.description)
+
     
     def spaced_description(self, taken:int, total:int) -> str:
         l = total - taken
@@ -113,3 +174,39 @@ class AbstractModel(LoggerModel, ABC):
             return ' ' * taken + self.description
         
         return cut_strings_to_words(self.description, taken, total)
+    
+    def __repr__(self) -> str:
+        return (self.name, self.description)
+    
+    def stylized_presentation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_lenght:int=None, second_str_lenght:int=None) -> str:
+        """
+        stylized_presentation stylizes the presentation of the model.
+        
+        Args:
+            total_space (int): The total space. Default is None.
+            space_before (int): The space before the model. Default is None.
+            space_after (int): The space after the model. Default is None.
+            first_str_lenght (int): The length of the first string. Default is None.
+            second_str_lenght (int): The length of the second string. Default is None.
+        """
+        
+        repr_str = self.__repr__()
+        
+        if total_space is None:
+            total_space = RepresentationSettings.total_space()
+            
+        if space_before is None:
+            space_before = RepresentationSettings.space_before()
+            
+        if space_after is None:
+            space_after = RepresentationSettings.space_after()
+        
+        if first_str_lenght is None:
+            first_str_lenght = len(repr_str[0])
+            
+        space_before_second = first_str_lenght + space_before + space_after
+            
+        if second_str_lenght is None:
+            second_str_lenght = min(len(self.description), (total_space - space_before_second))
+            
+        return " " * space_before + repr_str[0].ljust(first_str_lenght) + " " * space_after + self.spaced_description(space_before_second, total_space)[space_before_second:]
