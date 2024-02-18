@@ -27,6 +27,11 @@ class ActionHandler(BaseModel):
             self.actions.append(action)
             self._validate_actions()
             
+    def insert_action(self, index: int, action: Action) -> None:
+        if action not in self.actions:
+            self.actions.insert(index, action)
+            self._validate_actions()
+            
     def remove_action(self, action: Action) -> None:
         if action in self.actions:
             self.actions.remove(action)

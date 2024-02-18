@@ -44,7 +44,7 @@ class ModuleAbstract(AbstractModel, ABC):
         
     def _setup_options_and_actions(self) -> None:
         #add help option
-        help_option = OptionFactory.flag(name='help', keys=['-h', '--help'], description='Display the help message. Also use with commands to display the command help message. Also use with options to display the option help message.')
+        help_option = OptionFactory.flag(name='help', keys=['-h', '--help'], description='Display the help message.')
         help_action = ActionFactory.from_flag(option=help_option, function=self.print_help)
         self.option_handler += help_option
         self.action_handler += help_action
@@ -66,7 +66,7 @@ class ModuleAbstract(AbstractModel, ABC):
         return self.help_str
     
     def print_help(self, *args) -> None:
-        print(f"\n{self.get_help()}\n")
+        print(f"\n{self.get_help()}")
         print(self.get_details())
             
     
@@ -81,7 +81,6 @@ class ModuleAbstract(AbstractModel, ABC):
             import shutil
             width = shutil.get_terminal_size().columns
             
-        print(width)
         spaces = {"before": 2, "after": 10}
         
         calc_taken = lambda strlen: spaces["before"] + strlen + spaces["after"]

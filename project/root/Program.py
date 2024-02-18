@@ -5,9 +5,9 @@ import os
 
 Root = RootModule(
     name = "root",
-    description = f'Use "{sys.argv[0]} -h" or "{sys.argv[0]} --help" to display the help message.',
+    description = f'Use "{sys.argv[0]} -h" or "{sys.argv[0]} --help" for help and information.',
     details = "CLI for secure management of dotEnv in a project.",
-    help_str = f'Usage: {sys.argv[0]} COMMAND [OPTIONS] [ARGUMENTS]',
+    help_str = f'Usage: \n  {sys.argv[0]} [COMMAND] [OPTIONS] [ARGUMENTS]',
 )
 
     

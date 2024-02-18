@@ -37,6 +37,5 @@ class ActionFactory:
         return ActionFactory.action(option.name, function, condition)
     
     @staticmethod
-    def from_option(option: OptionAbstract, expected_value: str, function: typing.Callable) -> Action:
-        condition = lambda **kwargs: option.value == expected_value
+    def from_option(option: OptionAbstract, condition: typing.Callable, function: typing.Callable) -> Action:
         return ActionFactory.action(option.name, function, condition)
