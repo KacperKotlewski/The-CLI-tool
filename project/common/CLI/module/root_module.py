@@ -5,7 +5,7 @@ import typing
 
 from common.CLI.option import OptionFactory, Option, OptionBuilder
 from common.CLI.action import ActionFactory, ActionBuilder, ActionHandler
-# from common.CLI.interface import UserInterface
+from common.CLI.interface import InterfaceHandler
 
 from common.SOLID import Singleton
 from common.debug import DEBUG
@@ -13,10 +13,13 @@ from common.debug import DEBUG
 import sys
 
 class RootModule(Singleton, Module):
+    interface_handler: InterfaceHandler = None
+    root_module: typing.Optional['RootModule'] = None
     
     def __init__(self, **data) -> None:
+        data['interface_handler'] = InterfaceHandler()
         super().__init__(**data)
-        self.root_module = self        
+        self.root_module = self
     
     def print_help_usage_action(self, *args) -> None:
         print(f'Use "{sys.argv[0]} -h" or "{sys.argv[0]} --help" for help and information.')

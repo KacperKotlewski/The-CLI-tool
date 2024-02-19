@@ -1,7 +1,7 @@
-from root import Program
+import app
 
 def main() -> None:
-    Program.run_cli()
+    app.run_cli()
     
 if __name__ == "__main__":
     main()

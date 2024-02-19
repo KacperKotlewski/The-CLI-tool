@@ -1,5 +1,3 @@
-import enum
-from copy import deepcopy
 import typing
 import sys
 
@@ -19,7 +17,7 @@ class ModuleAbstract(AbstractModel, ABC):
     option_handler: OptionHandler = None
     action_handler: ActionHandler = None
     action: typing.Callable = None
-    root_module: 'ModuleAbstract' = None
+    root_module: typing.Optional['ModuleAbstract'] = None
     
     @abstractmethod
     def bad_command_action(self, *args) -> None:
