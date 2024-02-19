@@ -5,21 +5,21 @@ import sys
 
 from abc import ABC, abstractmethod
 
-from common.CLI.abstract_model import AbstractModel, RepresentationSettings
+from common.CLI.abstract_model import AbstractModel
 from pydantic import Field
 
 from common.CLI.option import OptionHandler, OptionFactory, OptionValueError, Argument, Option, Flag
 from common.CLI.action import ActionFactory, ActionHandler, ActionBuilder
-# from common.CLI.interface import UserInterface
 
 from common.debug import DEBUG
+from common.utils.settings_classes import Representation
 
 class ModuleAbstract(AbstractModel, ABC):
     help_str: str
     option_handler: OptionHandler = None
     action_handler: ActionHandler = None
     action: typing.Callable = None
-    # current_user_interface: 'UserInterface' = None
+    root_module: 'ModuleAbstract' = None
     
     @abstractmethod
     def bad_command_action(self, *args) -> None:
@@ -119,8 +119,8 @@ class ModuleAbstract(AbstractModel, ABC):
             
     
     def get_child_info(self) -> str:
-        RepresentationSettings.set_space_before(2)
-        RepresentationSettings.set_space_after(10)
+        Representation.set_space_upfront(2)
+        Representation.set_space_between(10)
         info = ""
         
         filter_condition = lambda type: lambda item: isinstance(item, type)
@@ -179,6 +179,7 @@ class ModuleAbstract(AbstractModel, ABC):
     
     def inherit_from(self, module: 'ModuleAbstract') -> None:
         # pass duplicate of the option and action handler
+        self.root_module = module.root_module
         for option in module.option_handler:
             try:
                 self.option_handler += option
