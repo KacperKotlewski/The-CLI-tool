@@ -1,3 +1,4 @@
+from typing import Tuple
 from .option_abstract import OptionAbstract
 
 import typing
@@ -20,3 +21,23 @@ class Argument(OptionAbstract):
 
     def __str__(self) -> str:
         return f"Argument: {self.name}, {self.description}, {self.value} | keys: {self.keys}"
+    
+    def _validate_value(self) -> None:
+        pass
+    
+    def __repr__tuple__(self) -> Tuple[str, str]:
+        _r_t = super().__repr__tuple__()
+        return (self.get_option_str(), _r_t[1])
+    
+    def transform_to_option(self) -> 'Option':
+        """
+        transmute_to_option transmutes the argument to an option.
+        
+        Returns:
+            Option: The option object.
+        """
+        if len(self.keys) == 0:
+            raise ValueError("Argument must have at least one key to transmute to option.")
+        from .option import Option
+        option = Option(name=self.name, keys=self.keys, description=self.description, default_value=self.value, require_argument=True)
+        return option

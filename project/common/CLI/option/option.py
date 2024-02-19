@@ -2,6 +2,8 @@ from .option_abstract import OptionAbstract
 from .flag import Flag
 import typing
 
+from .exceptions import *
+
 class Option(OptionAbstract):
     """
     Option class is a class that represents an option that has a key and a value.
@@ -32,7 +34,7 @@ class Option(OptionAbstract):
             ValueError: If the value of the option is not a string.
         """
         if self.require_argument and self.value is not None and not isinstance(self.value, str):
-            raise ValueError(f"Option {self.name} requires a value.")
+            raise OptionNotValidError(f"Option {self.name} requires a value.")
 
     def __str__(self) -> str:
         return f"Option: {self.name}, {self.description}, {self.value} | keys: {self.keys}"
@@ -40,9 +42,9 @@ class Option(OptionAbstract):
     def set_value(self, value: typing.Optional[str]=None) -> None:
         if self.require_argument and value is None:
             if self.error_message:
-                raise ValueError(self.error_message)
+                raise OptionNotValidError(self.error_message)
             else:
-                raise ValueError(f"Option {self.name} requires a value.")
+                raise OptionNotValidError(f"Option {self.name} requires a value.")
             
         elif value is None:
             self.value = True

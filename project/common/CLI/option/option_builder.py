@@ -18,6 +18,7 @@ class OptionBuilder:
     value: typing.Optional[str] = None
     require_argument: typing.Optional[str] = None
     option: typing.Optional[str] = None
+    required: bool = None
     
     def __init__(self) -> None:
         self.keys = list()
@@ -55,6 +56,20 @@ class OptionBuilder:
         
         key = key.strip("-").strip()
         self.keys.append(KeyModel(key=key, type=type))
+        return self
+    
+    def add_keys(self, *keys:str) -> 'OptionBuilder':
+        """
+        add_keys adds a list of keys to the option.
+        
+        Args:
+            keys (typing.List[str]): The list of keys to add to the option.
+            
+        Returns:
+            OptionBuilder: The OptionBuilder object.
+        """
+        for key in keys:
+            self.add_key(key)
         return self
     
     def set_description(self, description: str) -> 'OptionBuilder':
@@ -109,6 +124,19 @@ class OptionBuilder:
         self.option = option
         return self
     
+    def set_required(self, required: bool) -> 'OptionBuilder':
+        """
+        set_required sets the flag that indicates that this option is required.
+        
+        Args:
+            required (bool): The flag that indicates that this option is required.
+            
+        Returns:
+            OptionBuilder: The OptionBuilder object.
+        """
+        self.required = required
+        return self
+    
     def build_flag(self) -> Flag:
         """
         build_Flag builds a flag.
@@ -135,6 +163,8 @@ class OptionBuilder:
             description=self.description,
             value=self.value
         )
+        if self.required is not None:
+            argument.required = self.required
         if self.require_argument is not None:
             argument.require_argument = self.require_argument
         return argument
@@ -152,6 +182,8 @@ class OptionBuilder:
             description=self.description,
             value=self.value
         )
+        if self.required is not None:
+            option.required = self.required
         if self.require_argument is not None:
             option.require_argument = self.require_argument
         if self.option is not None:

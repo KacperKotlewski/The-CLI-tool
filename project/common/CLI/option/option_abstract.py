@@ -22,6 +22,7 @@ class OptionAbstract(AbstractModel, ABC):
     error_message: typing.Optional[str] = None
     option: typing.Optional[str] = None
     _require_argument: bool = True
+    required: bool = False
     
     @property
     def value(self) -> typing.Optional[str]:
@@ -79,7 +80,7 @@ class OptionAbstract(AbstractModel, ABC):
             ValueError: If the flag has no key.
         """
         if len(self.keys) == 0:
-            raise ValueError(f"Flag {self.name} has no key")
+            raise ValueError(f"Option {self.name} has no key.")
         
     def set_value(self, value) -> None:
         self._value = value
@@ -117,6 +118,23 @@ class OptionAbstract(AbstractModel, ABC):
     def __str__(self) -> str:
         pass
     
+    def get_option_str(self) -> typing.Optional[str]:
+        """
+        get_option gets the option of the flag, argument, or option.
+        
+        Returns:
+            typing.Optional[str]: The option of the flag, argument, or option.
+        """
+        option = self.name
+        if self.option:
+            option =  self.option
+    
+        
+        bracket = "[]"
+        if self.require_argument:
+            bracket = "<>"
+        return f"{bracket[0]}{option}{bracket[1]}"
+    
     def get_keys(self) -> typing.List[str]:
         """
         get_keys gets the keys of the flag, argument, or option.
@@ -134,31 +152,26 @@ class OptionAbstract(AbstractModel, ABC):
             str: The keys of the flag, argument, or option as a string.
         """
         styled_keys = [f"-{key.key}" if key.type == KeyModelTypes.letter else f"--{key.key}" for key in self.keys]
-        option = self.name
-        if self.option:
-            option = self.option
-            
             
         option_str = ""
         join_str = ", "
         if self.__class__.__name__ != "Flag":
-            bracket = "[]"
-            if self.require_argument:
-                bracket = "<>"
-            option_str = f" {bracket[0]}{option}{bracket[1]}"
+            option_str = self.get_option_str()
             
-            join_str = option_str + join_str
+            join_str = f" {option_str}{join_str}"
             
         output =  join_str.join(styled_keys)
         
         if self.__class__.__name__ != "Flag":
-            output += option_str
+            output += f" {option_str}"
         
         return output
     
     def __repr__(self) -> str:
-        keys = self.get_keys_str()
-        return (keys, self.description)
+        return f"{self.__class__.__name__}{self.__repr__tuple__()}"
+    
+    def __repr__tuple__(self) -> typing.Tuple[str, str]:
+        return (self.get_keys_str(), self.description)
     
     def __lt__(self, other) -> bool:
         super().__lt__(other)

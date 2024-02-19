@@ -52,7 +52,7 @@ class OptionFactory:
         return flag
     
     @classmethod
-    def argument(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Argument:
+    def argument(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None, required: bool = False) -> Argument:
         """
         create_argument creates an argument.
         
@@ -67,11 +67,14 @@ class OptionFactory:
         """
         builder = self._create_builder(name, keys, description)
         builder.set_value(default_value)
+        if required:
+            builder.set_required(required)
+            
         argument = builder.build_argument()
         return argument
     
     @classmethod
-    def option(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None) -> Option:
+    def option(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None, require_argument: bool = False, option: typing.Optional[str] = None, required: bool = False) -> Option:
         """
         create_option creates an option.
         
@@ -85,7 +88,14 @@ class OptionFactory:
             Option: The option object.
         """
         builder = self._create_builder(name, keys, description)
-        builder.set_value(default_value)
+        if option is not None:
+            builder.set_option(option)
+        if require_argument is not None:
+            builder.set_require_argument(require_argument)
+        if required:
+            builder.set_required(required)
+        if default_value is not None:
+            builder.set_value(default_value)
         option = builder.build_option()
         return option
     
