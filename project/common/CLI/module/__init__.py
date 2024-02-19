@@ -1,3 +1,3 @@
 from .module_abstract import ModuleAbstract
-from .command import Command
+from .command import Command, command
 from .module import Module

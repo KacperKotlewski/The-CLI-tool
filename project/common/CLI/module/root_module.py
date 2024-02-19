@@ -7,10 +7,18 @@ from common.CLI.action import ActionFactory, ActionBuilder, ActionHandler
 
 from common.debug import DEBUG
 
+import sys
+
 class RootModule(Module):
+    
+    def print_help_usage_action(self, *args) -> None:
+        print(f'Use "{sys.argv[0]} -h" or "{sys.argv[0]} --help" for help and information.')
+        
+    def get_usage(self) -> str:
+        return f'Usage: {sys.argv[0]} [command] [options]'
+    
     def _extra_options_and_actions(self) -> None:
         self._append_debug_option()
-        self._append_dry_run_action()
         
     def _append_debug_option(self) -> None:
         builder = OptionBuilder().set_name('debug')
@@ -33,12 +41,4 @@ class RootModule(Module):
             condition=lambda *args: isinstance(debug_option.value, str),
             function=lambda *args: DEBUG.set_keyword(debug_option.value)
         ))
-        
-    def _append_dry_run_action(self) -> None:
-        # add dry run action - print info about using -h or --help
-        dry_run_action = ActionBuilder()
-        dry_run_action.set_name("dry_run")
-        dry_run_action.set_function(lambda *args: print(self.description))
-        dry_run_action.set_condition(lambda *args: len(args) == 0)
-        self.action_handler += dry_run_action.build()
         

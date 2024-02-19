@@ -9,9 +9,23 @@ import typing
 class Module(ModuleAbstract):
     module_handler: ModuleHandler = None
     
+    def bad_command_action(self, *args) -> None:
+        return super().bad_command_action(*args)
+    
+    def print_help_usage_action(self, *args) -> None:
+        return super().print_help_usage_action(*args)
+    
     def __init__(self, **data) -> None:
         data['module_handler'] = ModuleHandler()
         super().__init__(**data)
+        
+    def get_usage_args(self) -> str:
+        text = ""
+        
+        if len(self.module_handler) > 0:
+            text += f" [COMMAND]"
+             
+        return text + super().get_usage_args()
         
     def _validate(self) -> None:
         """
@@ -50,14 +64,53 @@ class Module(ModuleAbstract):
     
     
     
-    def get_details(self) -> str:
-        info = super().get_details()
+    def get_child_info(self) -> str:
+        info = super().get_child_info()
         
         if len(self.module_handler) > 0:
             info += f"\nCommands:\n"
             
             strlen = max([len(opt.__repr__()[0]) for opt in self.module_handler])
             
-            info += "\n".join(self.module_handler.stylized_representation(first_str_lenght = strlen)) +"\n"
+            info += "\n".join(self.module_handler.stylized_representation(first_str_length = strlen)) +"\n"
             
         return info
+    
+    def inherit_from(self, module: ModuleAbstract) -> None:
+        super().inherit_from(module)
+        
+        for mod in self.module_handler.items:
+            mod.inherit_from(self)
+    
+    def add_module(self, module: ModuleAbstract) -> None:
+        """
+        add adds a module to the module handler.
+        
+        Args:
+            module (ModuleAbstract): The module to add to the module handler.
+        """
+        module.inherit_from(self)
+        self.module_handler.add(module)
+    
+    def __add__(self, other: typing.Union[ModuleAbstract, typing.List[ModuleAbstract], ModuleHandler]) -> 'Module':
+        """
+        __add__ adds a module to the module handler.
+        
+        Args:
+            other (Union[ModuleAbstract, List[ModuleAbstract]]): The module to add to the module handler.
+            
+        Returns:
+            Module: The module with the added module.
+        """
+        if isinstance(other, ModuleAbstract):
+            other.inherit_from(self)
+            self.add_module(other)
+            
+        elif isinstance(other, list):
+            for module in other:
+                self.__add__(module)
+            
+        elif isinstance(other, ModuleHandler):
+            self.__add__(other.items)
+            
+        return self

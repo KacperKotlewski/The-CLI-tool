@@ -59,6 +59,12 @@ class ModuleHandler(AbstractHandler, BaseModel):
         except ValueError as e:
             raise ModuleNotFound(f"Module {name} not found.")
     
+    def filter(self, condition: typing.Callable = None, type: typing.Type = None) -> typing.List[ModuleAbstract]:
+        return super().filter(condition, type)
+    
+    def filtered(self, condition: typing.Callable = None, type: typing.Type = None) -> 'ModuleHandler':
+        return super().filtered(condition, type)
+    
     def __add__(self, other: typing.Union[ModuleAbstract, typing.List[ModuleAbstract]]) -> 'ModuleHandler':
         return super().__add__(other)
     
