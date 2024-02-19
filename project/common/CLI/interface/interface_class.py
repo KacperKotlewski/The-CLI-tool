@@ -1,6 +1,6 @@
 
 
-from abc import ABC
+from abc import ABC, abstractmethod
 import typing
 from common.CLI.abstract_model import AbstractModel
 
