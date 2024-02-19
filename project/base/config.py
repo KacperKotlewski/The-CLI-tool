@@ -1,1 +1,0 @@
-ROOT_MODULE_NAME = 'root'
