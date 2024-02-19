@@ -109,7 +109,12 @@ class ModuleAbstract(AbstractModel, ABC):
     def get_usage_args(self) -> str:
         text = ""
         
-        if len(self.option_handler.filtered(type=Argument)) > 0:
+        args_ = self.option_handler.filtered(type=Argument)
+        
+        for arg in list(args_.filtered(required=True)):
+            text += f" {arg.get_option_str()}"
+        
+        if len(list(args_.filtered(required=False))) > 0:
             text += f" [ARGUMENTS]"
             
         if len(self.option_handler.filtered(type=(Option, Flag))) > 0:
@@ -123,16 +128,14 @@ class ModuleAbstract(AbstractModel, ABC):
         Representation.set_space_between(10)
         info = ""
         
-        filter_condition = lambda type: lambda item: isinstance(item, type)
-        
         filters = {
-            "Arguments": self.option_handler.filtered(filter_condition(Argument)),
-            "Options": self.option_handler.filtered(filter_condition(tuple([Option, Flag]))),
+            "Arguments": self.option_handler.filtered(type=Argument),
+            "Options": self.option_handler.filtered(type=tuple([Option, Flag])),
         }
         
         for argument in filters["Arguments"]:
             try:
-                option = argument.transform_to_option()
+                option = argument.to_option()
                 filters["Options"] += option
             except ValueError:
                 pass

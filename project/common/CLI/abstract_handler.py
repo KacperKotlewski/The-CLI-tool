@@ -144,34 +144,74 @@ class AbstractHandler(ABC):
         raise ValueError(f"Item {name} does not exist in the handler.")
     
     @abstractmethod
-    def filter(self, condition: typing.Callable = None, type: typing.Type = None) -> typing.List[typing.Any]:
+    def filter(self, condition: typing.Callable = None) -> filter:
         """
-        filter filters the items of the handler by name.
+        filter filters the items of the handler by condition.
         
         Args:
-            name (str): The name to filter the items by.
-            
+            condition (Callable): The condition to filter the items by.
+
         Returns:
-            List[Any]: The items of the handler filtered by name.
+            filter: The items of the handler filtered by condition.
         """
         if condition is not None:
             return filter(condition, self.items)
-        elif type is not None:
-            return filter(lambda item: isinstance(item, type), self.items)
         
-        raise ValueError("Condition or Type must be set.")
+        raise ValueError("Condition must be set.")
     
-    def filtered(self, condition: typing.Callable = None, type: typing.Type = None) -> 'AbstractHandler':
+    def filter_conditions(self, *args, **kwargs) -> typing.Callable:
         """
-        filtered filters the items of the handler by name.
+        filter_conditions filters the items of the handler by kwargs.
         
         Args:
-            name (str): The name to filter the items by.
-            
+            **kwargs: The conditions to filter the items by.
+
         Returns:
-            AbstractHandler: The items of the handler filtered by name.
+            Callable: The conditions to filter the items by.
         """
-        return self.__class__(items=self.filter(condition, type))
+        conditions = []
+        
+        for arg in args:
+            if arg is None:
+                continue
+            
+            if isinstance(arg, typing.Callable):
+                conditions.append(arg)
+            else:
+                conditions.append(lambda item: item == arg)
+        
+        for key, value in kwargs.items():
+            if value is None:
+                continue
+            conditions.append(lambda item: getattr(item, key) == value)
+        
+        condition = lambda item: all([condition(item) for condition in conditions])
+        
+        return condition
+    
+    
+    def filtered(self, condition: typing.Callable = None, type: typing.Type = None, *args, **kwargs) -> 'AbstractHandler':
+        """
+        filtered filters the items of the handler by condition.
+        
+        Args:
+            condition (Callable): The condition to filter the items by.
+            type (Type): The type to filter the items by.
+            required (bool): The required to filter the items by.
+
+        Returns:
+            AbstractHandler: The items of the handler filtered by condition.
+        """
+        if condition is not None:
+            return self.__class__(items=self.filter(condition))
+        else:
+            args = list(args)
+            if type is not None:
+                args.append(lambda item: isinstance(item, type))
+                
+            condition = self.filter_conditions(*args, **kwargs)
+            
+            return self.__class__(items=self.filter(condition))
     
     @abstractmethod    
     def execute(self, name: str, *args) -> typing.Any:

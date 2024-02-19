@@ -29,9 +29,9 @@ class Argument(OptionAbstract):
         _r_t = super().__repr__tuple__()
         return (self.get_option_str(), _r_t[1])
     
-    def transform_to_option(self) -> 'Option':
+    def to_option(self) -> 'Option':
         """
-        transmute_to_option transmutes the argument to an option.
+        to_option transmutes the argument to an option.
         
         Returns:
             Option: The option object.
@@ -39,5 +39,5 @@ class Argument(OptionAbstract):
         if len(self.keys) == 0:
             raise ValueError("Argument must have at least one key to transmute to option.")
         from .option import Option
-        option = Option(name=self.name, keys=self.keys, description=self.description, default_value=self.value, require_argument=True)
+        option = Option(name=self.name, keys=self.keys, description=self.description, value=self.value, require_argument=True, option=self.option, required=self.required, error_message=self.error_message)
         return option

@@ -1,5 +1,4 @@
 from .option_abstract import OptionAbstract
-from .flag import Flag
 import typing
 
 from .exceptions import *
@@ -17,9 +16,7 @@ class Option(OptionAbstract):
         require_argument (bool): The flag that indicates that this function can act as flag or only as an option with a value/argument.
     """
     
-    def __init__(self, default_value: typing.Optional[str] = None, **data) -> None:
-        if default_value is not None:
-            self.value = default_value
+    def __init__(self, **data) -> None:
         super().__init__(**data)
         
     def _validate_key(self) -> None:
@@ -51,15 +48,27 @@ class Option(OptionAbstract):
         else:
             self.value = value
             
-    def to_flag(self) -> Flag:
+    def to_flag(self) -> 'Flag':
         """
         to_flag converts the option to a flag.
         
         Returns:
             Flag: The flag object.
         """
+        from .flag import Flag
         flag = Flag(name=self.name, keys=self.keys, description=self.description, error_message=self.error_message)
         if self.value not in [None, False]:
             flag.set_value(True)
             
         return flag
+    
+    def to_argument(self) -> 'Argument':
+        """
+        to_argument converts the option to an argument.
+        
+        Returns:
+            Argument: The argument object.
+        """
+        from .argument import Argument
+        argument = Argument(name=self.name, keys=self.keys, description=self.description, default_value=self.value)
+        return argument

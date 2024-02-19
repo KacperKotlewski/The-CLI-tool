@@ -96,6 +96,7 @@ class OptionBuilder:
             OptionBuilder: The OptionBuilder object.
         """
         
+        self.value = value
         return self
     
     def set_require_argument(self, require_argument: bool) -> 'OptionBuilder':
@@ -149,6 +150,23 @@ class OptionBuilder:
             keys=deepcopy(self.keys),
             description=self.description
         )
+        
+    def __append_to(self, option: 'AbstractOption') -> 'AbstractOption':
+        """
+        __build_arg builds an argument.
+
+        Returns:
+            Argument: The argument object.
+        """
+        if self.required is not None:
+            option.required = self.required
+        if self.option is not None:
+            option.option = self.option
+        if self.value is not None:
+            option.value = self.value
+        if self.require_argument is not None:
+            option.require_argument = self.require_argument
+        return option
     
     def build_argument(self) -> Argument:
         """
@@ -157,17 +175,12 @@ class OptionBuilder:
         Returns:
             Argument: The argument object.
         """
-        argument =  Argument(
+        arg = Argument(
             name=self.name,
             keys=deepcopy(self.keys),
-            description=self.description,
-            value=self.value
+            description=self.description
         )
-        if self.required is not None:
-            argument.required = self.required
-        if self.require_argument is not None:
-            argument.require_argument = self.require_argument
-        return argument
+        return self.__append_to(arg)
     
     def build_option(self) -> Option:
         """
@@ -176,16 +189,9 @@ class OptionBuilder:
         Returns:
             Option: The option object.
         """
-        option = Option(
+        opt = Option(
             name=self.name,
             keys=deepcopy(self.keys),
-            description=self.description,
-            value=self.value
+            description=self.description
         )
-        if self.required is not None:
-            option.required = self.required
-        if self.require_argument is not None:
-            option.require_argument = self.require_argument
-        if self.option is not None:
-            option.option = self.option
-        return option
+        return self.__append_to(opt)

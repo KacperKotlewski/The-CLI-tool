@@ -52,7 +52,7 @@ class OptionFactory:
         return flag
     
     @classmethod
-    def argument(self, name: str, keys: typing.List[str], description: str, default_value: typing.Optional[str] = None, required: bool = False) -> Argument:
+    def argument(self, name: str, description: str, keys: typing.List[str]= list(), default_value: typing.Optional[str] = None, required: bool = False) -> Argument:
         """
         create_argument creates an argument.
         
@@ -69,6 +69,8 @@ class OptionFactory:
         builder.set_value(default_value)
         if required:
             builder.set_required(required)
+        if default_value is not None:
+            builder.set_value(default_value)
             
         argument = builder.build_argument()
         return argument
@@ -92,7 +94,7 @@ class OptionFactory:
             builder.set_option(option)
         if require_argument is not None:
             builder.set_require_argument(require_argument)
-        if required:
+        if required is not None:
             builder.set_required(required)
         if default_value is not None:
             builder.set_value(default_value)

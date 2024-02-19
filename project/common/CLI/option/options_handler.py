@@ -178,11 +178,11 @@ class OptionHandler(AbstractHandler, BaseModel):
     def get(self, name: str) -> OptionAbstract:
         return super().get(name)    
     
-    def filter(self, condition: typing.Callable = None, type: typing.Type = None) -> typing.List[OptionAbstract]:
-        return super().filter(condition, type)
+    def filter(self, condition: typing.Callable = None) -> filter:
+        return super().filter(condition)
     
-    def filtered(self, condition: typing.Callable = None, type: typing.Type = None) -> 'OptionHandler':
-        return super().filtered(condition, type)
+    def filtered(self, condition: typing.Callable = None, type: typing.Type = None, required: bool = None) -> 'OptionHandler':
+        return super().filtered(condition=condition, type=type, required=required)
     
     def __add__(self, other: typing.Union['OptionHandler', OptionAbstract, list]) -> 'OptionHandler':
         return super().__add__(other)
