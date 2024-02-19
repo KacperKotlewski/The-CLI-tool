@@ -3,20 +3,17 @@ from common.CLI.action import ActionFactory, ActionBuilder
 import sys
 import os
 
-Root = RootModule(
+root:RootModule = RootModule(
     name = "root",
-    description = f'Use "{sys.argv[0]} -h" or "{sys.argv[0]} --help" for help and information.',
-    details = "CLI for secure management of dotEnv in a project.",
-    help_str = f'Usage: \n  {sys.argv[0]} [COMMAND] [OPTIONS] [ARGUMENTS]',
+    description = f'CLI for secure management of dotEnv in a project.',
+    help_str = f'CLI for secure management of dotEnv in a project.',
 )
-
-    
 
 
 def register_base_modules() -> None:
+    global root
     from . import modules as module
-    Root.module_handler += module.create
-    pass
+    root += module.create
 
 def register_base_interfaces() -> None:
     # Root.interface_handler += Interface()
@@ -29,4 +26,4 @@ def register_modules() -> None:
 def run_cli() -> None:
     register_modules()
     args = sys.argv[1:]
-    Root.execute(*args)
+    root.execute(*args)
