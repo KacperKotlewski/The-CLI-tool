@@ -1,14 +1,8 @@
 import os
 import sys
 from common.CLI.module import Module, Command, command
-from common.CLI.option import OptionFactory, OptionBuilder, OptionHandler
+from common.CLI.option import OptionFactory
 from common.utils.string_manipulation import fit_in_space
-
-# create = Module(
-#     name = "create",
-#     description = "Create new elements in the project.",
-#     help_str = "This command creates a new module in the project.",
-# )
 
 @command(
     name = "list",
@@ -23,13 +17,9 @@ from common.utils.string_manipulation import fit_in_space
             default_value='list'
         ),
     ]
-)
+) 
 def list_elements(self: Command, *args) -> Command:
     listings = {
-        # 'env': 'List .env files in the project.',
-        # 'schema': 'List schema files in the project.',
-        # 'modules': 'List module files in the project.',
-        # 'commands': 'List commands available.',
         'interfaces': 'List user interfaces.',
     }
     
@@ -45,3 +35,9 @@ def list_elements(self: Command, *args) -> Command:
         for key, value in listings.items():
             print(fit_in_space([key, value], [max_key_len], space_before=2, space_between=10))
             
+    elif element in listings:
+        print("ERROR: Not implemented yet.")
+        
+    else:
+        print(f"ERROR: Element '{element}' is not recognized.\n")
+        self.print_help_usage_action()

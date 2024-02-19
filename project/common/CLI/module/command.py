@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import typing
 from .module_abstract import ModuleAbstract
 from common.CLI.option import OptionHandler
@@ -31,10 +32,5 @@ class Command(ModuleAbstract):
     
     def execute(self, *args) -> None:
         super().execute(*args)
-            
-            
-# decorator to create new command
-def command(name: str, description: str, help_str: str, option_handler: OptionHandler = None, action_handler: ActionHandler = None) -> typing.Callable:
-    def decorator(func: typing.Callable) -> Command:
-        return Command(name=name, description=description, help_str=help_str, option_handler=option_handler, action_handler=action_handler, action=func)
-    return decorator
+
+
