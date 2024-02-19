@@ -4,7 +4,7 @@ from ..settings_classes import Representation
 from .cut_string import cut_strings_to_words as to_words
 from .spaced_text import spaced_fit
 
-def fit_in_space(strings:typing.List[str], total_space:int=None, space_before:int=None, space_between:int=None, str_length:typing.List[typing.Optional[int]]=list()) -> None:
+def fit_in_space(strings:typing.List[str], str_length:typing.List[typing.Optional[int]]=list(), total_space:int=None, space_before:int=None, space_between:int=None) -> None:
     """
     fit_in_space Adjusts the strings to fit in the total space.
     
@@ -34,16 +34,15 @@ def fit_in_space(strings:typing.List[str], total_space:int=None, space_before:in
             return " " * space_before + strings[0].ljust(str_length[0])
         
         elif len(strings) == 2:                
-            text = fit_in_space([strings[0]], total_space, space_before, space_between, [str_length[0]])
+            text = fit_in_space([strings[0]], [str_length[0]], total_space, space_before, space_between)
             
             space_before_second = len(text)
             
+            
+            if len(str_length) < 2:
+                str_length.append(None)
             if str_length[1] is None:
                 str_length[1] = len(strings[1])
-                
-            # if second_str_length is None:
-            #     second_str_length = min(str_length[1], (total_space - space_before_second))
-                
                 
             text +=" " *space_between + spaced_fit(strings[1], space_before_second, total_space)[space_before_second:]
             
@@ -62,10 +61,10 @@ def fit_in_space(strings:typing.List[str], total_space:int=None, space_before:in
         other_strs_length = str_length[:-1]
         
         # fit the rest
-        text = fit_in_space(other_strs, total_space, space_before, space_between, other_strs_length)
+        text = fit_in_space(other_strs, other_strs_length, total_space, space_before, space_between)
         
         # fit the last one
-        return fit_in_space([text, last_str], total_space, space_before, space_between, [len(text), last_str_length])
+        return fit_in_space([text, last_str], [len(text), last_str_length], total_space, space_before, space_between)
         
         
         
