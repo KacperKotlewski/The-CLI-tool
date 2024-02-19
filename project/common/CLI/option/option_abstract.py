@@ -173,8 +173,5 @@ class OptionAbstract(AbstractModel, ABC):
     def __repr__tuple__(self) -> typing.Tuple[str, str]:
         return (self.get_keys_str(), self.description)
     
-    def __lt__(self, other) -> bool:
-        super().__lt__(other)
-    
     def __len__(self) -> int:
         return len(self.get_keys_str())

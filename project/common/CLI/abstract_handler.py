@@ -13,14 +13,12 @@ class AbstractHandler(ABC):
     items_instance: typing.Type
     items: typing.List[AbstractModel]
     
-    @abstractmethod
     def _validate(self) -> None:
         """
         _validate validates the items of the handler.
         """
         self._validate_items()
-        
-    @abstractmethod
+    
     def _validate_items(self) -> None:
         """
         _validate_items validates the items of the handler.
@@ -29,8 +27,7 @@ class AbstractHandler(ABC):
         
         for item in self.items:
             item._validate()
-        
-    @abstractmethod
+    
     def _validate_duplicates(self) -> None:
         """
         _validate_duplicates validates the items of the handler for duplicates.
@@ -38,8 +35,7 @@ class AbstractHandler(ABC):
         list_of_names = [item.name for item in self.items]
         if len(list_of_names) != len(set(list_of_names)):
             raise ValueError(f"Handler has duplicate names: \n{list_of_names}")
-        
-    @abstractmethod
+    
     def verify_item(self, item: AbstractModel) -> bool:
         """
         verify_item verifies the item to be added to the handler.
@@ -51,8 +47,7 @@ class AbstractHandler(ABC):
         item._validate()
         self.check_item_duplicates(item)
         return True
-        
-    @abstractmethod
+    
     def check_item_duplicates(self, item: typing.Any) -> bool:
         """
         check_item_duplicates checks the item for duplicates.
@@ -63,8 +58,7 @@ class AbstractHandler(ABC):
         if item in self.items:
             raise ValueError(f"Item {item} already exists in the handler.")
         return True
-        
-    @abstractmethod
+    
     def check_item_instance(self, item: typing.Any) -> bool:
         """
         check_item_instance checks the item to be an instance of AbstractModel.
@@ -78,7 +72,6 @@ class AbstractHandler(ABC):
             raise ValueError(f"Item {item} is not an instance of {self.items_instance}.")
         return True
     
-    @abstractmethod 
     def add(self, item: typing.Any) -> None:
         """
         add adds an item to the handler.
@@ -90,8 +83,7 @@ class AbstractHandler(ABC):
         if item not in self.items:
             self.items.append(item)
             self._validate_items()
-            
-    @abstractmethod
+    
     def extend(self, items: typing.List[typing.Any]) -> None:
         """
         extend extends the handler with a list of items.
@@ -101,8 +93,7 @@ class AbstractHandler(ABC):
         """
         for item in items:
             self.add(item)
-            
-    @abstractmethod
+    
     def insert(self, index: int, item: typing.Any) -> None:
         """
         insert inserts an item into the handler at the given index.
@@ -115,7 +106,6 @@ class AbstractHandler(ABC):
             self.items.insert(index, item)
             self._validate_items()
 
-    @abstractmethod
     def remove(self, item: typing.Any) -> None:
         """
         remove removes an item from the handler.
@@ -126,8 +116,7 @@ class AbstractHandler(ABC):
         if item in self.items:
             self.items.remove(item)
             self._validate_items()
-            
-    @abstractmethod
+    
     def get(self, name: str) -> typing.Any:
         """
         get gets an item from the handler by name.
@@ -143,7 +132,6 @@ class AbstractHandler(ABC):
                 return item
         raise ValueError(f"Item {name} does not exist in the handler.")
     
-    @abstractmethod
     def filter(self, condition: typing.Callable = None) -> filter:
         """
         filter filters the items of the handler by condition.
@@ -189,7 +177,7 @@ class AbstractHandler(ABC):
         
         return condition
     
-    
+    @abstractmethod
     def filtered(self, condition: typing.Callable = None, type: typing.Type = None, *args, **kwargs) -> 'AbstractHandler':
         """
         filtered filters the items of the handler by condition.
@@ -225,7 +213,6 @@ class AbstractHandler(ABC):
         item = self.get(name)
         return item(*args)
     
-    @abstractmethod
     def __len__(self) -> int:
         """
         __len__ gets the length of the handler.
@@ -235,7 +222,6 @@ class AbstractHandler(ABC):
         """
         return len(self.items)
     
-    @abstractmethod
     def __iter__(self) -> typing.Iterator:
         """
         __iter__ iterates the handler.
@@ -245,7 +231,6 @@ class AbstractHandler(ABC):
         """
         return iter(self.items)
     
-    @abstractmethod
     def __lt__(self, other: 'AbstractHandler') -> bool:
         """
         __lt__ checks if the handler is less than another handler.
@@ -258,7 +243,6 @@ class AbstractHandler(ABC):
         """
         return len(self) > len(other)
     
-    @abstractmethod
     def __add__(self, other: typing.Union['AbstractHandler', typing.Any, typing.List[typing.Any]]) -> 'AbstractHandler':
         """
         __add__ adds an item or list of items to the handler.
@@ -282,7 +266,6 @@ class AbstractHandler(ABC):
             raise ValueError(f"Cannot add {other.__class__} to {self.__class__}")
         
         return self
-    
     
     def stylized_representation(self, total_space:int=None, space_before:int=None, space_after:int=None, first_str_length:int=None, second_str_length:int=None) -> str:
         """

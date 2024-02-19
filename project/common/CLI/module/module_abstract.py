@@ -193,22 +193,3 @@ class ModuleAbstract(AbstractModel, ABC):
                 self.action_handler += action
             except ValueError:
                 pass
-        
-        
-        
-        
-        
-    def __str__(self) -> str:
-        return super().__str__()
-    
-    def __repr__tuple__(self) -> str:
-        return super().__repr__tuple__()
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __lt__(self, other) -> bool:
-        return super().__lt__(other)
-    
-    def __len__(self) -> int:
-        return super().__len__()

@@ -141,60 +141,14 @@ class OptionHandler(AbstractHandler, BaseModel):
     def __str__(self) -> str:
         return f"OptionsHandler: \n\t" + "\t\n".join([str(option) for option in self.items])
     
-    
-    
-    
-    
     def __init__(self, **data) -> None:
         super().__init__(**data)
-        
-    def _validate(self) -> None:
-        super()._validate()
-        
-    def _validate_items(self) -> None:
-        super()._validate_items()
-        
-    def check_item_duplicates(self, item: OptionAbstract) -> bool:
-        return super().check_item_duplicates(item)
-        
-    def check_item_instance(self, item: OptionAbstract) -> bool:
-        return super().check_item_instance(item)
-        
-    def verify_item(self, item: OptionAbstract) -> bool:
-        return super().verify_item(item)
-        
-    def add(self, option: OptionAbstract) -> None:
-        super().add(option)
-            
-    def extend(self, items: List[OptionAbstract]) -> None:
-        return super().extend(items)
-    
-    def insert(self, index: int, option: OptionAbstract) -> None:
-        super().insert(index, option)
-            
-    def remove(self, option: OptionAbstract) -> None:
-        super().remove(option)
-            
-    def get(self, name: str) -> OptionAbstract:
-        return super().get(name)    
-    
-    def filter(self, condition: typing.Callable = None) -> filter:
-        return super().filter(condition)
     
     def filtered(self, condition: typing.Callable = None, type: typing.Type = None, required: bool = None) -> 'OptionHandler':
         return super().filtered(condition=condition, type=type, required=required)
     
     def __add__(self, other: typing.Union['OptionHandler', OptionAbstract, list]) -> 'OptionHandler':
         return super().__add__(other)
-    
-    def __len__(self) -> int:
-        return super().__len__()
-    
-    def __iter__(self) -> typing.Iterator[OptionAbstract]:
-        return super().__iter__()
-    
-    def __lt__(self, other: 'OptionHandler') -> bool:
-        return super().__lt__(other)
     
     def __repr__(self) -> str:
         return f"OptionsHandler: {self.items}"

@@ -49,25 +49,20 @@ class AbstractModel(LoggerModel, ABC):
         if not self.description:
             raise ValueError("Model description not set.")
         
-    @abstractmethod
     def __str__(self) -> str:
         return f"{self.name}: {self.description}"
     
-    @abstractmethod
     def __repr__tuple__(self) -> str:
         return (self.name, self.description)
     
-    @abstractmethod
     def __repr__(self) -> str:
         return f"{self.name}: {self.description}"
     
-    @abstractmethod
     def __lt__(self, other) -> bool:
         if not isinstance(other, AbstractModel):
             raise ValueError("Can only compare with AbstractModel.")
         return len(self) > len(other)
     
-    @abstractmethod
     def __len__(self) -> int:
         return len(self.__repr__()[0])
     
