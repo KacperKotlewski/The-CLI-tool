@@ -2,12 +2,8 @@ import os
 import sys
 from common.CLI.module import Module, Command, command
 from common.CLI.option import OptionFactory, OptionBuilder, OptionHandler
-
-create = Module(
-    name = "create",
-    description = "Create new elements in the project.",
-    help_str = "This command creates a new module in the project.",
-)
+from common.CLI.module.root_module import RootModule
+from common.CLI.interface import UserInterface
 
 @command(
     name = "env",
@@ -28,9 +24,12 @@ create = Module(
         ),
     ]
 )
-def env_create(self: Command, *args) -> Command:
-    input_file = self.get_value('input')
-    output_file = self.get_value('output')
+def env_create(self: Command, *args, **kwargs) -> Command:
+    root:RootModule = self.root_module
+    ui:UserInterface = root.get_ui()
+    
+    input_file = kwargs.get('input', None)
+    output_file = kwargs.get('output', None)
     
     if not os.path.exists(input_file):
         print(f"File {input_file} does not exist")
@@ -44,7 +43,8 @@ def env_create(self: Command, *args) -> Command:
     schema = parser.parse_env_schema(text)
     
     #print schema
-    print(f"\nSchema: {input_file}\n\n{schema}\n\n")
+    # print(f"\nSchema: {input_file}\n\n{schema}\n\n")
+    ui.message(f"\nSchema: {input_file}\n\n{schema}\n\n")
     
     output_file_data = ""
     
@@ -54,38 +54,47 @@ def env_create(self: Command, *args) -> Command:
         if isinstance(element, models.SchemaText):
             if element.type == models.SchemaTextTypes.header:
                 size = len(element.text)
-                print(size*"-" + f"\n{element.text.upper()}\n" + size*"-" + "")
+                # print(size*"-" + f"\n{element.text.upper()}\n" + size*"-" + "")
+                ui.message(size*"-" + f"\n{element.text.upper()}\n" + size*"-" + "")
             elif element.type == models.SchemaTextTypes.section:
-                print(f"\n---- {element.text.upper()} ----")
+                # print(f"\n---- {element.text.upper()} ----")
+                ui.message(f"\n---- {element.text.upper()} ----")
             elif element.type == models.SchemaTextTypes.subsection:
-                print(f" {element.text.upper()} ")
+                # print(f" {element.text.upper()} ")
+                ui.message(f" {element.text.upper()} ")
             else:
-                print(f"{element}")
+                # print(f"{element}")
+                ui.message(f"{element}")
                 
             output_file_data += f"# {element}\n"
                 
         elif isinstance(element, models.SchemaField):
             
             if not element.is_hidden():
-                print(f"\n{element.name if element.name is not None else element.og_name}")
+                # print(f"\n{element.name if element.name is not None else element.og_name}")
+                ui.message(f"\n{element.name if element.name is not None else element.og_name}")
                 if element.description is not None:
-                    print(f" {element.description}") 
+                    # print(f" {element.description}") 
+                    ui.message(f" {element.description}")
                 if element.example is not None:
-                    print(f" example: {element.example}")
+                    # print(f" example: {element.example}")
+                    ui.message(f" example: {element.example}")
                     
                 default = "will be generated" if element.is_generated() else element.default
                 
                 while True:
-                    new_value = input(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
+                    # new_value = input(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
+                    new_value = ui.prompt(f"Enter value" + (f" (default: {default}): " if default != "" else ": "), return_none=True)
                     
-                    if new_value != "" and element.check_regex(new_value):
+                    if new_value != "":# and element.check_regex(new_value):
                         element.default = new_value
                         break
                     elif new_value == "" and element.is_generated():
                         element.default = element.generate()
                         break
                     elif new_value == "" and element.is_required() and element.default == "":
-                        print(f"Field is required")
+                        # print(f"Field is required")
+                        ui.message(f"Field is required")
                     else:
                         break
 
@@ -98,14 +107,13 @@ def env_create(self: Command, *args) -> Command:
             
     sname = schema.schemaInfo.name.lower().replace(' ', '_')
     if output_file is None:
-        output_file = input(f"Enter output file name (default: .env." + (f".{sname}" if sname != "" else "") + "): ").strip()
+        # output_file = input(f"Enter output file name (default: .env." + (f".{sname}" if sname != "" else "") + "): ").strip()
+        output_file = ui.prompt(f"Enter output file name (default: .env." + (f".{sname}" if sname != "" else "") + "): ").strip()
     if output_file == "":
         output_file = ".env" + (f".{sname}" if sname != "" else "") + ".deserialized"
         
-    print(f"Saves to {output_file}")
+    # print(f"Saves to {output_file}")
+    ui.message(f"Saves to {output_file}")
         
     with open(output_file, 'w') as f:
         f.write(output_file_data)
-        
-
-create += env_create
