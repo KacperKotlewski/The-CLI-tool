@@ -152,3 +152,9 @@ class OptionHandler(AbstractHandler, BaseModel):
     
     def __repr__(self) -> str:
         return f"OptionsHandler: {self.items}"
+    
+    def status(self) -> typing.Tuple[str, str]:
+        status = []
+        for option in self.items:
+            status.append((option.name, option.value))
+        return status
