@@ -68,8 +68,12 @@ class AbstractHandler(ABC):
         """
         if not isinstance(item, AbstractModel):
             raise ValueError(f"Item {item} is not an instance of AbstractModel.")
-        if not (isinstance(item, self.items_instance) or issubclass(item, self.items_instance)):
-            raise ValueError(f"Item {item} is not an instance of {self.items_instance}.")
+        try:
+            if not (isinstance(item, self.items_instance) or not issubclass(item, self.items_instance)):
+                raise ValueError(f"Item {item} is not an instance of {self.items_instance}.")
+        except TypeError as e:
+            if not issubclass(item.__class__, self.items_instance):
+                raise ValueError(f"Item {item} is not a subclass of {self.items_instance}.")
         return True
     
     def add(self, item: typing.Any) -> None:

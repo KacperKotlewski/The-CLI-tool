@@ -63,6 +63,7 @@ class AbstractModel(LoggerModel, ABC):
             raise ValueError("Can only compare with AbstractModel.")
         return len(self) > len(other)
     
+    @abstractmethod
     def __len__(self) -> int:
         return len(self.__repr__()[0])
     
