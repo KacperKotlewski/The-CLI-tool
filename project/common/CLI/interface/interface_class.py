@@ -23,8 +23,11 @@ class Interface(AbstractModel, ABC):
         """
         return super()._validate()
     
+    def __len__(self) -> int:
+        return super().__len__()
+    
     @abstractmethod
-    def prompt(self, message: str) -> str:
+    def prompt(self, message: str, *args, **kwargs) -> str:
         """
         prompt prompts the user for input.
         
@@ -34,7 +37,7 @@ class Interface(AbstractModel, ABC):
         pass
     
     @abstractmethod
-    def confirm(self, message: str) -> bool:
+    def confirm(self, message: str, *args, **kwargs) -> bool:
         """
         confirm confirms the user for input.
         
@@ -44,7 +47,7 @@ class Interface(AbstractModel, ABC):
         pass
     
     @abstractmethod
-    def choose(self, message: str, choices: typing.List[str]) -> str:
+    def choose(self, message: str, choices: typing.List[str], *args, **kwargs) -> int:
         """
         choose prompts the user for input.
         
@@ -55,7 +58,7 @@ class Interface(AbstractModel, ABC):
         pass
     
     @abstractmethod
-    def message(self, message: str) -> None:
+    def message(self, message: str, *args, **kwargs) -> None:
         """
         message outputs a message.
         
