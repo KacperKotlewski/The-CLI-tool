@@ -1,14 +1,10 @@
 from abc import ABC, abstractmethod
 import typing
 from .module_abstract import ModuleAbstract
-from common.CLI.option import OptionHandler
-from common.CLI.action import ActionHandler
-
-# from common.CLI.option import OptionAbstract
-# from common.CLI.interface import UserInterface, UIDataDriven, UIMenuDriven
 
 class Command(ModuleAbstract):
-    action: typing.Callable = None
+    base_action: typing.Callable = None
+    root_module: typing.Optional['Command'] = None
     
     def __init__(self, **data) -> None:
         super().__init__(**data)
@@ -27,10 +23,21 @@ class Command(ModuleAbstract):
         return super()._validate()
     
     def _validate_action(self) -> None:
-        if self.action is None:
+        if self.base_action is None:
             raise ValueError("Command action is not assigned.")
     
-    def execute(self, *args) -> None:
-        super().execute(*args)
+    def run_base_action(self, *args, **kwargs) -> typing.Any:
+        try:
+            from .root_module import RootModule
+            if self.root_module is not None and isinstance(self.root_module, RootModule):
+                self._ui = self.root_module.get_ui()
+        except ImportError:
+            pass
+        return super().run_base_action(*args, **kwargs)
+    
+    def execute(self, *args):
+        return super().execute(*args)
 
+    def command(self, *args, **kwargs) -> typing.Any:
+        return super().command(*args, **kwargs)
 

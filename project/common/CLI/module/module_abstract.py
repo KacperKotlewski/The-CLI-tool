@@ -4,19 +4,17 @@ import sys
 from abc import ABC, abstractmethod
 
 from common.CLI.abstract_model import AbstractModel
-from pydantic import Field
 
 from common.CLI.option import OptionHandler, OptionFactory, OptionValueError, Argument, Option, Flag
-from common.CLI.action import ActionFactory, ActionHandler, ActionBuilder
+from common.CLI.action import ActionFactory, ActionHandler
 
-from common.debug import DEBUG
 from common.utils.settings_classes import Representation
 
 class ModuleAbstract(AbstractModel, ABC):
     help_str: str
     option_handler: OptionHandler = None
     action_handler: ActionHandler = None
-    action: typing.Callable = None
+    base_action: typing.Optional[typing.Callable] = None
     root_module: typing.Optional['ModuleAbstract'] = None
     
     @abstractmethod
@@ -160,20 +158,39 @@ class ModuleAbstract(AbstractModel, ABC):
         ModuleAbstract.log_strict(f"Executing actions for {self.name} with args: {args}")
         try:
             handled_args_number = self.option_handler.execute(*args)
-            handled_action_number = self.action_handler.execute_actions(*args)
-            self.option_handler.is_requirement_met(*args)
+            handled_action_number = self.action_handler.execute(*args)
+            requirements_met = self.option_handler.is_requirement_met(*args)
             
         except OptionValueError as e:
             print(f"Error: {e}\n")
             self.print_help_usage_action(*args)
             return
         
-        if handled_args_number == 0 and handled_action_number == 0 and self.action is None:
+        if requirements_met and self.base_action is None:
             self.print_help_usage_action(*args)
-        elif handled_action_number == 0:
-            self.action(self, *args)
+        elif self.base_action is not None:
+            self.run_base_action()
         else:
             self.bad_command_action(*args)
+            
+    def option_dict(self) -> dict:
+        options = {}
+        for option in self.option_handler.items:
+            options[option.name] = option.value
+        return options
+            
+    def run_base_action(self, *args, **kwargs) -> typing.Any:
+        args = list(args)
+        args.insert(0, self)
+        
+        options = self.option_dict()
+        
+        kwargs.update(options)
+            
+        return self.command(*args, **kwargs)
+    
+    def command(self, *args, **kwargs) -> None:
+        return self.base_action(*args, **kwargs)
     
     def __call__(self, *args) -> None:
         self.execute(*args)
@@ -191,3 +208,6 @@ class ModuleAbstract(AbstractModel, ABC):
                 self.action_handler += action
             except ValueError:
                 pass
+            
+    def __len__(self) -> int:
+        return super().__len__()
