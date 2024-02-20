@@ -1,16 +1,18 @@
 import typing
-from common.models.base import BaseModel
+from common.CLI.abstract_model import AbstractModel
 
-# action is made from a function and a condition
-class Action(BaseModel):
-    name: str = None
+# action is made from a function and a conditionfrom common.CLI.abstract_model import AbstractModel
+
+class Action(AbstractModel):
+    """
+    """
     function: typing.Callable = None
     condition: typing.Callable = None
     
     def __init__(self, **data) -> None:
         super().__init__(**data)
         self._validate()
-        
+    
     def _validate(self) -> None:
         self._validate_function()
         self._validate_condition()
@@ -26,3 +28,7 @@ class Action(BaseModel):
     def execute(self, *args, **kwargs) -> typing.Optional[typing.Tuple[bool, typing.Any]]:
         if self.condition(*args, **kwargs):
             return True, self.function(*args, **kwargs)
+        
+    
+    def __len__(self) -> int:
+        return super().__len__()
