@@ -1,24 +1,73 @@
 ---
 lang: en-GB
-author: Name Surname
-title: Project
+author: Kacper Kotlewski
+title: The CLI tool - managing environment variables in projects
 document_class: ENGINEERING DIPLOMA THESIS
-album_no: 000000
-supervisor: DSc. John Doe
-location: Poland
-date: 2024
-affiliation: University
+album_no: 338854
+supervisor: Dr Hab. Łukasz Machura
+location: Katowice
+date: February 2024
+university: UNIVERSITY OF SILESIA IN KATOWICE
+faculty: |
+  FACULTY OF EXACT SCIENCES AND TECHNOLOGY,\\
+  AUGUST CHELKOWSKI INSTITUTE OF PHYSICS
+field_of_study: Applied Computer Science
+
+geometry: margin=2.5cm
+fontsize: 14.5pt
 
 bibliography: references.bib
 toc: true
 toc-depth: 2
 
 header-includes: |
+    \usepackage{hyperref}
+    \usepackage{listings}
+    
+    \usepackage{xcolor}
+    
+    \definecolor{codegreen}{rgb}{0,0.6,0}
+    \definecolor{codegray}{rgb}{0.5,0.5,0.5}
+    \definecolor{codepurple}{rgb}{0.58,0,0.82}
+    \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+    \lstdefinestyle{mystyle}{
+        backgroundcolor=\color{backcolour},
+        commentstyle=\color{codegreen},
+        keywordstyle=\color{magenta},
+        numberstyle=\tiny\color{codegray},
+        stringstyle=\color{codepurple},
+        basicstyle=\ttfamily\footnotesize,
+        breakatwhitespace=false,
+        breaklines=true,
+        captionpos=b,
+        keepspaces=true,
+        numbersep=5pt,
+        showspaces=false,
+        showstringspaces=false,
+        showtabs=false,
+        tabsize=2
+    }
+
+    \lstset{style=mystyle}
+
+    \setlength{\parindent}{5mm}
+    
+
+
     \renewcommand{\maketitle}{
       \begin{titlepage}
         \centering
-        \textbf{$affiliation$}
-        \vspace{1 cm}
+        \textbf{
+          \large
+          $university$\\
+          \small
+          $faculty$\\
+        }
+        \normalsize
+        $field_of_study$\\
+
+        \vspace{4 cm}
       
         \begin{center}
         \vspace{0.5 cm}
@@ -26,17 +75,17 @@ header-includes: |
         $author$\\
         ALBUMU NO: $album_no$\\
         \vspace*{0.5 cm}
+        \huge
         $title$\\
-        %\textbf {Something clever}\\
-        %\vspace*{0.5 cm}
-        %\vspace*{2.0 cm}
+
         \small
-        \vspace*{2.0 cm}
-        $document_class$\\
-        \vspace*{2.0 cm}
-        Supervisor: $supervisor$\\
-        %\vspace{0.5 cm}
-        \vspace{5.0 cm}
+        \vspace{4 cm}
+        \begin{flushleft}
+          $document_class$\\
+          Supervisor: $supervisor$\\
+        \end{flushleft}
+
+        \vspace{4 cm}
         \small 
         $location$ $date$\\
         \end{center}
@@ -46,12 +95,10 @@ header-includes: |
 ---
 \newpage
 
-some reference to the introduction [@aiOverview]
 
 
-!import: ./1_introduction/_main.md
+!import: ./content.md
 \newpage
-
 
 
 \section*{Bibliography}

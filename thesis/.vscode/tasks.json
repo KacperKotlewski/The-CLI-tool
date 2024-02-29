@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Thesis pdf",
+            "type": "shell",
+            "command": "python thesis_gen.py && vscode build/thesis.pdf",
+            "problemMatcher": [],
+        }
+        
+    ]
+}
