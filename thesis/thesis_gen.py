@@ -32,6 +32,13 @@ class MarkdownFile:
     def deep_read(self, overwrite:bool=False) -> str:
         new_markdown = ""
         for line in self.markdown.split("\n"):
+            if "(./" in line:
+                start = line.find("(./")
+                end = line.find(")", start)
+                img_dir = line[start+1:end]
+                new_img_dir = self.directory + img_dir[1:]
+                line = line[:start+1] + new_img_dir + line[end:]
+                
             if line.strip().startswith("!import:"):
                 stripped = line.split(":")[1].strip()                    
                 if stripped.startswith("./"):

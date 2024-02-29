@@ -1,9 +1,9 @@
 from typing import Any
 import typing
-from common.CLI.commands import Command
-from common.CLI import argument as a
-from common.CLI import options as o
-from common.CLI.module import CLImodule
+from common.CLI_old.commands import Command
+from common.CLI_old import argument as a
+from common.CLI_old import options as o
+from common.CLI_old.module import CLImodule
 
 from client.schema.deserialize import parser
 from client.schema import models
