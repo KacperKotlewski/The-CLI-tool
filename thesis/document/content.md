@@ -5,8 +5,7 @@
 \label{sec:introduction}
 \addcontentsline{toc}{section}{\nameref{sec:introduction}}
 
-\subsection*{Motivation and Background}
-
+\subsection*{Background}
 In today's world, **Command Line Interfaces** (CLI) programs also called *shell scripts* are important puzzle pieces in almost every stage and position of the *Information Technology* (IT) industry, from debugging the network connection with the usage of *ifconfig* command in the terminal of Unix-based Operating Systems (*ipconfig* for Windows) or setting up a virtual machine with Docker on a remote machine via SSH. Without this small but important part of the software industry that is available on all modern operating systems, Computer Science (CS) would miss a great ally that drives all parts of this industry. One of the first closest things that resemble the Command-Line Interfaces that we know today was introduced half a century ago in OS called CTSS (Compatible Time-Sharing System) [@Corbat1992CTSStheCT] by MIT in the early 1960s, this impacted the newly developed system in 1971 called Unix [@Bourne1978UnixTS] that introduced the first shell called Thompson Shell (tsh) made by Ken Thompson. A few years later in 1979 UNIX 7 introduced a new and improved shell the Bourne Shell (sh) that became standard for the next shell generations including Microsoft OS in MS-DOS for IBM PC in 1981. In 1989 Brian Fox created Bash (Bourne Again Shell) [@newham2005learning] the shell that all Linux and macOS users are most familiar with. Command Line Interface takes the best parts of all shells created in '60s-70s of XX century and makes it so great that is it currently used by millions of users even on Windows systems by third-party software, for example, Git Bash that is automatically installed on Windows when you install git version control system [@spinellis2012git]
 
 The important part of Shells are **Environment Variables** that were introduced in Unix 7 with the introduction of Bourne Shell, they were invented to maintain information of configuration to share them with running programs [@gray2003interprocess] for specific users, they can store data of particular paths to files or programs and could be used by all programs and processes in system and shell (see [Fig 1](#fig:envar_example) ), these variables can be found under ``.bash_profile`` or ``.bashrc`` in Bash. Today they are not only an integral part of the most widely used operating systems but also very useful for configuring *virtual machines* (VMs) that are currently on the rise and are used in many areas of development. In 2012 company called Heroku, one of the providers of online virtual machine services also known as *clouds* introduced ``.env`` file also known as **dotenv** for Ruby, and because of its ease of use they were quickly adopted by a new and fast-growing node.js community back in 2013 as dotenv node module [@dotenv_heroku_2012]. They usually are used to store settings, tokens, passwords, API keys, and credentials for services like databases or APIs, downside of dotenv files is that because they are plain text files they are not encrypted and can be easily read by anyone who has access to the file, because of this they never should be published or committed to places where someone could have access to them, for example, zip, GitHub, GitLab or friend on chat. Because of that many developers create ``.env.example`` files with empty or dummy values, because of its nature, it is far from the ideal solution, on the other hand for teams that need to share the same configuration, there is a solution called *dotenv vaults*.
@@ -15,15 +14,12 @@ The important part of Shells are **Environment Variables** that were introduced 
 
 \newpage
 
+\subsection*{Motivation}
 This thesis focused on this undeveloped part that is sharing dotenv in public repositories for example in GitHub, by creating a new solution as the CLI tool that will help create safer, easier to use and fill, more intuitive versions of .env.example files that developers currently rely on in form of schemas (schematic files) that will be a form of serialization data without sharing precious keys and passwords with the outside world and are easy to deserialize back even by beginners. That is important that the schema files can be used even without the CLI tool as an alternative to ``.env.example`` files themselves and not be changed to some kind of structure format like JSON or YAML, because that will force usage of this tool to get our precious ``.env`` file back from schema format and we want to prevent forcing users to change what they like. In the engineering work big focus will be put on developing a Python CLI framework around that with good code practices that will be easily decoupled from the dotenv schema solution itself, current CLI frameworks focus on the CLI part only but today's users want to move more, and more from CLI's to more GUI's or web-based apps. This thesis as well as the project itself will be developed and taken to a discussion to give a different interface approach than the other similar solutions for the reason of trying to change the CLI stage to give a new perspective as well as discover new possibilities for the future of CLI's.
 
 This tool can one day improve the workflow of millions of developers across the globe who are using dotenv files in their everyday work, It could give them better comfort and flexibility with those files mainly due to not forceful nature of the tool that the output schema files will be in format that will be almost identical to current ``.env`` and ``.env.example`` files but will give extra point of knowledge for the tool by including the data in form of specifically and precisely design comments before each fields. Tool that is a part of the thesis will be shared publicly on MIT License at GitHub as well as the thesis for other developers, researchers, and scientists to give people an opportunity to learn and improve based on this work, The biggest tools that we are using today are open-sourced including whole systems like Linux. The project will be developed in Python 3 programming language, because of its simplicity, readability, and rich ecosystem of libraries and frameworks that make it easy to build a variety of programs that can be used on a multitude of operating systems. The software will be designed to be flexible, extensible, and easy to integrate into existing development workflows, making it a valuable addition to the toolkit of modern software developers. This utility should provide a valuable resource for developers, enabling them to work more effectively and efficiently with environment variables and dotenv files in their needs. The project will be developed with the newest code practices and SOLID methodologies to ensure proper adapters, fabricators, and other good practices for easy maintenance and extendability of future features as well as being as Pythonic as it is possible. Also to keep best practices in place there will be included unit tests of dotenv schema part of the project to ensure that the tool meets the requirements and objectives of the engineering work. The tool will be tested and validated to ensure its functionality, reliability, and usability, and the test results and analysis to identify any potential issues or areas for improvement. The tool will be compared with alternative solutions and their possible impact on the domain and the community, and the conclusions will highlight the significance of the CLI tool as well as the importance of the work in advancing best practices in software development.
 
 To assume all of the above, my motivation to create this tool is to provide a user-friendly and secure approach to better and more sharable version environment variables files commonly known as dotenv across projects, as a developer myself I know how much time and effort it takes to manage environment variables even with help of dotenv files especially on multiple devices, I have been using dotenv files for years and I know the limitations and challenges associated with them, I believe that there is a need for a more efficient and secure solution for sharing environment variables in projects, and I am excited to contribute to the development community by providing a new approach for this field of CS (Computer Science). I'm also looking forward to using this piece of technology myself in my and others everyday work, I believe that this will provide a valuable resource for the developer community by opening not only a fresh view of dotenv files but also the approach of the CLI tools in general with exchangeable interfaces and the possibility of using it as a library in other projects or even as a whole framework for CLI's like Flask for web applications. 
-
-<!-- Cel pracy
-Określenie celu: Wyraźnie zdefiniuj główny cel swojej pracy inżynierskiej. Opisz, co dokładnie zamierzasz osiągnąć poprzez swoje badanie, projekt lub rozwój określonego narzędzia.
-Relevancja celu: Wyjaśnij, dlaczego realizacja tego celu jest ważna dla danej dziedziny lub potencjalnych użytkowników. -->
 
 \newpage
 
@@ -52,23 +48,6 @@ The main objective of this engineering work is to develop a base for a CLI frame
     > Afterwards the tool will be compared with similar tools and alternative solutions, including an analysis of their features, limitations, and advantages. The goal is to understand how the CLI tool stands out from existing solutions and provides unique value to the development community. The impact of the CLI tool on the domain and the community will be analyzed to assess its potential benefits and contributions to the field of environment variable management.
 
 
-<!-- Zakres pracy
-Granice badań: Określ zakres Twojej pracy, czyli co będzie, a co nie będzie objęte Twoim badaniem lub projektem. Jest to ważne, aby czytelnik miał jasność co do granic Twojego przedsięwzięcia.
-Skupienie na kluczowych obszarach: Możesz także krótko wspomnieć o głównych obszarach, które zostaną poruszone w pracy, takich jak analiza istniejących rozwiązań, projektowanie i implementacja narzędzia, oraz jego ewaluacja. -->
-
-<!-- The scope of this engineering work is focused on the development of a CLI tool for managing environment variables in projects, this program will help developers manage environment variables in a structured and organized manner, making it easier to work with configuration settings and share them securely across different environments and projects publicly. The tool will be designed to be flexible, extensible, and easy to integrate into existing development workflows, making it a valuable addition to the toolkit of modern software developers. This thesis will provide a comprehensive overview of the development process, including the research, design, implementation, testing, and validation of the CLI tool. The research will involve an analysis of the existing solutions for managing environment variables and dotEnv files, as well as an examination of the related research works in this area. The development of the tool will follow best practices in software engineering, including SOLID principles, design patterns, and clean code practices. The tool will be implemented using the Python 3 programming language, leveraging its rich ecosystem of libraries and frameworks for building command line applications. The development process will include stages such as planning, design, implementation, testing, and validation, ensuring that the tool meets the requirements and objectives of the engineering work. The tool will be tested and validated to ensure its functionality, reliability, and usability, and the test results and analysis to identify any potential issues or areas for improvement. The tool will be compared with alternative solutions and their possible impact on the domain and the community, and the conclusions will highlight the significance of the CLI tool as well as the importance of the work in advancing best practices in software development. -->
-
-<!-- Metodologia
-Opis podejścia: Choć szczegółowy opis metodologii znajdzie się w późniejszej części pracy, w wstępie warto krótko wspomnieć o ogólnym podejściu badawczym lub technikach projektowych, które zostaną zastosowane. -->
-
-<!-- Struktura pracy
-Przegląd struktury dokumentu: Na końcu wstępu zaproponuj przedstawienie struktury reszty pracy. Opisz w skrócie, co znajduje się w każdym z rozdziałów, aby przygotować czytelnika na to, co będzie następować. -->
-
-<!-- \subsection*{Document Structure} -->
-
-<!-- This paper consists of 5 chapters, not including the introduction and the implications. The first chapter is the state of the art, where the key concepts and terminologies are explained, and the overview of alternatives to the tool is presented. In the second chapter, the technical description of the tool is presented, including its functionality, architecture, implementation details, and interfaces. The third chapter will present the methodology used for designing and developing the tool, including the design approach, development process, and testing strategy. In the fourth chapter, the test and validation of the tool will be presented, including the test plan, test cases, and test results. Finally, the fifth chapter will discuss and analyze the tool, including a comparison with alternatives, limitations, and challenges, and the impact of the work. Below all five chapters is the implications section, which will provide a summary of findings, conclusions, and recommendations for future work based on the findings of the engineering work. -->
-
-
 
 
 
@@ -87,12 +66,12 @@ Przegląd struktury dokumentu: Na końcu wstępu zaproponuj przedstawienie struk
 <!---------------------------------------------------------------------->
 <!----------------           State of the Art           ---------------->
 <!---------------------------------------------------------------------->
-# State of the Art
+# Key Concepts and Terminologies
 
-## Key Concepts and Terminologies
-Explanation of the key concepts and terminologies relevant to the development of the project and thesis, including environment variables, dotEnv files, and CLIs, as well as other relevant elements and ideas that will be used throughout the document.
+<!-- ## Key Concepts and Terminologies
+Explanation of the key concepts and terminologies relevant to the development of the project and thesis, including environment variables, dotEnv files, and CLIs, as well as other relevant elements and ideas that will be used throughout the document. -->
 
-### Environment Variables
+## Environment Variables
 Dynamic-named values can affect the way running processes will behave on a computer. They are part of the environment/OS/VM in which a process runs. For example, in node.js based frameworks it is common to use them to store sensitive information, such as API keys, database credentials, and other configuration settings (see [Lst 1](#lst:env_in_vue)). This is a common practice in modern software development, as it allows developers to manage fragile data without hardcoding it into the codebase. Environment variables are also used to define system-wide settings, such as the location of executable files (PATH), the default editors or browsers, and the default shell. They are used by the operating system and all the processes that run on it. Environment variables are typically set at the time of user login and loading saved variables for a particular environment, set manually by a user or by some processes, and could be loaded from files and scripts.
 
 ```bash
@@ -103,7 +82,7 @@ Web dev portfolio
 ``` 
 [Listing 1: VUE.js environment variable example]{#lst:env_in_vue}
 
-### dotEnv Files
+## dotEnv Files
 Documents that are open text files used to store environment variables for VMs, applications, and environments. The main purpose of this file is to provide a "secure" place to store sensitive data without the need to re-enter them on every new environment and that is especially useful during the development and production of applications that utilize VMs and cloud services like Heroku that introduced it in 2012 and was popularized by the dotenv node module in 2013. The .env file format is simple and easy to use, making it a popular choice among developers who want to have one or a few configurations of environment variables in a structured and organized manner that can be used on a multitude of environments, devices, clouds, and especially with microservices. The use of .env files has become a common practice in modern software development, and understanding how to use and manage them is crucial for developers. They are simple text files that contain key-value pairs separated by an equal sign, with each pair representing an environment variable (see [Lst 2](#lst:env_file_example)). The design of those files also includes comments, multiline strings, lists, and empty lines.
 
 ```bash
@@ -122,7 +101,7 @@ ALLOWED_HOSTS=localhost, 10.0.0.1, 192.168.0.1
 \newpage
 
 
-### Command Line Interface (CLI)
+## Command Line Interface (CLI)
 Element of modern systems that allows users to interact with the OS by entering words so-called commands, options, and arguments into a terminal or console to perform various operations by utilizing processes, programs, and scripts. This user interface (UI) is widely used in software development to manage operating systems, automate repetitive tasks, manage project dependencies, and interact with version control systems. It is as old as the first OS and commercial computers (see [Fig 2](#fig:zenith_z19_terminal)) that give users the ability to interact with it by entering words into the computer to interact or run specific virtual resources on the machine. Unix-based systems have built-in different shell's that are a command-line interpreter that provides a command-line user interface. It is both an interactive command language and a scripting language and is used by the operating system to give users the ability to control their virtual environments.
 
 ![Zenith Z-19 terminal](https://live.staticflickr.com/3414/3281139507_f56091fa84_b.jpg){ height=150px #fig:zenith_z19_terminal }
@@ -135,29 +114,29 @@ Image Source \href{https://www.flickr.com/photos/ajmexico/3281139507/}{www.flick
 \normalsize
 \end{center}
 
-### CLI Tools
+## CLI Tools
 Commands, scripts, and various programs that are used as commands and scripts from the command line, it allows the developers to perform a wide range of tasks without the need for a graphical user interface and also allow them to control other machines or VMs via Telnet or SSH. It gives developers a lot of flexibility and power to control their environments and resources. Examples of these types of programs and tools like simplest ping command (see [Fig 3](#fig:ping_command)), ifconfig/ipconfig up to git, docker, npm, python, and many more. The use of CLI tools is widespread in modern software development, and understanding how to use and manage them is crucial for developers.
 
 ![Ping command example](./images/1.command_example.png){ height=100px #fig:ping_command}
 
 
-### Python
+## Python
 High-level programming language that is widely used in software development for web development, data analysis, machine learning, and many other applications. It is known for its simplicity and readability, making it an ideal language for beginners and experienced developers alike. Python has a rich ecosystem of libraries and frameworks that make it easy to build a variety of scripts and applications from all software fields. The main benefits of it are simplicity, readability, and a rich ecosystem of libraries and frameworks. For the purpose of the engineering project, I've chosen Python in version 3.8 will be used to implement the CLI framework and tool for dotenv in projects because of its attributes mentioned above, this version has been chosen because it is the oldest version still supported by the Python Software Foundation and thanks to that it will set a big range of users that can use the tool.
 
-### Marshaling
+## Marshaling
 It's an operation of serializing data to a structured format like schema files from files that contain some data but in a non-structured format, it usually means converting data from a more human-readable format to a hard-to-read structured data format, but in this thesis, it will mean to convert one human-readable format which is the .env file to other human-readable format but with extra data information for the needs of the tool. In thesis can be used interchangeably with the word "serialization".
 
-### Unmarshaling
+## Unmarshaling
 In opposition to marshaling this is an operation of deserializing data from a structured format like schema files to the final product which in this case are .env files, usualy it means converting structured data format to a more human-readable one, but in this case, it will be used to convert one human-readable format with extra data information for needs of the tool to another human-readable format but without the extra data information. In case of this thesis, it can be used interchangeably with the word "deserialization".
 
-### Regular Expressions
+## Regular Expressions
 Regex as they are called is a sequence of structured characters that define patterns, they are used to search, extract, and match strings and are widely used in software development for example data validation, data extraction, and data manipulation. They can be utilized in many programming languages and tools, including Python, JavaScript, and even Unix-based systems. In the project, they will be used to parse and validate the schema file fields of the process of unmarshaling the data from schema to .env files.
 
 
-### SOLID
+## SOLID
 Principal of software design introduced by Robert C. Martin in the early 2000s, it have become one of the biggest standards in the modern software engineering industry. They are used to create clean, modular, and extensible code, and they are considered best practices for designing and implementing software systems. It stands for Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion.
 
-### Design Patterns
+## Design Patterns
 Predefined recipes for solving common software design problems, they are used to create clean, modular. Thanks to that easily extensible code, which allows for easier maintenance of code and projects, they are considered the best code guidelines.
 
 The few patterns below were used inside the project:
@@ -175,7 +154,7 @@ The few patterns below were used inside the project:
 > They where utilzed to make easy to create commands, modules and interfaces for the CLI framework, they were used to add new functionalities to the existing objects without altering their structure.
 
 
-### Kwargs and Args
+## Kwargs and Args
 That's are Python shortcut names for two types of **arguments**, **args** is a list of arguments that are passed to the function with no keyword assigned to them (see [Lst XXXX](#lst:args_example)) on the other hand, **kwargs** (keyword arguments) is a dictionary of arguments that are passed to the function with a **keyword** assigned to them (see [Lst XXXX](#lst:kwargs_example)), they are used to make the function more flexible and to make it easier to use and understand, they could be used both, either, or neither in the same function or method.
 
 ```python
@@ -194,30 +173,13 @@ def example_function(**kwargs):
 
 TODO: dodaj patterny i popraw ten bełkot
 
+
+<!-- 
 ## Overview of Alternative to the Tool
 \huge
 TODO: Rozdział do przeredagowania
 \normalsize
-<!-- 
-Vault by HashiCorp:
 
-Opis: Narzędzie do zarządzania sekretami umożliwiające bezpieczne przechowywanie, dostęp i audytowanie poufnych danych.
-Funkcjonalności: Dynamiczne sekrety, szyfrowanie danych, zaawansowane zarządzanie politykami dostępu.
-Ograniczenia: Wymaga zaawansowanej wiedzy technicznej do konfiguracji i zarządzania.
-Zalety: Wysoki poziom bezpieczeństwa, elastyczność, wsparcie dla wielu dostawców usług chmurowych.
-Doppler:
-
-Opis: Platforma do centralnego zarządzania sekretami i konfiguracjami aplikacji.
-Funkcjonalności: Centralne przechowywanie, wersjonowanie konfiguracji, łatwa integracja z narzędziami deweloperskimi.
-Ograniczenia: Możliwe ograniczenia w kompatybilności z niektórymi specyficznymi środowiskami.
-Zalety: Prostota użytkowania, wspiera bezpieczne wdrażanie i zarządzanie konfiguracją w różnych środowiskach.
-
-Vault by HashiCorp to zaawansowane narzędzie do zarządzania sekretami, które umożliwia dynamiczne generowanie sekretów, szyfrowanie danych przechowywanych i przesyłanych, oraz szczegółowe zarządzanie politykami dostępu. Vault jest wysoce konfigurowalny i zaprojektowany z myślą o bezpieczeństwie na najwyższym poziomie. Oferuje również możliwości takie jak leasing i odnawianie sekretów, co umożliwia automatyczne zarządzanie ich cyklem życia. Jego modularna architektura pozwala na łatwą integrację z istniejącymi systemami. Wadą może być skomplikowana konfiguracja i wymóg głębokiej wiedzy technicznej do efektywnego wykorzystania wszystkich funkcji.
-
-Doppler zapewnia centralne miejsce do zarządzania wszystkimi sekretami i konfiguracjami aplikacji, umożliwiając ich bezpieczne przechowywanie, dostęp i synchronizację między różnymi środowiskami i zespołami. Jest łatwy w użyciu i integruje się z wieloma popularnymi narzędziami i platformami deweloperskimi. Doppler oferuje również wersjonowanie konfiguracji, co ułatwia zarządzanie zmianami i wprowadzanie aktualizacji. Jednak, jak każde narzędzie, może mieć ograniczenia związane z kompatybilnością z niektórymi specyficznymi środowiskami lub narzędziami.
-
-
- -->
 
 ### Vault by HashiCorp
 
@@ -232,7 +194,7 @@ Command Line Interface Creation Kit, a Python package that allows developers to 
 
 ## Examination of Related Research Works
 Summary of academic and industry research relevant to CLI development and usage as well as research on the specific domain of the tool.
-
+ -->
 
 
 
@@ -243,7 +205,6 @@ Summary of academic and industry research relevant to CLI development and usage 
 
 
 \newpage
-<!-- tool requiraments and models that we work with -->
 
 
 
@@ -600,31 +561,36 @@ All modules and commands will have an action for help message, also there will b
 \newpage
 
 ## Architecture
-
-TODO: dodaj opis architektury i diagramy, dodaj informacje na temat wykorzystanych technologii, bibliotek, frameworków, itp. poinformuj też o wykorzystaniu wzorców projektowych, SOLID, DDD, itp.
+TODO: do dokończenia
+Most of the architecture of the project was already described in the previous sections, the architecture of the schema files, the elements CLI framework, and the dotenv-schema tool were mentioned thanks to detailed domain analysis and models made before based on that. As addition the architecture will be supported 
 
 ## Metodology
 
 TODO: opisz metodyki, procesy, narzędzia, itp. które wykorzystałeś w projekcie oraz w zarządzaniu nim, uzasadnij dlaczego wybrałeś akurat te
 
+DDD
+
+TDD
+
+Agile
 
 
 
 
-## Implementation
 
-<!-- TODO: opisz implementacje, dodaj kod źródłowy, opisz jakie problemy napotkałeś i jak je rozwiązałeś, opisz jakie technologie, biblioteki, frameworki wykorzystałeś, opisz jakie wzorce projektowe, SOLID, DDD, itp. zastosowałeś -->
+
+# Implementation
 
 Here is the implementation of the project, the code that was written to create the tool and the schema files, pieces of code that was applied to the CLI framework, and the dotenv-schema tool part where are introduced the commands and actions with utilization of two previous ones. The code will be structured in the way that it was described in the previous sections, and it will be used to show the implementation of the project and the way that it was done.
 
-### Schema File
+## Schema File
 
 As we already know the schema file will be a form of serialized data without losing precious information about the fields and their values but without sharing confidential values with outsiders. The file will be required to contain such information as a version of the CLI tool, and data about the creation like author, license, name of schema, description, and the version of the particular schema. In the case of fields, they will be required to contain the key also called field, default value, type, regex, description, hint, example, and for example required flag. The file will also contain extra information to be displayed for the user and split the fields into groups and sections, this will be called the text element, and int could be a simple message, header, section, or textless like a divider or space. Elements will need to be easy to distinguish both by the user and the tool. To create this structure project will utilize *Pydantic* library that will be used to create the models of the data and structure in an organized way.
 
 <!-- section models schema files -->
 There will be presented three parts of this section, schema file model, parser to schema file, and parser from schema file to dotenv. The example of the schema file was introduced under "schema files" of the section [Models](#models) and [Listing 8: Schema file shop example](#lst:schema_file_shop_example).
 
-\subsubsection*{Schema Data Model}
+### Schema Data Model
 To start with the schema file model we will take the first part of it which is "EnvSchema" (see [Lst 9](#lst:schema_data_model)) that contains information about the CLI version and also contains the optional element of "SchemaInfo" that will be used to store the information about particular schema, also it contains a list of SchemaElements that will be used to store the fields and text components. The model will be used to create the structure of the schema file to marshal and unmarshal it. *Pydantic* library was used to create the model of the schema as well as their components, also python library called *typing* was used to create the typing hints for the model, pydantic library utilized type hints to create the models and validate the data that is passed to them. Usually, the default value was set to None.
 
 \paragraph*{EnvSchema} is the main part of the schema model, it contains the version of the CLI tool and references to the schema info and elements, it also contains methods to convert the schema to the text for serialization, and to print the schema as a string, it utilizes the function that provides the text of the schema and the elements that are in it (see [Lst 10](#lst:schema_text_template)) it not only covert the EnvSchema but also the info and elements that are in it, and it also contains the methods to print the schema as a string and to represent the schema as a string.
@@ -751,7 +717,7 @@ class Version(enum.Enum):
 ```
 [Listing 14: Version enum]{#lst:version_enum}
 
-\subsubsection*{Schema Parser}
+### Schema Parser
 The parser is split into two separate parts, the first one is the parser from the *schema file* to the *schema model*, and the second one is the parser from the *env* file to the *schema model*. The second one is much less complicated because it is made only from fields with values and comments, and the first one needs to gather and format all the model information from the comments and fields and also needs to handle the text elements that are used to separate the fields and provide the user with the information about the schema.
 
 \paragraph*{Serialize schema file to model} is the parser that will be used to convert the schema file to the schema model that is later used to create the .env file after interaction with the user, it is made from seven functions but only one is called by the "create env" command that creates .env from .env.schema, rest of them are called by the main one, this function is *parse_env_schema* that takes whole text from file and split it to the pieces that are further analyzed and parsed by the other functions, the first called function is *parse_cli_config* that takes first lines of schema files and makes sure that it contains "``# dotEnv schema``" at the beginning, valid "``CliVersion``" and "``---``" at the end. Another function is *parse_schema_info* which takes the lines between the first and the second dashed line and creates the *SchemaInfo* based on information gathered from the file. The last one called directly by the main function is *parse_elements* which takes the rest of the file and creates the list of *SchemaElements* that are used to create the schema model, it also contains the function *parse_schema_element* that delegates the parsing of the elements to the other functions and makes sure that the elements are in the right order and are valid, functions that covers particular elements are *parse_field* and *parse_schema_text* that are used to parse proper components and makes sure that they are valid as well. The seventh function is *get_key_and_value* which is called by other functions to split the line to the key and value from comments that use the pattern "`#` key: value``". Also, the whole parser utilizes Pydantic model **ParseData** (see [Lst 15](#lst:parse_data_model)) which is used to exchange information between the functions and to store the data that is used to create the schema model. The model is flexible and it allows it to be adjusted to the needs of the parser and functions, in all cases it currently takes an analyzed *line*, the *number* of the line, and the **schema_model** that depending on a context and functions that currently exchange the data takes *SchemaEnv* in case of communication between *parse_env_schema* and both *parse_cli_config* and *parse_schema_element*, *SchemaInfo* in case of data exchange of *parse_env_schema* and *parse_schema_info*, but in case of *parse_schema_element* and *parse_field* it takes *SchemaField* and *SchemaText* in with *parse_schema_text*. The *flag* field is optional and also highly context dependend, each, each function use it in different way, for example *parse_cli_config* (see [Lst 16](#lst:parse_env_schema_function)) and *parse_schema_info* uses it to inform parser that thier job has been finished and all information are gathered and validated, but in a case of *parse_elements* it utilize it as a flag that inform the parser that curently there is an element under development and lines that are currently analyzed are part of it. Because of the complexity and importance of this particular parser, it was tested with the unit and integration tests, and it was also used to create the schema model that was used to create the .env file.
@@ -810,11 +776,11 @@ def build_schema(schemaInfo: models.SchemaInfo, elements: typing.List[models.Sch
 
 \newpage
 
-### CLI Framework
+## CLI Framework
 
 Based on information and specifications that were previously formed this module is crucial to the project, it will be used to create interfaces for the tool and to create the commands for it. The library needs to be easy to use, maintain, and keep best practices. 
 
-\subsubsection*{The base classes}
+### The base classes
 To achieve all the goals and be aligned with needs and architecture there were developed two abstract classes that were base classes for most of the components, that is **AbstractModel** and **AbstractHandler** they provided not only the basic methods and fields that were required and used by the components but also give high component compatibility that gives developer solid ground to work with components in this same way no matter what component is used. Each of the classes were well documented in the form of Python docstrings and comments, they were only tested manually by the developer while building the tool from the project.
 
 \paragraph*{AbstractModel} has two fields that are required for every component, the ``name``, and the ``description``, and the methods that were required for easy handling of the components including abstract ``validate``, ``init`` that runs validate method (see [Lst 18](#lst:abstract_model_class)), and ``__len__`` and also non-abstract methods like ``validate_name``, ``validate_description``, ``__str__`` or ``__repr__`` that was used to provide the user with the information about the component. 
@@ -907,7 +873,7 @@ class AbstractHandler(ABC):
 ```
 [Listing 19: AbstractHandler class]{#lst:abstract_handler_class}
 
-\subsubsection*{Modules}
+### Modules
 As there were mentioned in the previous parts module is and major element of the command that selects the action that the user wants to execute, it also contains the options that are used to modify the behavior and actions that are executed when certain conditions will be met, it also have name, description, help. As we already know there are 3 types of modules, the program - **Root Module**, **Module**, and **Command**, because of that there were created 3 classes, and one abstract class that was used to create the structure of all the module-like components that is **ModuleAbstract**, also there were created the **ModuleHandler** for handling all modules and commands that were used in **Module** class as well as the **RootModule** that inherit from it.
 
 \paragraph*{ModuleHandler} setups required fields for dealing with **ModuleAbstract** and methods as default provided by **AbstractHandler**, the only difference in methods is ``get`` that is overwritten to raise custom ``ModuleNotFound`` exception when module with given name was not found, and ``filtered`` method got new *keyword argument* that is ``type`` to filter modules by type so it can be used to filter only instances of commands or only modules.
@@ -1077,7 +1043,7 @@ class RootModule(Module):
 [Listing 28: Append interface option and action]{#lst:append_interface_option}
 
 
-\subsubsection*{Actions}
+### Actions
 They are one of the simplest implementations of **AbstractModel** on top of inherited elements adds two fields that are required for every action, that is ``function`` and `condition` that is used to execute the action and to check if the action should be executed, also it overwrites the ``execute`` method to run the function if the condition were met (see [Lst 29](#lst:action_class)), and two additional validators that are used to check if the function and condition are set. **ActionHandler** also utilizes base methods from **AbstractHandler** and changes only required parts of the code to handle the actions and execute them. For simpler action creation has been made **ActionBuilder** as well as **ActionFactory** for the same purpose, both of them are Creational Design Patterns. The first of them is used to create the action step by step and then build it, builder contains methods to set the name, function, and condition which are the most valuable in case of actions. The second one is used to create the action immediately with provided data, also there are methods to create the action directly from the option and flag, in case of creating an action from a flag it takes the flag name as its own and sets condition to checks if the flag is set to true in other words if the flag was used by the user (see [Lst 30](#lst:action_factory_class)). On the other hand, while the action is made with the usage of the option it takes the option name only, the condition must be defined by the developer.
 
 ```python
@@ -1107,7 +1073,7 @@ class ActionFactory:
 ```
 [Listing 30: ActionFactory class]{#lst:action_factory_class}
 
-\subsubsection*{Options}
+### Options
 
 Options are as complex as the modules, they are used to modify the behavior of the command and to provide the user with the possibility to set the arguments that are required by the command, they are also used to provide the user with information about the command and to display the help message. They also utilize both the **AbstractModel** and **AbstractHandler** as the base classes for the **OptionHandler** and **OptionAbstract** is the base class for three types of option, the **Option** itself, **Argument** that does not require a key, and **Flag** that does not take the value. 
 
@@ -1182,7 +1148,7 @@ class Option(OptionAbstract):
 
 <!-- \newpage -->
 
-\subsubsection*{Interfaces}
+### Interfaces
 
 The interfaces are used to provide the user with the possibility to interact with the tool, they are used to display the information and to gather the information from the user, as well as all the rest of the framework implementations are based on the **AbstractModel** and **AbstractHandler** as the base classes for the **InterfaceHandler** and **InterfaceAbstract** that is the base class for interfaces, also there is an interface decorator that helps create new interfaces with classes.
 
@@ -1251,15 +1217,15 @@ def interface(name: str, description: str) -> typing.Callable:
 
 \newpage
 
-### DotEnv Schema Tool
+## DotEnv Schema Tool
 
 As there were mentioned tool is made to provide the user with the possibility to create the schema from the dotenv file, it is made from two main parts, the first one is the parser and models that are in the **schema** section and the second one is whole CLI framework that is in the **framework** section. The parser is used to parse the dotenv file to the schema model then with the help of framework interfaces asks the user for the data to be fulfilled in the schema model, and then serializes the model to the schema file, and on the other hand to parse schema back to dotenv with the usage of the deserialize parser, model and the framework interfaces. The CLI framework is used to create the interfaces for the tool and to create the commands for it, it is made to be easy to use, maintain, and keep best practices.
 
-\subsubsection*{Minimum Viable Product}
+### Minimum Viable Product
 
 Before the thesis was started the MVP was created, it was a very simple implementation that had only a deserializer from a basic schema file that was the precursor to the current implementation, schema file was created manually and then parsed directly from raw code, it is publicly available on the GitHub repository (see [github.com/KacperKotlewski/strapi_postgres_docker](https://github.com/KacperKotlewski/strapi_postgres_docker)), this project was used to set up quickly new docker containers for new projects that require fast backend with database setup, it uses Strapi as BaaS and PostgreSQL as database. In this repository aside from docker files some shell scripts and the basic strapi_app folder is ``.env.example`` that were used back then as schema file, and the `env_creator.py` was used to parse this primitive schema file to the dotenv for particular needs. The MVP was used to gather the requirements aside from possible improvements that were used to create the final version of the tool.
 
-\subsubsection*{Current implementation}
+### Current implementation
 
 The current implementation is much more readable aside from the schema and framework modules that are more complex. The commands are much more separated in different files and also there are easy-to-add interfaces and options to create schema files that were not possible in MVP. To create an app first it was needed to initialize the root module instance with all needed fields (see [Lst 38](#lst:root_module_instance)), then in exactly this same manner instance of module "**create**" was made, to register the module to the root program was as easy as to just add it to the root module instance like that "``app += create``".To finish the create module there was a need to add "**env**" and "**schema**" commands as well as "**list**" command directly to the root module instance. A basic interface has been added in the previous section so that was not needed. As a result of these actions, the CLI tool was created and ready to use, after use of help (see [Fig 4](#fig:cli_tool_help)) flag there were displayed all available commands and options that were created during steps that were described above.
 
@@ -1468,27 +1434,42 @@ The last test was to create a .env file from the schema file with changes using 
 \clearpage
 
 ## Validation
-<!-- Wyjaśnij proces walidacji, w którym demonstrujesz, że program spełnia wymagania biznesowe i oczekiwania użytkowników. Opisz, jak:
 
-Walidacja z użytkownikami: Podejście do gromadzenia opinii od rzeczywistych użytkowników za pomocą testów beta lub pilotażowych wdrożeń.
-Walidacja funkcjonalna: Metody używane do potwierdzenia, że wszystkie funkcje działają zgodnie z dokumentacją wymagań.
-Walidacja wydajności: Testy przeprowadzone, aby upewnić się, że aplikacja działa płynnie i efektywnie pod obciążeniem. -->
+The validation was used to ensure that the tool works as expected and that it is ready to use by the end-user. The validation will include the validation of the requirements, functional validation, and non-functional validation. Many elements were validated with the usage of the system and acceptance tests, the system and acceptance tests were used to check if the tool works as expected on both user level and system behavior. The acceptance tests were also used to check if the tool meets the requirements.
 
-### walidacja założeń
+### Validation of the assumptions
 
-### punkty poprawy
+The assumptions that were made during the development of the CLI framework and the DotEnv Schema Tool were validated with the usage of the system and acceptance tests. The elements that are covered by this test are the CLI tool work and behavior, the framework implementation and behavior in the CLI tool, and the basic interface implementation and behavior. The success of the tool was the successful creation of the schema and .env files from their counterparts by execution of "``create env``" and "``create schema``" commands, proper information about how to use "-h" and "--help" for detailed information about the command in case of calling module only or improper execution of the command, a listing of all available interfaces in the tool by "``list``" command, and proper execution of the help command. All of these tests passed and the tool was considered a success not only for the tool but for the framework and interface and all other parts of the system that were used to create the tool. 
+
+The design of the schema file allows the user to safely share them in the project repository, it is a simple text file format that is easy to read and understand so it could work as a replacement for "``.env.example``". The schema file is also easy to create with the help of the tool and change back to the regular ``.env`` format. The schema file also allows to use of regex patterns to validate the user input.
+
+The implementation of the tool with all best practices that were used allows the code to be flexible and easily extendable, the tool is also easy to use and maintain, and it is ready to use by the end-user. The tool gives the possibility to create new interfaces using the CLI framework and to create schema files that were not possible in MVP. Framework also provided the possibility to create easily new commands and modules with options and arguments. Framework classes utilize not only SOLID methodologies but also Design Patterns like the Builder, Factory, Decorator, and Adapter.
+
+Thanks to the usage of the Python programming language the tool is cross-platform and can be used on any system that supports Python, the tool is also easy to use. Thanks to all the best practices that were used the tool can be also scaled and extended in the future.
 
 
+### Comparison with other solutions
+
+There is not much competition with this particular tool but rather to particular parts of it, that is schema file and CLI framework. The only alternative for the tool itself is the vault, to be precise dotenv-vault from company dotenv. This tool allows the developers to securely share and sync one configuration of environment variables across many devices, users, or environments. Vault is stored in the cloud and saves only the id of the .env as well as multiple at once for different environments like production or development. It saves ``.env.vault`` file that contains the id of the cloud vault to fetch variables from but also ``.env.me`` with credentials to access the vault. ``.env.vault`` can be securely shared in repositories but credentials should be kept secret and never committed. The goals of the schema tool and vault tool are clearly different, one saves only the id for the cloud where you store environment variables to fetch to `.env` whereas the schema one is focused on not storing values at all only sharing the structure of the file and validating the input. There are no better solutions in this case because they both have different purposes, vault is made for teams and value share whereas schema is for public usage, validation and to provide the structure.
+
+The only type of file that is at least in some parts similar is mentioned before ``.env.example`` file that is used to provide the user with the information about the keys that are used in the project and also sometimes some comments and default values. This example file does not use any kind of validation and it often reads README from the project to get the information about the values that are required to be set in the .env file. The schema file is a much better solution because it provides the user with the possibility to validate the input and provide the user with information about the keys that are used in the project in a few different ways. Not only the user can be informed by text components that are split into headers, sections, messages, and spaces, but also by data that is inside fields like the type of the key, the description of the key, and the default value of the key. The schema file is also easy to create with the help of the tool and change back to the regular ``.env`` format. The schema file also uses these same 3 types of elements which are keys, values, and comments with the only difference being that comments are used to provide additional data so thanks to it is cross-compatible with the ``.env`` and ``.env.example`` files in their normal usage but tool distinguishes them from the other formats.
+
+In the framework case, there are a bunch of alternative solutions for each programming language, but in Python, there are 2 most popular once that is argparse and click. Argparse is a built-in library that is used to parse the command-line arguments, it is a simple and easy-to-use library that is used to create the command-line interface. Click is a third-party library that is used to create the command-line interface, it is a simple and easy-to-use library that is also used to create the command-line interface, it is also easy to use and maintain, and it is ready to use by the end-user. The main difference between argparse and click is that click is more user-friendly and has more features than argparse, it is also more flexible. Click uses decorators to create commands and options whereas argparse uses functional programming for this purpose. In comparison to the framework that was created for the tool, the framework is more flexible and has more features than argparse and it tries to be more user-friendly and flexible. In case of comparison to click, the framework is less user-friendly and one of the points of improvement is to adopt their way of creating commands and options, currently only commands can be created in simular fashion. The biggest advantage of the CLI framework that was developed for the thesis are programable interfaces that are the main difference between other libraries, it allows to create new interfaces that could be used not only as a CLI but with GUI or other interfaces as well. Also users will could create thier own styles of the interface that they will like to use.
+
+### Points of improvement
+
+The tool already met all the requirements that were provided in the thesis, but as the Kaizen philosophy says there is always a place for improvement. The first point of improvement is to review again the implementation to check that all framework and system elements are properly made, and architectured, and if there are some responsibilities of the classes to be split. The second point of improvement is to add more automated tests on all levels from units to acceptance for all 3 parts that make the tool possible. Another improvement point will be to split the tool into at least 2 separate repositories, one with the framework and the other with the tool. Also, the tool should have an implementation that will allow it to be without the "``python``" prefix in the terminal and to be installed as a package from PyPI using a pip package manager. At one point tool should also have the possibility to create a server for the exchange of the schema files and to use it as a service like the PYPI or docker HUB services. The last two points of improvement for the tool are to add and improve existing interfaces and commands for even easier and faster usage and add the possibility to create .env and .env.schema files from scratch without the usage of input files.
+
+In the case of a separated CLI framework, it should be also reviewed the current interface implementation by creating GUI and REST API interfaces and finding truly the best way to implement them and create one abstract plugin interface to rule them all in the same way as the CLI because if that is currently possible it could be not that reliable and easy to use as the CLI interfaces currently are. Also, there should be created implementations of the tool for automated testing and CI/CD purposes. Framework should be also easy to install from PyPI and like in Django's case should allow to choose packages that the user needs for example package that includes a web interface out of the box. The last point of improvement for the framework is to add the even easier possibility to create new commands and modules with options and arguments with the use of Python decorators that were used in the "Click" library.
+
+
+\newpage
 \section*{Summary}
 \label{sec:summary}
 \addcontentsline{toc}{section}{Summary}
 
-TODO: podsumuj całość pracy, opisz jakie wyniki uzyskałeś, jakie problemy napotkałeś, jakie technologie, biblioteki, frameworki wykorzystałeś, opisz jakie wzorce projektowe, SOLID, DDD, itp. zastosowałeś, porównaj z innymi rozwiązaniami, opisz jakie masz plany na przyszłość, jakie funkcjonalności chciałbyś dodać, jakie problemy chciałbyś rozwiązać, itp. zaknij całość pracy
+Project and thesis is consider as a success, the tool was created and it is easy to use and maintain, as well as it is ready to use by the end-user. The framework developed aside of the tool gives the possibility to create new interfaces for users and could be used to develope more tools. New schema format is easy to read, understand, and it can be greate replacement for ``.env.example`` and it is easy to create with the help of the tool and change back to the regular ``.env`` format. The schema file also allows to use of regex patterns to validate the user input. The tool and framework were tested and validated to ensure that they work as expected. The tool, envschema format, and framework were also compared with other solutions to ensure that will make a fine addition to developers collection. Project met all the requirements that were provided in the thesis as well as it was developed with the usage of the best practices and design patterns like SOLID, DDD, TDD, and Builder, Factory, Decorator, and Adapter. The tool and framework were developed with the usage of the Python programming language and because of that the tool is cross-platform and can be used on any system that supports Python. The tool and framework are also easy to use and maintain, and they are ready to use by the end-user. The tool and framework are also easy to scale and extend in the future. 
 
-\subsection*{Results}
 
-\subsection*{Problems}
-
-\subsection*{Comparison}
 
 
