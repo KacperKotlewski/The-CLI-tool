@@ -48,172 +48,7 @@ The main objective of this engineering work is to develop a base for a CLI frame
     > Afterwards the tool will be compared with similar tools and alternative solutions, including an analysis of their features, limitations, and advantages. The goal is to understand how the CLI tool stands out from existing solutions and provides unique value to the development community. The impact of the CLI tool on the domain and the community will be analyzed to assess its potential benefits and contributions to the field of environment variable management.
 
 
-
-
-
 \newpage
-
-
-
-
-
-
-
-
-
-
-
-<!---------------------------------------------------------------------->
-<!----------------           State of the Art           ---------------->
-<!---------------------------------------------------------------------->
-# Key Concepts and Terminologies
-
-<!-- ## Key Concepts and Terminologies
-Explanation of the key concepts and terminologies relevant to the development of the project and thesis, including environment variables, dotEnv files, and CLIs, as well as other relevant elements and ideas that will be used throughout the document. -->
-
-## Environment Variables
-Dynamic-named values can affect the way running processes will behave on a computer. They are part of the environment/OS/VM in which a process runs. For example, in node.js based frameworks it is common to use them to store sensitive information, such as API keys, database credentials, and other configuration settings (see [Lst 1](#lst:env_in_vue)). This is a common practice in modern software development, as it allows developers to manage fragile data without hardcoding it into the codebase. Environment variables are also used to define system-wide settings, such as the location of executable files (PATH), the default editors or browsers, and the default shell. They are used by the operating system and all the processes that run on it. Environment variables are typically set at the time of user login and loading saved variables for a particular environment, set manually by a user or by some processes, and could be loaded from files and scripts.
-
-```bash
-> export VUE_APP_TITLE="Web dev portfolio"
-
-> echo $VUE_APP_TITLE
-Web dev portfolio
-``` 
-[Listing 1: VUE.js environment variable example]{#lst:env_in_vue}
-
-## dotEnv Files
-Documents that are open text files used to store environment variables for VMs, applications, and environments. The main purpose of this file is to provide a "secure" place to store sensitive data without the need to re-enter them on every new environment and that is especially useful during the development and production of applications that utilize VMs and cloud services like Heroku that introduced it in 2012 and was popularized by the dotenv node module in 2013. The .env file format is simple and easy to use, making it a popular choice among developers who want to have one or a few configurations of environment variables in a structured and organized manner that can be used on a multitude of environments, devices, clouds, and especially with microservices. The use of .env files has become a common practice in modern software development, and understanding how to use and manage them is crucial for developers. They are simple text files that contain key-value pairs separated by an equal sign, with each pair representing an environment variable (see [Lst 2](#lst:env_file_example)). The design of those files also includes comments, multiline strings, lists, and empty lines.
-
-```bash
-API_KEY=abc123
-DB_HOST=localhost
-DB_USER=admin #comment
-DB_PASS=password
-WELCOME_TEXT="""
-Behold this power!
-The power of .env!
-"""
-ALLOWED_HOSTS=localhost, 10.0.0.1, 192.168.0.1
-``` 
-[Listing 2: .env file example]{#lst:env_file_example}
-
-\newpage
-
-
-## Command Line Interface (CLI)
-Element of modern systems that allows users to interact with the OS by entering words so-called commands, options, and arguments into a terminal or console to perform various operations by utilizing processes, programs, and scripts. This user interface (UI) is widely used in software development to manage operating systems, automate repetitive tasks, manage project dependencies, and interact with version control systems. It is as old as the first OS and commercial computers (see [Fig 2](#fig:zenith_z19_terminal)) that give users the ability to interact with it by entering words into the computer to interact or run specific virtual resources on the machine. Unix-based systems have built-in different shell's that are a command-line interpreter that provides a command-line user interface. It is both an interactive command language and a scripting language and is used by the operating system to give users the ability to control their virtual environments.
-
-![Zenith Z-19 terminal](https://live.staticflickr.com/3414/3281139507_f56091fa84_b.jpg){ height=150px #fig:zenith_z19_terminal }
-
-\begin{center}
-\small
-
-Image Source \href{https://www.flickr.com/photos/ajmexico/3281139507/}{www.flickr.com}
-
-\normalsize
-\end{center}
-
-## CLI Tools
-Commands, scripts, and various programs that are used as commands and scripts from the command line, it allows the developers to perform a wide range of tasks without the need for a graphical user interface and also allow them to control other machines or VMs via Telnet or SSH. It gives developers a lot of flexibility and power to control their environments and resources. Examples of these types of programs and tools like simplest ping command (see [Fig 3](#fig:ping_command)), ifconfig/ipconfig up to git, docker, npm, python, and many more. The use of CLI tools is widespread in modern software development, and understanding how to use and manage them is crucial for developers.
-
-![Ping command example](./images/1.command_example.png){ height=100px #fig:ping_command}
-
-
-## Python
-High-level programming language that is widely used in software development for web development, data analysis, machine learning, and many other applications. It is known for its simplicity and readability, making it an ideal language for beginners and experienced developers alike. Python has a rich ecosystem of libraries and frameworks that make it easy to build a variety of scripts and applications from all software fields. The main benefits of it are simplicity, readability, and a rich ecosystem of libraries and frameworks. For the purpose of the engineering project, I've chosen Python in version 3.8 will be used to implement the CLI framework and tool for dotenv in projects because of its attributes mentioned above, this version has been chosen because it is the oldest version still supported by the Python Software Foundation and thanks to that it will set a big range of users that can use the tool.
-
-## Marshaling
-It's an operation of serializing data to a structured format like schema files from files that contain some data but in a non-structured format, it usually means converting data from a more human-readable format to a hard-to-read structured data format, but in this thesis, it will mean to convert one human-readable format which is the .env file to other human-readable format but with extra data information for the needs of the tool. In thesis can be used interchangeably with the word "serialization".
-
-## Unmarshaling
-In opposition to marshaling this is an operation of deserializing data from a structured format like schema files to the final product which in this case are .env files, usualy it means converting structured data format to a more human-readable one, but in this case, it will be used to convert one human-readable format with extra data information for needs of the tool to another human-readable format but without the extra data information. In case of this thesis, it can be used interchangeably with the word "deserialization".
-
-## Regular Expressions
-Regex as they are called is a sequence of structured characters that define patterns, they are used to search, extract, and match strings and are widely used in software development for example data validation, data extraction, and data manipulation. They can be utilized in many programming languages and tools, including Python, JavaScript, and even Unix-based systems. In the project, they will be used to parse and validate the schema file fields of the process of unmarshaling the data from schema to .env files.
-
-
-## SOLID
-Principal of software design introduced by Robert C. Martin in the early 2000s, it have become one of the biggest standards in the modern software engineering industry. They are used to create clean, modular, and extensible code, and they are considered best practices for designing and implementing software systems. It stands for Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion.
-
-## Design Patterns
-Predefined recipes for solving common software design problems, they are used to create clean, modular. Thanks to that easily extensible code, which allows for easier maintenance of code and projects, they are considered the best code guidelines.
-
-The few patterns below were used inside the project:
-
-- Factory Method
-
-> I've implemented factories in CLI framework in creating of the Options, Arguments, and Flags for commands, they were utilizing Builder pattern to create the objects easily and with a lot of flexibility.
-
-- Builder
-
-> They were used as a part of the Factory Method pattern but also for the users choice of the method that they are prefer
-
-- Decorator
-
-> They where utilzed to make easy to create commands, modules and interfaces for the CLI framework, they were used to add new functionalities to the existing objects without altering their structure.
-
-
-## Kwargs and Args
-That's are Python shortcut names for two types of **arguments**, **args** is a list of arguments that are passed to the function with no keyword assigned to them (see [Lst XXXX](#lst:args_example)) on the other hand, **kwargs** (keyword arguments) is a dictionary of arguments that are passed to the function with a **keyword** assigned to them (see [Lst XXXX](#lst:kwargs_example)), they are used to make the function more flexible and to make it easier to use and understand, they could be used both, either, or neither in the same function or method.
-
-```python
-def example_function(*args):
-    for arg in args:
-        print(arg)
-```
-[Listing XXXX: Args example]{#lst:args_example}
-
-```python
-def example_function(**kwargs):
-    for key, value in kwargs.items():
-        print(f"{key}: {value}")
-```
-[Listing XXXX: Kwargs example]{#lst:kwargs_example}
-
-TODO: dodaj patterny i popraw ten bełkot
-
-
-<!-- 
-## Overview of Alternative to the Tool
-\huge
-TODO: Rozdział do przeredagowania
-\normalsize
-
-
-### Vault by HashiCorp
-
-Vault by HashiCorp is an advanced tool for managing secrets that enables secure storage, access, and auditing of confidential data. It provides features such as dynamic secrets, data encryption, and advanced access policy management. Vault is highly configurable and designed with security at the highest level. It also offers capabilities such as leasing and renewing secrets, enabling automatic lifecycle management. Its modular architecture allows for easy integration with existing systems. However, it may require advanced technical knowledge to effectively utilize all of its features.
-
-### Doppler
-
-Doppler provides a central place for managing all application secrets and configurations, enabling their secure storage, access, and synchronization across different environments and teams. It is easy to use and integrates with many popular developer tools and platforms. Doppler also offers configuration versioning, making it easier to manage changes and introduce updates. However, like any tool, it may have limitations related to compatibility with specific environments or tools.
-
-### Click
-Command Line Interface Creation Kit, a Python package that allows developers to create command line interfaces for their programs. It provides a simple and intuitive way to define commands, options, and arguments, and supports features such as automatic help page generation and context passing. Click is widely used in the Python community for building command line applications, and it is known for its simplicity and ease of use. (https://github.com/shadawck/awesome-cli-frameworks?tab=readme-ov-file#python)
-
-## Examination of Related Research Works
-Summary of academic and industry research relevant to CLI development and usage as well as research on the specific domain of the tool.
- -->
-
-
-
-
-
-
-
-
-
-\newpage
-
-
-
-
-
-
-
-
-
 
 
 
@@ -561,21 +396,13 @@ All modules and commands will have an action for help message, also there will b
 \newpage
 
 ## Architecture
-TODO: do dokończenia
-Most of the architecture of the project was already described in the previous sections, the architecture of the schema files, the elements CLI framework, and the dotenv-schema tool were mentioned thanks to detailed domain analysis and models made before based on that. As addition the architecture will be supported 
+Most of the architecture of the project was already described in the previous sections, the architecture of the schema files, the elements CLI framework, and the dotenv-schema tool were mentioned thanks to detailed domain analysis and models made before based on that. Architecture of CLI framework on top of element already mentioned will introduce abstract elements that share similar characteristic across other elements that are **AbstractModel** for Interfaces, Models, Options and Actions as well as **AbstractHandler** for handling Abstract Models and to inherit from it (see [Fig 1](#fig:cli_framework_architecture)).
+
+![CLI Framework Architecture](./images/architecture.drawio.png){#fig:cli_framework_architecture}
 
 ## Metodology
 
-TODO: opisz metodyki, procesy, narzędzia, itp. które wykorzystałeś w projekcie oraz w zarządzaniu nim, uzasadnij dlaczego wybrałeś akurat te
-
-DDD
-
-TDD
-
-Agile
-
-
-
+On project development period methodologies were very fluid and were used based on the situation and element that was developed, for example, the first iteration of schema used in MVP were developed in waterfall methodology and has no plan at all. But in this version of project model of schema file was developed with help of DDD and Agile methodologies, thanks to that schema files are now more organized and structured, and much more better suited for user and tool. Parser from the start was developed with TDD because it was the most important part of the project and also it was very complex and hard to test it after finish. The CLI framework was developed with help of Agile methodology, at first it was developed without architecture and detailed plan and that leads to detailed analysis of the domain (DDD) like in case of schema file, and then it was developed with help of the new architecture and SOLID methodologies and Design Patterns. The dotenv-schema tool was developed with help of Agile and Lean methodology and was brought down to most needed parts of the app. The project was managed with help of modified Kanban methodology, there was set of goals and objectives that were sorted by priority and were developed in the order of priority, development was iterative and sometimes require to review previous temporary solutions and refactor them to better ones. The project was developed with help of Git and GitHub, the code as well as the thesis was written in VSCode, all text documents including thesis was made with help of Markdown, the project was written in Python with the environment manager that is Pyenv and Virtualenv, and the diagram were created with Drawio.
 
 
 
