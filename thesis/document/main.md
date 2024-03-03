@@ -5,12 +5,12 @@ title: The CLI tool - managing environment variables in projects
 document_class: ENGINEERING DIPLOMA THESIS
 album_no: 338854
 supervisor: Dr Hab. Łukasz Machura
-location: Katowice
-date: February 2024
+location: Chorzów
+date: 2024
 university: UNIVERSITY OF SILESIA IN KATOWICE
 faculty: |
   FACULTY OF SCIENCE AND TECHNOLOGY,\\
-  AUGUST CHELKOWSKI INSTITUTE OF PHYSICS
+  AUGUST CHEŁKOWSKI INSTITUTE OF PHYSICS
 field_of_study: Applied Computer Science
 
 geometry: margin=2.5cm
@@ -25,6 +25,8 @@ header-includes: |
     \usepackage{listings}
     
     \usepackage{xcolor}
+    
+    \usepackage{tabulary}
     
     \definecolor{codegreen}{rgb}{0,0.6,0}
     \definecolor{codegray}{rgb}{0.5,0.5,0.5}
