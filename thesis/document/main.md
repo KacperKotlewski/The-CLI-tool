@@ -9,7 +9,7 @@ location: Katowice
 date: February 2024
 university: UNIVERSITY OF SILESIA IN KATOWICE
 faculty: |
-  FACULTY OF EXACT SCIENCES AND TECHNOLOGY,\\
+  FACULTY OF SCIENCE AND TECHNOLOGY,\\
   AUGUST CHELKOWSKI INSTITUTE OF PHYSICS
 field_of_study: Applied Computer Science
 
@@ -73,7 +73,7 @@ header-includes: |
         \vspace{0.5 cm}
         \large
         $author$\\
-        ALBUMU NO: $album_no$\\
+        ALBUM NO: $album_no$\\
         \vspace*{0.5 cm}
         \huge
         $title$\\
