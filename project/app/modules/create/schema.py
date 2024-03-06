@@ -117,6 +117,7 @@ class SchemaCommand(Command):
         description = inp("Enter description" + (f"(current: {element.description})" if element.description else ""))
         hint = inp("Enter hint" + (f"(current: {element.hint})" if element.hint else ""))
         default = inp("Enter default value" + (f"(current: {element.default})" if element.default else ""))
+        type_ = self.user_input_choose_string(message="Choose type", choices=[t.value for t in models.SchemaFieldTypes])
         regex = inp("Enter regex" + (f"(current: {element.regex})" if element.regex else ""))
         error = inp("Enter error message" + (f"(current: {element.error})" if element.error else ""))
         
@@ -129,6 +130,9 @@ class SchemaCommand(Command):
                 
         if len(props) == 0:
             props = None
+            
+        if type_ is not None and type_ > 0:
+            type_ = [t for t in models.SchemaFieldTypes][type_-1]
                 
         new_elem = element.__deepcopy__()
         new_elem.og_name = og_name if og_name else element.og_name
@@ -136,6 +140,7 @@ class SchemaCommand(Command):
         new_elem.description = description if description else element.description
         new_elem.hint = hint if hint else element.hint
         new_elem.default = default if default else element.default
+        new_elem.type = type_ if type_ else element.type
         new_elem.regex = regex if regex else element.regex
         new_elem.props = props if props else element.props
         new_elem.error = error if error else element.error
