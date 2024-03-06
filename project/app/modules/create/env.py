@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from common.CLI.module import Module, Command, command
 from common.CLI.option import OptionFactory, OptionBuilder, OptionHandler
@@ -84,6 +85,10 @@ def env_create(self: Command, *args, **kwargs) -> Command:
                 
                 while True:
                     new_value = ui.prompt(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
+                    
+                    if element.regex is not None and not element.check_regex(new_value):
+                        ui.message(f"Invalid value - regex does not match: {element.regex}")
+                        continue
                     
                     if new_value != "":
                         element.value = new_value
