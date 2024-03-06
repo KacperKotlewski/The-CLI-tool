@@ -63,8 +63,8 @@ class Deserialize(Command):
         
         self.execute(stripped_args)
         
-    def execute(self, args: typing.List[str]) -> None:
-        super().execute(args)
+    def execute(self, *args) -> None:
+        super().execute(*args)
         
         #ask for file path
         if self.input_file is None:

@@ -83,34 +83,37 @@ def env_create(self: Command, *args, **kwargs) -> Command:
                 default = "will be generated" if element.is_generated() else element.default
                 
                 while True:
-                    # new_value = input(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
-                    new_value = ui.prompt(f"Enter value" + (f" (default: {default}): " if default != "" else ": "), return_none=True)
+                    new_value = ui.prompt(f"Enter value" + (f" (default: {default}): " if default != "" else ": "))
                     
-                    if new_value != "":# and element.check_regex(new_value):
-                        element.default = new_value
+                    if new_value != "":
+                        element.value = new_value
                         break
                     elif new_value == "" and element.is_generated():
-                        element.default = element.generate()
+                        element.value = element.generate()
                         break
                     elif new_value == "" and element.is_required() and element.default == "":
-                        # print(f"Field is required")
                         ui.message(f"Field is required")
-                    else:
+                    elif new_value == "" and element.default != "":
+                        element.value = element.default
                         break
-
+                    else:
+                        ui.message(f"Something went wrong")
+            elif element.default is not None:
+                element.value = element.default
             elif element.is_generated():
-                element.default = element.generate()
+                element.value = element.generate()
             
             descrition_str = f" # {element.description}" if element.description is not None else ""
-            output_file_data += f"{element.og_name}={element.default}{descrition_str}\n"
+            value = element.value if element.value is not None else ""
+            output_file_data += f"{element.og_name}={value}{descrition_str}\n"
             
             
     sname = schema.schemaInfo.name.lower().replace(' ', '_')
     if output_file is None:
         # output_file = input(f"Enter output file name (default: .env." + (f".{sname}" if sname != "" else "") + "): ").strip()
-        output_file = ui.prompt(f"Enter output file name (default: .env." + (f".{sname}" if sname != "" else "") + "): ").strip()
+        output_file = ui.prompt(f"Enter output file name (default: .env" + (f".{sname}" if sname != "" else "") + "): ").strip()
     if output_file == "":
-        output_file = ".env" + (f".{sname}" if sname != "" else "") + ".deserialized"
+        output_file = ".env" + (f".{sname}" if sname != "" else "")
         
     # print(f"Saves to {output_file}")
     ui.message(f"Saves to {output_file}")

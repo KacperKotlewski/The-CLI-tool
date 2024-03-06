@@ -67,10 +67,10 @@ class OptionHandler(AbstractHandler, BaseModel):
     
     def get_help(self) -> str:
         """
-        get_help gets the help message for the flags, arguments, and options.
-        
+        get_help gets the help string of the flags, arguments, and options.
+
         Returns:
-            str: The help message for the flags, arguments, and options.
+            str: The help string of the flags, arguments, and options.
         """
         help_str = ""
         for option in self.options:
@@ -119,6 +119,8 @@ class OptionHandler(AbstractHandler, BaseModel):
                                 raise IndexError("Next argument is a flag.")
                             option.set_value(next_arg)
                             index += 1
+                            if isinstance(option, Argument) and option in queue_of_arguments:
+                                queue_of_arguments.remove(option)
                             
                         except IndexError as e: # threat as flag
                             option.set_value()

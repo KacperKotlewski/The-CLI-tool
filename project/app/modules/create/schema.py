@@ -32,14 +32,14 @@ import requests
 )
 class SchemaCommand(Command):   
     
-    def user_input_choose_item(self, items: typing.List[models.SchemaElement], message: str, escape:bool=False, allow_empty_element:bool=False) -> typing.Tuple[int, models.SchemaElement]:
+    def user_input_choose_item(self, items: typing.List[models.SchemaElement], message: str, required:bool=False) -> typing.Tuple[int, models.SchemaElement]:
         strings = []
         for item in items:
             if item is None:
                 strings.append("----- Empty -----")
             elif isinstance(item, typing.get_args(models.SchemaElement)):
                 strings.append(item.introduce())
-        choice = self._ui.choose(message, strings)
+        choice = self._ui.choose(message, strings, required)
         
         if choice is not None:
             item = items[choice-1]
@@ -47,12 +47,13 @@ class SchemaCommand(Command):
         else:
             return None, None
     
-    def user_input_choose_string(self, message: str, escape:bool=False, choices: typing.List[str]=None) -> str:
+    def user_input_choose_string(self, message: str, choices: typing.List[str]=None, required:bool=False) -> str:
         if choices is None:
             return ""
-        choice = self._ui.choose(message, choices)
-        
-        return choices[choice-1]
+        choice = self._ui.choose(message, choices, required)
+        if choice is not None:
+            return choices[choice-1]
+        return None
                 
                 
     def create_schema_info(self) -> models.SchemaInfo:
@@ -62,12 +63,12 @@ class SchemaCommand(Command):
         version = self._ui.prompt("Enter version: ")
         author = self._ui.prompt("Enter author: ")
         
-        # licence_choice = self._ui.choose(["Detect", "Choose established license", "Custom license", "None"], "Choose license type: ")
-        licence_choice = self.user_input_choose_string(message="Choose license type: ", choices=["Detect", "Choose established license", "Custom license", "None"])
         
         license = None
         
         while license is None:
+            licence_choice = self.user_input_choose_string(message="Choose license type: ", choices=["Detect", "Choose established license", "Custom license", "None"])
+        
             if licence_choice == "Choose established license" or licence_choice == "Detect":
                 licenses = requests.get("https://api.github.com/licenses").json()
                 license_names = [license["spdx_id"] for license in licenses]
@@ -101,13 +102,15 @@ class SchemaCommand(Command):
             author=author,
             license=license,
         )
-        
-    # def go_through_elements(self, elements: typing.List[models.SchemaElement]) -> typing.List[models.SchemaElement]:
-    
+            
     def edit_field(self, element: models.SchemaField) -> models.SchemaField:
         self._ui.message(f"Editing field: {element.og_name}")
-        
-        inp = lambda message: self._ui.prompt(message, return_none=True)
+                
+        def inp(message: str) -> str:
+            in_ = self._ui.prompt(message)
+            if in_ == "":
+                return None
+            return in_
         
         og_name = inp("Enter field key" + f"(current: {element.og_name})")
         name = inp("Enter display name" + (f"(current: {element.name})" if element.name else ""))
@@ -145,20 +148,22 @@ class SchemaCommand(Command):
         self._ui.message(f"Editing text element: {element.type.value} : {element.text if element.text else ''}")
         
         if element.type in no_text:
-            new_type = self.user_input_choose_string(message="Choose new type", choices=[t.value for t in models.SchemaTextTypes if t not in no_text])
+            new_type = self.user_input_choose_string(message="Choose new type", choices=[t.value for t in models.SchemaTextType])
             text = None
             if not new_type in no_text:
                 text = self._ui.prompt(f"Enter text (current: {element.text if element.text else ''})")
-            return models.SchemaText(type=new_type, text=text)
+            if new_type is not None:
+                return models.SchemaText(type=new_type, text=text)
         else:
             new_type = self.user_input_choose_string(message="Choose what to edit", choices=["Type", "Text"])
             if new_type == "Type":
-                # new_type = self._ui.choose([t.value for t in models.SchemaTextTypes], "Choose new type")
-                new_type = self.user_input_choose_string(message="Choose new type", choices=[t.value for t in models.SchemaTextTypes if t not in no_text])
-                return models.SchemaText(type=new_type, text=element.text)
+                new_type = self.user_input_choose_string(message="Choose new type", choices=[t.value for t in models.SchemaTextTypes])
+                if new_type is not None:
+                    return models.SchemaText(type=new_type, text=element.text)
             elif new_type == "Text":
                 text = self._ui.prompt(f"Enter text (current: {element.text if element.text else ''})")
                 return models.SchemaText(type=element.type, text=text)
+            return element
         
     def edit_element(self, element: models.SchemaElement) -> models.SchemaElement:
         if isinstance(element, models.SchemaField):
@@ -170,39 +175,62 @@ class SchemaCommand(Command):
     def create_new_field(self) -> models.SchemaField:
         self._ui.message("Enter field information:")
         og_name = self._ui.prompt("Enter field (example: DATABASE_PASSWORD)", required=True)
-        name = self._ui.prompt("Enter display name", return_none=True)
+        name = self._ui.prompt("Enter display name")
         default = self._ui.prompt("Enter default value")
-        description = self._ui.prompt("Enter description", return_none=True)
-        example = self._ui.prompt("Enter example", return_none=True)
-        hint = self._ui.prompt("Enter hint", return_none=True)
-        # type_ = self.user_input_string("Enter type")
-        regex = self._ui.prompt("Enter regex", return_none=True)
-        error_msg = self._ui.prompt("Enter error message", return_none=True)
+        description = self._ui.prompt("Enter description")
+        example = self._ui.prompt("Enter example")
+        hint = self._ui.prompt("Enter hint")
+        type_ = self._ui.choose("Choose type", [t.value for t in models.SchemaFieldTypes])
+        regex = self._ui.prompt("Enter regex")
+        error_msg = self._ui.prompt("Enter error message")
         
         props = list()
         for elem in models.SchemaFieldProps:
             answer = self._ui.confirm(f"Is {elem.value} set?")
             if answer:
                 props.append(elem)
+                
+        if name == "":
+            name = None
+        if default == "":
+            default = None
+        if description == "":
+            description = None
+        if example == "":
+            example = None
+        if hint == "":
+            hint = None
+        if regex == "":
+            regex = None
+        if error_msg == "":
+            error_msg = None
+            
+        if type_ is not None and type_ > 0:
+            type_ = [t for t in models.SchemaFieldTypes][type_-1]
         
-        return models.SchemaField(
+        model =  models.SchemaField(
             og_name=og_name,
             default=default,
             name=name,
             example=example,
             description=description,
             hint=hint,
-            # type=type.
             regex=regex,
             props=props,
             error=error_msg
         )
         
+        if isinstance(type_, models.SchemaFieldTypes):
+            model.type = type_
+        return model
+        
     def create_new_text(self) -> models.SchemaText:
         self._ui.message("Enter text information:")
         choices = [e.value for e in models.SchemaTextTypes]
-        # type_ = self._ui.choose(choices, "Choose text type")
         type_ = self.user_input_choose_string(message="Choose text type", choices=choices)
+        if type_ is None:
+            return None
+        
         type_ = models.SchemaTextTypes(type_)
         if type_ in [models.SchemaTextTypes.space, models.SchemaTextTypes.divider]:
             return models.SchemaText(type=type_)
@@ -220,24 +248,22 @@ class SchemaCommand(Command):
             return self.create_new_text()
         
     def insert_element(self, element: models.SchemaElement, elements: typing.List[models.SchemaElement]) -> typing.List[models.SchemaElement]:
-        index, elem = self.user_input_choose_item(elements, "Choose position", allow_empty_element=True)
+        index, elem = self.user_input_choose_item(elements, "Choose position")
         if index is None:
-            return None
+            return elements
         
         elements.insert(index, element)
         return elements
     
-    def last_think_before_save(self, schema: models.Schema) -> models.Schema:
+    def main_menu(self, schema: models.Schema) -> models.Schema:
         
         while True:
             
             choices = ["View", "Edit", "Save"]
             self._ui.message("\n\n--------- Options ---------\n")
-            # choice = self._ui.choose(choices, "What do you want to do?")
-            choice = self.user_input_choose_string(message="What do you want to do?", choices=choices)
+            choice = self.user_input_choose_string(message="What do you want to do?", choices=choices, required=True)
             
             if choice == "View":
-                # choice = self._ui.choose(["Schema", "Elements"], "What do you want to view?")
                 choice = self.user_input_choose_string(message="What do you want to view?", choices=["Schema", "Elements"])
                 if choice == "Schema":
                     self._ui.message("\n\n--------- Schema ---------\n")
@@ -255,7 +281,7 @@ class SchemaCommand(Command):
             elif choice == "Edit":               
                 
                 while True:
-                    choices = ["Change schema info", "Edit element", "Add element", "Remove element", "Change element position", "Finish editing"]
+                    choices = ["Change schema info", "Edit element", "Add element", "Remove element", "Change element position"]
                     # choice = self._ui.choose(choices, "What do you want to do?")
                     choice = self.user_input_choose_string(message="What do you want to do?", choices=choices)
                     if choice == "Change schema info":
@@ -263,11 +289,13 @@ class SchemaCommand(Command):
                         
                     elif choice == "Edit element":
                         index, element = self.user_input_choose_item(schema.elements, "Choose element to edit")
-                        schema.elements[index] = self.edit_element(element)
+                        if index is not None:
+                            schema.elements[index] = self.edit_element(element)
                         
                     elif choice == "Add element":
                         element = self.create_new_element()
-                        schema.elements = self.insert_element(element, schema.elements+[None])
+                        if element is not None:
+                            schema.elements = self.insert_element(element, schema.elements+[None])
 
                     elif choice == "Remove element":
                         index, element = self.user_input_choose_item(schema.elements, "Choose element to delete")
@@ -283,7 +311,7 @@ class SchemaCommand(Command):
                         # filter none values
                         schema.elements = [elem for elem in schema.elements if elem is not None]
                     
-                    elif choice == "Finish editing":
+                    elif choice == "Finish editing" or choice is None:
                         break
                     
                     schema.elements = [elem for elem in schema.elements if elem is not None]
@@ -309,7 +337,7 @@ class SchemaCommand(Command):
         schemaInfo = self.create_schema_info()
         
         
-        schema = self.last_think_before_save(parser.build_schema(schemaInfo, elements))
+        schema = self.main_menu(parser.build_schema(schemaInfo, elements))
         
         sname = schema.schemaInfo.name.lower().replace(' ', '_')
         if output_file is None:

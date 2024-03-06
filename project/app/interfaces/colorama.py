@@ -1,4 +1,5 @@
 from inspect import isclass
+import random
 import time
 import typing
 from common.CLI.interface import interface, UserInterface
@@ -45,9 +46,36 @@ class ColoramaInterface(UserInterface):
                 print("Value is required")
     
     def confirm(self, message: str) -> bool:
+        # message = self.strip_msg(message)
+        # input_ = input(f'{message} (y/n): ')
+        # return input_.lower() == "y"
+        #made that it works like the choose function but right and left arrow keys are used and elements are side to side
         message = self.strip_msg(message)
-        input_ = input(f'{message} (y/n): ')
-        return input_.lower() == "y"
+        term = self.init_terminal()
+        element_selected = False
+        with term.cbreak(), term.hidden_cursor():
+            while True:
+                print(term.clear)
+                print(f"{colorama.Fore.LIGHTYELLOW_EX}{colorama.Back.BLACK}{message}{colorama.Fore.RESET}{colorama.Back.RESET}\n")
+                if element_selected:
+                    print(f"{colorama.Fore.RED}{colorama.Back.WHITE}  Yes  {colorama.Fore.LIGHTWHITE_EX}{colorama.Back.BLACK}  No  {colorama.Fore.LIGHTWHITE_EX}{colorama.Back.BLACK}  ")
+                else:
+                    print(f"{colorama.Fore.LIGHTWHITE_EX}{colorama.Back.BLACK}  Yes  {colorama.Fore.RED}{colorama.Back.WHITE}  No  {colorama.Fore.LIGHTWHITE_EX}{colorama.Back.BLACK}  ")
+                print(f"\n{colorama.Fore.LIGHTMAGENTA_EX}{colorama.Back.BLACK}Use {colorama.Back.MAGENTA}{colorama.Fore.LIGHTBLACK_EX}arrow{colorama.Fore.LIGHTMAGENTA_EX}{colorama.Back.BLACK} keys to navigate, press '{colorama.Back.MAGENTA}{colorama.Fore.LIGHTBLACK_EX}Enter{colorama.Fore.LIGHTMAGENTA_EX}{colorama.Back.BLACK}' to select, to exit '{colorama.Back.MAGENTA}{colorama.Fore.LIGHTBLACK_EX}Escape{colorama.Fore.LIGHTMAGENTA_EX}{colorama.Back.BLACK}' or '{colorama.Back.MAGENTA}{colorama.Fore.LIGHTBLACK_EX}Ctrl+C{colorama.Fore.LIGHTMAGENTA_EX}{colorama.Back.BLACK}'.", end=f"{colorama.Style.RESET_ALL}")
+                try:
+                    key = term.inkey()
+                    change_element = ['KEY_LEFT', 'KEY_RIGHT', 'KEY_UP', 'KEY_DOWN']
+                    if key.name in change_element:
+                        element_selected = not element_selected
+                    elif key.name == 'KEY_ENTER':
+                        print(f"{colorama.Fore.RESET}{colorama.Back.RESET}")
+                        return element_selected
+                    elif key.name == 'KEY_ESCAPE':
+                        print(f"{colorama.Fore.RESET}{colorama.Back.RESET}")
+                        return False
+                except KeyboardInterrupt:
+                    print(f"{colorama.Fore.RESET}{colorama.Back.RESET}")
+                    exit(0)
     
     def init_terminal(self) -> Terminal:
         term = self._term()
@@ -136,8 +164,9 @@ class ColoramaInterface(UserInterface):
                 
     def message(self, message: str) -> None:
         message = self.strip_msg(message)
-        term = self.init_terminal()
-        print(f"{colorama.Fore.LIGHTWHITE_EX}{colorama.Back.BLACK}{message}{colorama.Style.RESET_ALL}")
+        self.init_terminal()
+        choose_fore_color = random.choice([colorama.Fore.LIGHTYELLOW_EX, colorama.Fore.LIGHTMAGENTA_EX, colorama.Fore.LIGHTCYAN_EX, colorama.Fore.LIGHTGREEN_EX, colorama.Fore.LIGHTRED_EX, colorama.Fore.LIGHTWHITE_EX, colorama.Fore.LIGHTBLACK_EX, colorama.Fore.LIGHTBLUE_EX, colorama.Fore.LIGHTMAGENTA_EX])
+        print(f"{choose_fore_color}{colorama.Back.BLACK}{message}{colorama.Fore.RESET}{colorama.Back.RESET}")
 
     def clear(self) -> None:
         print(colorama.clear)

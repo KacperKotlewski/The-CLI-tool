@@ -18,22 +18,14 @@ class CLIInterface(UserInterface):
             pass
         return message
     
-    def prompt(self, message: str, required:bool=False, return_none:bool=False) -> str:
-        if required and return_none:
-            raise ValueError("required and return_none cannot be both True")
+    def prompt(self, message: str, required:bool=False) -> str:        
+        if message is not None:
+            message = self.strip_msg(message)
         
-        if message is None:
-            message = "Enter value"
-        message = self.strip_msg(message)
+        input_ = lambda msg: input(f"{msg}: ")
+        error_ = lambda : print("Value is required")
         
-        while True:
-            input_ = input(f'{message}: ')
-            if input_ != "" or (not required and input_ == "" and not return_none):
-                return input_
-            elif not required and input_ == "" and return_none:
-                return None
-            else:
-                print("Value is required")
+        return super().prompt(message, required, input_, error_)
     
     def confirm(self, message: str) -> bool:
         message = self.strip_msg(message)

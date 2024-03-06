@@ -17,7 +17,7 @@ def parse_env_to_elements(env: str) -> typing.List[models.SchemaElement]:
             if "#" in value:
                 value, comment = value.split("#", 1)
                 
-            element = models.SchemaField(og_name=key, default=value.strip())
+            element = models.SchemaField(og_name=key)#, default=value.strip())
             
             if comment is not None:
                 element.description = comment

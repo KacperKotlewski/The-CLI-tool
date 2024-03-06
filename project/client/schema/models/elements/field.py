@@ -52,6 +52,10 @@ class GeneratorField(BaseModel):
     
     
 def text_field_template(field: 'SchemaField') -> str:
+    type_ = field.type
+    if isinstance(type_, SchemaFieldTypes):
+        type_ = type_.value
+    
     text =  '# Field:\n'
     if field.name:
         text += f'# - Name:         {field.name}\n'
@@ -61,8 +65,8 @@ def text_field_template(field: 'SchemaField') -> str:
         text += f'# - Description:  {field.description}\n'
     if field.hint:
         text += f'# - Hint:         {field.hint}\n'
-    if field.type:
-        text += f'# - Type:         {field.type}\n'
+    if type_:
+        text += f'# - Type:         {type_}\n'
     if field.regex:
         text += f'# - Regex:        {field.regex}\n'
     if field.props:
@@ -70,12 +74,14 @@ def text_field_template(field: 'SchemaField') -> str:
     if field.error:
         text += f'# - Error:        {field.error}\n'
             
-    text += f'{field.og_name}={field.default}\n'
+    default = field.default if field.default is not None else ""
+    text += f'{field.og_name}={default}\n'
     
     return text
     
 class SchemaField(BaseModel):
     og_name: str = None
+    value: typing.Optional[str] = None
     default: typing.Optional[str] = None
     name: typing.Optional[str] = None
     example: typing.Optional[str] = None
