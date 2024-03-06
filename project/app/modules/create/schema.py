@@ -131,8 +131,8 @@ class SchemaCommand(Command):
         if len(props) == 0:
             props = None
             
-        if type_ is not None and type_ > 0:
-            type_ = [t for t in models.SchemaFieldTypes][type_-1]
+        if type_ is not None:
+            type_ = models.SchemaFieldTypes(type_)
                 
         new_elem = element.__deepcopy__()
         new_elem.og_name = og_name if og_name else element.og_name
