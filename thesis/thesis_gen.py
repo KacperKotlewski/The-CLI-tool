@@ -127,7 +127,7 @@ def convert_md_file_to_pdf(input_file:str, output_file:str = None, delete_old_fi
     if os.path.exists(f"{output_file}") and delete_old_file:
         os.remove(f"{output_file}")
         
-    output = os.system(f'pandoc -s --citeproc --csl=csl/ieee-with-url.csl {input_file} -o {output_file} --number-sections')
+    output = os.system(f'pandoc -s --citeproc --csl=csl/ieee-with-url.csl {input_file} -o {output_file} --number-sections  --listings')
     
     if output != 0:
         print(f"Error: {output}")
