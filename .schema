@@ -1,0 +1,40 @@
+# dotEnv schema
+# CliVersion: 0.1.1
+# ---
+# Name: 
+# Description: 
+# Version: 
+# Author: 
+# License: None
+# ---
+
+# Message: Django Shop settings
+
+# Message: Database
+
+# Message: Postgres
+
+# Field:
+# - Description:   Name of the database
+DB_NAME=django_shop_db
+
+# Field:
+# - Description:   Name of the database user
+# - Props:        Hidden
+DB_USER=django_shop_user
+
+# Field:
+# - Description:   Password of the database user
+DB_PASSWORD=django_shop_password
+
+# Field:
+# - Description:   Host of the database
+DB_HOST=
+
+# Message: Email
+
+# Message: SMTP
+
+# Field:
+# - Description:   Host of the email server
+EMAIL_HOST=localhost

@@ -1,0 +1,79 @@
+.slides {
+    font-size: 0.75em;
+}
+.reveal ul {
+    display: block;
+}
+.reveal ol {
+    display: block;
+}
+
+img {
+    max-height: 350px !important;
+}
+
+figcaption {
+    font-size: 0.6em !important;
+    font-style: italic !important;
+}
+
+.subtitle {
+    font-style: italic !important;
+}
+
+.date {
+    font-size: 0.75em !important;
+}
+
+.reveal section#title-slide h1.title {
+    --r-heading1-size: 2.5em;
+    --r-heading-margin: 0 0 1em 0;
+}
+.reveal section#title-slide h1.title span {
+    font-size: 0.6em;
+}
+.reveal section#title-slide p.subtitle {
+    font-size: 0.7em !important;
+}
+
+
+.reveal h1 {
+    --r-heading1-size: 2em;
+}
+
+:root {
+    --chat-bubble-bg-color: #CCC;
+    --chat-bubble-text-color: #333;
+    --chat-bubble-position: left;
+}
+
+.chat-bubble.blue {
+    --chat-bubble-bg-color: #007bff;
+    --chat-bubble-text-color: #FFF;
+    --chat-bubble-position: right;
+}
+
+
+.chat-bubble {
+    position: relative;
+    background-color: var(--chat-bubble-bg-color);
+    border-radius: 18px;
+    padding: 10px 20px;
+    color: var(--chat-bubble-text-color);
+    display: inline-block;
+    max-width: 80%;
+
+    &:after { /* Ten styl nie zadziała w czystym CSS; wymagany preprocesor */
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border: 15px solid transparent;
+        border-top-color: var(--chat-bubble-bg-color);
+        border-bottom: 0;
+        margin-left: -15px;
+        margin-bottom: -15px;
+    }
+}

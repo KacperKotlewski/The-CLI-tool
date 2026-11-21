@@ -15,6 +15,7 @@ def register_base_modules() -> None:
     from . import modules as module
     root_program_module += module.create
     root_program_module += module.list_elements
+    root_program_module += module.fake_cmd
     
     # from .modules.test import TestCommand
     # root_program_module += TestCommand

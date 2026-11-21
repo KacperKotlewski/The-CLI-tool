@@ -75,35 +75,35 @@ or
 
 In this tool you will also find user interfaces options that will be set in the program module. But more on that later
 
-### Modularity
+### Modules
 Based on that structure above we can define the following modules models:
-- [ ] ! - **Module Abstract** - consists of a set of options and arguments, key (calling name), name, description, help, selected ui
-  - [ ] ! - **Command** - interface depended, consists of the steps
-  - [ ] ! - **Module** - consists of a set of commands and submodules
-    - [ ] ! - **Program** - root module, consists of a set of modules, commands, options, and interfaces
-- [ ] **Module Handler** - register and handle modules
+- [x] ! - **Module Abstract** - consists of a set of options and arguments, key (calling name), name, description, help, selected ui
+  - [x] ! - **Command** - interface depended, consists of the steps
+  - [x] ! - **Module** - consists of a set of commands and submodules
+    - [x] ! - **Program** - root module, consists of a set of modules, commands, options, and interfaces
+- [x] **Module Handler** - register and handle modules
 
 ### Options
 Based on the structure above we can define the following options models:
-- [ ] ! - **Option Abstract** - consists of a set of keys (calling name), name, description
-  - [ ] ! - **Option** - build from the key and value
-    - [ ] ! - **Argument** - build from the value only
-    - [ ] ! - **Flag** - build from the key only
+- [x] ! - **Option Abstract** - consists of a set of keys (calling name), name, description
+  - [x] ! - **Option** - build from the key and value
+  - [x] ! - **Argument** - build from the value only
+  - [x] ! - **Flag** - build from the key only
 
 ### Interfaces
 Based on the structure above we can define the following interfaces models:
-- [ ] ! - **Interface Abstract** - consists of a set of keys (calling name), name, description, handlers
-  - [ ] ! - **UserInterface** - Abstract class, consists of a set of methods to handle the user input and output
+- [x] ! - **Interface Abstract** - consists of a set of keys (calling name), name, description, handlers
+  - [x] ! - **UserInterface** - Abstract class, consists of a set of methods to handle the user input and output
     - Methods:
-      - [ ] ! - **Prompt** - method to prompt the user for input
-      - [ ] ! - **Select** - method to select the user from the list
-      - [ ] ! - **Confirm** - method to confirm the user
+      - [x] ! - **Prompt** - method to prompt the user for input
+      - [x] ! - **Select** - method to select the user from the list
+      - [x] ! - **Confirm** - method to confirm the user
       - [ ] ? - **Alert** - method to alert the user
-      - [ ] ! - **Output** - method to output the data to the user
+      - [x] ! - **Output** - method to output the data to the user
     - Fields:
       - [ ] ! - **Actions** - list of actions that can be executed
       - [ ] ! - **Data** - list of data that can be selected
       - [ ] ! - **Steps** - list of steps that can be executed
     - Inherited classes:
-      - [ ] ! - **DataDrivenUI** - Executing commands that need UI in the data-driven way, based on the data provided for example from the schema file, then the user will choose the data from the list and choose the action to execute
-      - [ ] ? - **MenuDrivenUI** - Executing commands that need UI in the menu-driven way, based on the menu made from actions, then selected action ask to choose data from the list
+      - [ ] ! - **UIDataDriven** - Executing commands that need UI in the data-driven way, based on the data provided for example from the schema file, then the user will choose the data from the list and choose the action to execute
+      - [ ] ? - **UIMenuDriven** - Executing commands that need UI in the menu-driven way, based on the menu made from actions, then selected action ask to choose data from the list

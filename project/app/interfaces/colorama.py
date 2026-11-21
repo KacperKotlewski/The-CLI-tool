@@ -165,8 +165,8 @@ class ColoramaInterface(UserInterface):
     def message(self, message: str) -> None:
         message = self.strip_msg(message)
         self.init_terminal()
-        choose_fore_color = random.choice([colorama.Fore.LIGHTYELLOW_EX, colorama.Fore.LIGHTMAGENTA_EX, colorama.Fore.LIGHTCYAN_EX, colorama.Fore.LIGHTGREEN_EX, colorama.Fore.LIGHTRED_EX, colorama.Fore.LIGHTWHITE_EX, colorama.Fore.LIGHTBLACK_EX, colorama.Fore.LIGHTBLUE_EX, colorama.Fore.LIGHTMAGENTA_EX])
-        print(f"{choose_fore_color}{colorama.Back.BLACK}{message}{colorama.Fore.RESET}{colorama.Back.RESET}")
+        # choose_fore_color = random.choice([colorama.Fore.LIGHTYELLOW_EX, colorama.Fore.LIGHTMAGENTA_EX, colorama.Fore.LIGHTCYAN_EX, colorama.Fore.LIGHTGREEN_EX, colorama.Fore.LIGHTRED_EX, colorama.Fore.LIGHTWHITE_EX, colorama.Fore.LIGHTBLACK_EX, colorama.Fore.LIGHTBLUE_EX, colorama.Fore.LIGHTMAGENTA_EX])
+        print(f"{message}")
 
     def clear(self) -> None:
         print(colorama.clear)

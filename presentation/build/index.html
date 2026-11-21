@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Kacper Kotlewski">
+  <title>The CLI tool   managing environment variables in projects</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js//dist/reset.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js//dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js//dist/theme/serif.css" id="theme">
+  <style>
+  .slides {
+      font-size: 0.75em;
+  }
+  .reveal ul {
+      display: block;
+  }
+  .reveal ol {
+      display: block;
+  }
+
+  img {
+      max-height: 350px !important;
+  }
+
+  figcaption {
+      font-size: 0.6em !important;
+      font-style: italic !important;
+  }
+
+  .subtitle {
+      font-style: italic !important;
+  }
+
+  .date {
+      font-size: 0.75em !important;
+  }
+
+  .reveal section#title-slide h1.title {
+      --r-heading1-size: 2.5em;
+      --r-heading-margin: 0 0 1em 0;
+  }
+  .reveal section#title-slide h1.title span {
+      font-size: 0.6em;
+  }
+  .reveal section#title-slide p.subtitle {
+      font-size: 0.7em !important;
+  }
+
+
+  .reveal h1 {
+      --r-heading1-size: 2em;
+  }
+
+  :root {
+      --chat-bubble-bg-color: #CCC;
+      --chat-bubble-text-color: #333;
+      --chat-bubble-position: left;
+  }
+
+  .chat-bubble.blue {
+      --chat-bubble-bg-color: #007bff;
+      --chat-bubble-text-color: #FFF;
+      --chat-bubble-position: right;
+  }
+
+
+  .chat-bubble {
+      position: relative;
+      background-color: var(--chat-bubble-bg-color);
+      border-radius: 18px;
+      padding: 10px 20px;
+      color: var(--chat-bubble-text-color);
+      display: inline-block;
+      max-width: 80%;
+
+      &:after { /* Ten styl nie zadziała w czystym CSS; wymagany preprocesor */
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 0;
+          height: 0;
+          border: 15px solid transparent;
+          border-top-color: var(--chat-bubble-bg-color);
+          border-bottom: 0;
+          margin-left: -15px;
+          margin-bottom: -15px;
+      }
+  }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">The CLI tool <br> <span>managing environment
+variables in projects</span></h1>
+  <p class="subtitle">UNIVERSITY OF SILESIA IN KATOWICE FACULTY OF
+SCIENCE AND TECHNOLOGY,<br> AUGUST CHEŁKOWSKI INSTITUTE OF PHYSICS <br>
+Applied Computer Science</p>
+  <p class="author">Kacper Kotlewski</p>
+  <p class="date">Supervisor: Dr Hab. Łukasz Machura</p>
+</section>
+
+<section>
+<section id="quick-recap" class="title-slide slide level1">
+<h1>QUICK RECAP</h1>
+
+</section>
+<section id="what-is-this-project-about" class="slide level2">
+<h2>What is this project about?</h2>
+<p><img
+data-src="https://storage.needpix.com/rsynced_images/question-1015308_1280.jpg" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo from <strong><a href="https://www.needpix.com/photo/487659/question-question-mark-response-symbol-characters-help-request-note-punctuation-marks">needpix</a></strong></p>
+</div>
+</section>
+<section id="command-line-interface-and-environment-variables---dotenv"
+class="slide level2">
+<h2>Command Line Interface and <br> environment variables - dotEnv</h2>
+<p><img
+data-src="https://live.staticflickr.com/598/31673579214_9a3f86e237_c.jpg" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo from <strong><a href="https://www.flickr.com/">flickr</a></strong></p>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="what-is-command-line-interface">What is Command Line
+Interface?</h3>
+<p><img
+data-src="https://live.staticflickr.com/7296/11863817035_53d6397056_z.jpg" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo from <strong><a href="https://www.flickr.com/">flickr</a></strong></p>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="what-is-environment-variables">What is Environment
+variables?</h3>
+<p><img
+data-src="https://live.staticflickr.com/525/31461522456_ee91b94636_m.jpg" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo from <strong><a href="https://www.flickr.com/">flickr</a></strong></p>
+</div>
+</section>
+<section class="slide level2">
+
+<h3 id="what-is-dotenv">What is dotEnv?</h3>
+<div>
+    <div style = "display: flex; justify-content: center; gap: 50px;">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAh1BMVEXs1T8AAAD23kLz20Hp0j5QSBWHeiSQgiYsKAzMuDbUwDlZURgVEwXizDyDdiPv2EB8cCGZiinaxTpHQBOnlyyThSc9NxC0ojDBrjM3MQ4pJQtLRBQyLQ1DPRLSvjhiWBqfjyoLCgO6qDJWThewny8kIQobGQd1ah9pXxz840N9cSEgHQhnXRthazyAAAAEu0lEQVR4nO2aa1fbOBBAZSlhIRAEhFcp4dlNKN3///sWAolm9HC9aznknN77DWdi+1oTaUbGGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4Ixh1Ihf/m/Mlp+92E9XE1ti/my785T7j3d7m2CJzOn+gv+JewzlmtnQP30LQta9uuP+/DZs9l5wuNhR/N800fwv+TMSUnsLXGDaT5IHHhsbehPCH9ImsTnna+tC+1PB78sQTQ3cRwuf5AXLzEHJXPUn7GTbn8SNPDFUKnuXuX0Z8qz+EPQ2b5HZjQ+NmIfo0JyCTNBvwtYbLKPEyhuch+jaXpvYyBBTmoq80bA504qWGZiSi06lJJWn6u65reHtYZHy+vrXY8FbnVcbQHmYeVEAm6Xn9eUYZ7v10RTaXjg2jJSBj6K+Kz2N1QjGT1i9otOFxl595YthM5YPPGBojgpPVQCbp/RBJWsFQ3VfO0C1DcLKiu4fw4dMQSVrBUJWSOUN/HWJ/xcNkRZIOIljDcPEbQ+MeQ3A894okPRlgMTRVDOUMmTc8bkoXkUlav61YUcNQVGNZQ9lgLPRFRJIuhhnCOobjza8ra2jcbYjVaToNHwzQVqyoYthcbWaVvKFoMNSvTSZppt6pQg/Dl3B3j+uP84ZyPjmSIjaU5ZcDDaGuaWwBcXFhOBEbIK+2zVA1GGJCkeZDtBWx4dF+gV8y4YLhmVjn1sVKyVA0GEtxMpGkQ7QVsWGZ16zhxN6HkLlrM5QzShOOiyQdpK3obnicN/Tyvj/a/ZKhbDBCcSa+P0hb0d9QZtlHY1AylA3Gy6ZgfYi+vXuGxoqF7sW2GKoGY3Pt75tD/wyWpD0N1Xbo+yRZNJQNxjpNp+mhnTM09iRE3bgWQ9lgfA6YTNKhlor+hir7LlxLlsoG42PARJIO1FbEho9HBWTJGBu6H0Jx6lsMRbl3tVIUSXowXJJ226cR10/G0D6HGz20ZUN/F+JW2wKiCrgZcAj71KUfhmpT+8kVDVWD8b422HExtCq9DVXj8NhmGG0biiTN7vbXor+h8eL10t6kaCgroGdrfEjSy+EWQ1PHUFbgYeJJUk9UoW91tphJC2/d/gPleaOKobGiU1yUDcWovVWxYkR7txWji1OFqh9qGKpXE2VD+csb/wy6z72TdBpdeikvXcVQtn8thrLbGoVF5kfveSY2PKluqF4+lA1lgyEm4L5+WzH0kyYhs8j5NEo0UzttaOxxE5N7k7ZMoqpsBG/D0PhFdJXsGF7HQW9FQoXVfjuGTx0MjT9KDF8rVGydDVue5maToWSodmKKhpn95BptRVfDVtbbmUVDH18mO4Z3UVCzX6Po3o6hqqxLhqrBKEftqGF893nD6DHUaSu2Zai2pQqGqptsarUV2zI0Vi13+fwTLcU7yb+N7bahrsDzhl6XsHXeVmzPUG1LFeYQ9RQO6/S+7b3FTdOJToYqBwuGssGo0FasGB1o1J25+3EXZus3J/5h9nlonpkG/dks+UYc8rQJGc+r+L2fNEJ96EqvRTXhfxHSQ/JSmW+UQwbdnwEAAAAAAAAAAIA/jX8Bd4tF8+9SMoUAAAAASUVORK5CYII="
+        alt="dotEnv" style="width: 150px;">
+        <img src="https://pbs.twimg.com/profile_images/689189555765784576/3wgIDj3j_400x400.png" alt="Heroku" style="width: 150px;">
+    </div>
+    <img src="../document/images/Screenshot 2024-03-06 201115.png" alt="file" style="width: 600px;">
+</div>
+</section></section>
+<section>
+<section id="what-is-the-problem" class="title-slide slide level1">
+<h1>What is the problem?</h1>
+
+</section>
+<section id="public-repositories" class="slide level2">
+<h2>Public Repositories</h2>
+<p><img
+data-src="https://c.pxhere.com/images/8c/1c/8f63e4cf7cd36305b8f6812e0b05-1444327.jpg!d" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo by <strong><a href="https://pxhere.com/en/photographer/767067?utm_content=clipUser&utm_medium=referral&utm_source=pxhere">mohamed_hassan</a></strong> from <strong><a href="https://pxhere.com/en/photo/1444327?utm_content=clipUser&utm_medium=referral&utm_source=pxhere">PxHere</a></strong></p>
+</div>
+</section>
+<section id="why-that-is-a-problem" class="slide level2">
+<h2>Why that is a problem?</h2>
+<p><span class="fragment fade-in"> <strong>Sensitive data</strong> in
+public repositories</span></p>
+<center>
+<ul style="width:50%;">
+<li class="fragment fade-in"> <strong>Passwords</strong></li>
+<li class="fragment fade-in"> <strong>API keys</strong></li>
+<li class="fragment fade-in"> <strong>Database credentials</strong></li>
+<li class="fragment fade-in"> <strong>Tokens</strong></li>
+</ul>
+</center>
+</section>
+<section id="but-wait" class="slide level2">
+<h2>But wait…</h2>
+<p>there are .env.example file right?</p>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20094823.png" /></p>
+</section>
+<section id="yes-they-are" class="slide level2">
+<h2>Yes they are…</h2>
+<div style = "display: flex; justify-content: center; gap: 10px; align-items: center;">
+    <img src="../document/images/Screenshot 2024-03-07 095201.png" alt="" style="width: 300px; height:100px;">
+    <img src="../document/images/Screenshot 2024-03-07 095217.png" alt="" style="height: 600px;">
+</div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="solution---mvp" class="title-slide slide level1">
+<h1>Solution - MVP</h1>
+
+</section>
+<section id="characteristics" class="slide level2">
+<h2>Characteristics</h2>
+<center>
+<ul style="width:50%;">
+<li class="fragment fade-in"> <strong>Secure</strong></li>
+<li class="fragment fade-in"> <strong>Easy</strong></li>
+<li class="fragment fade-in"> <strong>Fast</strong></li>
+<li class="fragment fade-in"> <strong>Reliable</strong></li>
+<li class="fragment fade-in"> <strong>Scalable</strong></li>
+<li class="fragment fade-in"> <strong>Open Source</strong></li>
+</ul>
+</center>
+</section>
+<section id="the-cli-tool" class="slide level2">
+<h2>The CLI tool</h2>
+<figure>
+<img data-src="../document/images/Screenshot%202024-03-07%20095918.png"
+alt="MVP" />
+<figcaption aria-hidden="true">MVP</figcaption>
+</figure>
+</section>
+<section id="not-ideal-but-helpful" class="slide level2">
+<h2>Not ideal but helpful</h2>
+<figure>
+<img data-src="../document/images/Screenshot%202024-03-07%20100053.png"
+alt=".env.example" />
+<figcaption aria-hidden="true">.env.example</figcaption>
+</figure>
+<p><a
+href="https://github.com/KacperKotlewski/strapi_postgres_docker">github.com/KacperKotlewski/strapi_postgres_docker</a></p>
+</section>
+<section id="summary-of-mvp" class="slide level2">
+<h2>Summary of MVP</h2>
+<center>
+<ul style="width:50%;">
+<li class="fragment fade-in"> <strong>Secure?</strong> <span class="fragment fade-in">Yes</span></li>
+<li class="fragment fade-in"> <strong>Easy?</strong> <span class="fragment fade-in">To use as CLI,<br> not to implement</span></li>
+<li class="fragment fade-in"> <strong>Fast?</strong> <span class="fragment fade-in">Yes</span></li>
+<li class="fragment fade-in"> <strong>Reliable</strong> <span class="fragment fade-in">No</span></li>
+<li class="fragment fade-in"> <strong>Scalable</strong> <span class="fragment fade-in">Maybe</span></li>
+<li class="fragment fade-in"> <strong>Open Source?</strong> <span class="fragment fade-in">Not realy</span></li>
+</ul>
+</center>
+</section></section>
+<section>
+<section id="solution" class="title-slide slide level1">
+<h1>Solution</h1>
+
+</section>
+<section id="new-approach" class="slide level2">
+<h2>New approach</h2>
+<center>
+<ul style="width:50%;">
+<li class="fragment fade-in"> <strong>New "schema" format</strong></li>
+<li class="fragment fade-in"> <strong>Better CLI tool</strong>
+    <ul style="">
+    <li class="fragment fade-in"> <strong>Create .env from "schema"</strong></li>
+    <li class="fragment fade-in"> <strong>Create "schema" from .env</strong></li>
+    </ul>
+</li>
+<li class="fragment fade-in"> <strong>Open Source</strong></li>
+</ul>
+</section>
+<section id="schema-format" class="slide level2">
+<h2>Schema format</h2>
+<p><img src="../document/images/Screenshot 2024-03-07 101930.png" alt="schema" style="height: 1000px;"></p>
+</section>
+<section id="new-cli-tool" class="slide level2">
+<h2>New CLI tool</h2>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20102337.png" /></p>
+</section>
+<section id="new-framework" class="slide level2">
+<h2>New Framework</h2>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20102518.png" /></p>
+</section></section>
+<section>
+<section id="why-new-cli-framework" class="title-slide slide level1">
+<h1>Why new CLI framework?</h1>
+
+</section>
+<section id="because-it-is-not" class="slide level2">
+<h2>Because it is not</h2>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20102635.png" /></p>
+</section>
+<section id="gui-one-day" class="slide level2">
+<h2>GUI one day</h2>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20105506.png" /></p>
+</section>
+<section id="how-to-implement" class="slide level2">
+<h2>How to implement?</h2>
+<h3 id="command">Command</h3>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20110528.png" /></p>
+</section>
+<section id="how-to-implement-1" class="slide level2">
+<h2>How to implement?</h2>
+<h3 id="interface">Interface</h3>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20110709.png" /></p>
+</section></section>
+<section>
+<section id="what-about-tool" class="title-slide slide level1">
+<h1>What about tool?</h1>
+
+</section>
+<section id="create-.env-from-schema" class="slide level2">
+<h2>Create .env from “schema”</h2>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20111222.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20111516.png" /></p>
+</section>
+<section class="slide level2">
+
+<h3 id="results">Results</h3>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20111618.png" /></p>
+</section>
+<section id="create-schema-from-.env" class="slide level2">
+<h2>Create “schema” from .env</h2>
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20111855.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-02-28%20235850.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20112120.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20112144.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20112250.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20112610.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20112641.png" /></p>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="../document/images/Screenshot%202024-03-07%20113231.png" /></p>
+</section></section>
+<section>
+<section id="summary" class="title-slide slide level1">
+<h1>Summary</h1>
+
+</section>
+<section id="new-cli-tool-is" class="slide level2">
+<h2>New CLI tool is</h2>
+<center>
+<ul style="width:50%;">
+<li class="fragment fade-in"> <strong>Secure</strong></li>
+<li class="fragment fade-in"> <strong>Easy</strong></li>
+<li class="fragment fade-in"> <strong>Fast</strong></li>
+<li class="fragment fade-in"> <strong>Reliable</strong></li>
+<li class="fragment fade-in"> <strong>Scalable</strong></li>
+<li class="fragment fade-in"> <strong>Open Source</strong></li>
+</ul>
+</center>
+<div class="fragment fade-in"> All objectives of the work were achieved and implemented, and an additional advantage not planned at the beginning of the work's creation was the forum added to the application. </div>
+</section>
+<section id="questions" class="slide level2">
+<h2>Questions?</h2>
+<p><img
+data-src="https://storage.needpix.com/rsynced_images/question-1015308_1280.jpg" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo from <strong><a href="https://www.needpix.com/photo/487659/question-question-mark-response-symbol-characters-help-request-note-punctuation-marks">needpix</a></strong></p>
+</div>
+</section>
+<section class="slide level2">
+
+<p><img
+data-src="https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA1L2pvYjk2NC0xMDVhLXYuanBn.jpg" /></p>
+<div style="font-size: 0.5em;">
+<p>Photo from <strong><a href="https://www.rawpixel.com/search/thanks%20you?page=1&path=_topics&sort=curated">rawpixel</a></strong></p>
+
+UNIVERSITY OF SILESIA IN KATOWICE FACULTY OF SCIENCE AND TECHNOLOGY,<br> AUGUST CHEŁKOWSKI INSTITUTE OF PHYSICS <br> Applied Computer Science
+</div>
+<p><strong>Kacper Kotlewski</strong></p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/reveal.js//dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="https://unpkg.com/reveal.js//plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js//plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js//plugin/zoom/zoom.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // reveal.js plugins
+        plugins: [
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>
